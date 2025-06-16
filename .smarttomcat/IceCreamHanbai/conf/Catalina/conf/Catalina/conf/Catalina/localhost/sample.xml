@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context docBase="C:\java_workspace\deployment directory">
+  <Resources cacheMaxSize="10240">
+    <PreResources base="C:/java/Hello World/out/production/Hello World" className="org.apache.catalina.webresources.DirResourceSet" webAppMount="/WEB-INF/classes"/>
+  </Resources>
+</Context>

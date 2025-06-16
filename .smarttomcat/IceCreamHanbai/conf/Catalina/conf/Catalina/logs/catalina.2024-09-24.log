@@ -1,0 +1,77 @@
+24-Sep-2024 17:33:03.297 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log Serverのバージョン名:     Apache Tomcat/9.0.85
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log Server ビルド:            Jan 5 2024 08:28:07 UTC
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log サーバーのバージョン番号: 9.0.85.0
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log OS 名:                    Windows 11
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log OS バージョン:            10.0
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log アーキテクチャ:           amd64
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:                C:\Program Files\Java\jdk-1.8\jre
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log JVM バージョン:           1.8.0_401-b10
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log JVM ベンダ:               Oracle Corporation
+24-Sep-2024 17:33:03.301 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:            C:\pleiades\2023-12\tomcat\9\conf\Catalina
+24-Sep-2024 17:33:03.302 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:            C:\pleiades\2023-12\tomcat\9
+24-Sep-2024 17:33:03.304 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log コマンドライン引数:       -Dcatalina.home=C:\pleiades\2023-12\tomcat\9
+24-Sep-2024 17:33:03.304 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log コマンドライン引数:       -Dcatalina.base=C:\pleiades\2023-12\tomcat\9\conf\Catalina
+24-Sep-2024 17:33:03.304 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log コマンドライン引数:       -Djava.io.tmpdir=C:\pleiades\2023-12\tomcat\9\conf\Catalina\temp
+24-Sep-2024 17:33:03.304 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log コマンドライン引数:       -Djava.util.logging.config.file=C:\pleiades\2023-12\tomcat\9\conf\Catalina\conf\logging.properties
+24-Sep-2024 17:33:03.304 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log コマンドライン引数:       -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+24-Sep-2024 17:33:03.304 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log コマンドライン引数:       -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2024.1\lib\idea_rt.jar=62465:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2024.1\bin
+24-Sep-2024 17:33:03.304 情報 [main] org.apache.catalina.startup.VersionLoggerListener.log コマンドライン引数:       -Dfile.encoding=UTF-8
+24-Sep-2024 17:33:03.308 情報 [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent 商用環境に最適な性能を発揮する APR ベースの Tomcat ネイティブライブラリが java.library.path [C:\Program Files\Java\jdk-1.8\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\MySQL\MySQL Server 5.0\bin;C:\Program Files\dotnet\;C:\Users\pipit\AppData\Local\Microsoft\WindowsApps;C:\Users\pipit\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\Java\jdk-1.8\bin;;.] に存在しません。
+24-Sep-2024 17:33:03.909 情報 [main] org.apache.coyote.AbstractProtocol.init プロトコルハンドラ ["http-nio-8080"] を初期化します。
+24-Sep-2024 17:33:03.929 重大 [main] org.apache.catalina.util.LifecycleBase.handleSubClassException コンポーネント [Connector["http-nio-8080"]] の初期化に失敗しました
+	org.apache.catalina.LifecycleException: プロトコルハンドラの初期化に失敗しました
+		at org.apache.catalina.connector.Connector.initInternal(Connector.java:1011)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:127)
+		at org.apache.catalina.core.StandardService.initInternal(StandardService.java:554)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:127)
+		at org.apache.catalina.core.StandardServer.initInternal(StandardServer.java:1039)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:127)
+		at org.apache.catalina.startup.Catalina.load(Catalina.java:724)
+		at org.apache.catalina.startup.Catalina.load(Catalina.java:746)
+		at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+		at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+		at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+		at java.lang.reflect.Method.invoke(Method.java:498)
+		at org.apache.catalina.startup.Bootstrap.load(Bootstrap.java:307)
+		at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:477)
+	Caused by: java.net.BindException: Address already in use: bind
+		at sun.nio.ch.Net.bind0(Native Method)
+		at sun.nio.ch.Net.bind(Net.java:438)
+		at sun.nio.ch.Net.bind(Net.java:430)
+		at sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:225)
+		at org.apache.tomcat.util.net.NioEndpoint.initServerSocket(NioEndpoint.java:276)
+		at org.apache.tomcat.util.net.NioEndpoint.bind(NioEndpoint.java:231)
+		at org.apache.tomcat.util.net.AbstractEndpoint.bindWithCleanup(AbstractEndpoint.java:1332)
+		at org.apache.tomcat.util.net.AbstractEndpoint.init(AbstractEndpoint.java:1345)
+		at org.apache.coyote.AbstractProtocol.init(AbstractProtocol.java:654)
+		at org.apache.coyote.http11.AbstractHttp11Protocol.init(AbstractHttp11Protocol.java:75)
+		at org.apache.catalina.connector.Connector.initInternal(Connector.java:1009)
+		... 13 more
+24-Sep-2024 17:33:03.935 情報 [main] org.apache.catalina.startup.Catalina.load サーバーの初期化 [838] ミリ秒
+24-Sep-2024 17:33:04.135 情報 [main] org.apache.catalina.core.StandardService.startInternal サービス [Catalina] を起動します
+24-Sep-2024 17:33:04.137 情報 [main] org.apache.catalina.core.StandardEngine.startInternal サーブレットエンジンの起動：[Apache Tomcat/9.0.85]
+24-Sep-2024 17:33:04.211 情報 [main] org.apache.catalina.startup.HostConfig.deployDescriptor 配備記述子 [C:\pleiades\2023-12\tomcat\9\conf\Catalina\conf\Catalina\localhost\sample.xml] を配備します
+24-Sep-2024 17:33:05.161 情報 [main] org.apache.jasper.servlet.TldScanner.scanJars 少なくとも1つのJARでTLDをスキャンしましたが、TLDが含まれていませんでした。スキャンしたもののTLDが見つからなかったJARの完全なリストについては、このロガーのデバッグログを有効にしてください。スキャン中に不要なJARをスキップすると、起動時間とJSPのコンパイル時間が短縮されます。
+24-Sep-2024 17:33:05.385 情報 [main] org.apache.catalina.startup.HostConfig.deployDescriptor 配備記述子 [C:\pleiades\2023-12\tomcat\9\conf\Catalina\conf\Catalina\localhost\sample.xml] の展開が [1,168] ミリ秒で完了しました
+24-Sep-2024 17:33:05.407 情報 [main] org.apache.catalina.startup.Catalina.start サーバーの起動 [1471] ミリ秒
+24-Sep-2024 17:33:05.412 重大 [main] org.apache.catalina.core.StandardServer.await アドレス [localhost] のポート番号 [8005] にサーバー停止ソケットを作成できませんでした (基本ポート番号は [8005]、オフセットは [0] です)
+	java.net.BindException: Address already in use: JVM_Bind
+		at java.net.DualStackPlainSocketImpl.bind0(Native Method)
+		at java.net.DualStackPlainSocketImpl.socketBind(DualStackPlainSocketImpl.java:102)
+		at java.net.AbstractPlainSocketImpl.bind(AbstractPlainSocketImpl.java:513)
+		at java.net.PlainSocketImpl.bind(PlainSocketImpl.java:180)
+		at java.net.ServerSocket.bind(ServerSocket.java:375)
+		at java.net.ServerSocket.<init>(ServerSocket.java:237)
+		at org.apache.catalina.core.StandardServer.await(StandardServer.java:581)
+		at org.apache.catalina.startup.Catalina.await(Catalina.java:864)
+		at org.apache.catalina.startup.Catalina.start(Catalina.java:810)
+		at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+		at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+		at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+		at java.lang.reflect.Method.invoke(Method.java:498)
+		at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:347)
+		at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:478)
+24-Sep-2024 17:33:05.417 情報 [main] org.apache.coyote.AbstractProtocol.pause ProtocolHandler ["http-nio-8080"] を一時停止します。
+24-Sep-2024 17:33:05.417 情報 [main] org.apache.catalina.core.StandardService.stopInternal サービス [Catalina] を停止します
+24-Sep-2024 17:33:05.443 情報 [main] org.apache.coyote.AbstractProtocol.stop ProtocolHandler ["http-nio-8080"]の停止中
+24-Sep-2024 17:33:05.444 情報 [main] org.apache.coyote.AbstractProtocol.destroy ProtocolHandler ["http-nio-8080"] を破棄します。
