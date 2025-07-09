@@ -1,0 +1,264 @@
+@charset "utf-8";
+body{
+    font-size: 1.4rem;
+}
+
+div#text-box{
+    display: flex;
+    width: fit-content;
+    margin: 0px auto 20px 30px;
+    label{
+        font-size: 1.2rem;
+    }
+    input{
+        margin-right: 20px;
+        font-size: 1.2rem;
+    }
+}
+
+div#button-box{
+    width: fit-content;
+    display: flex;
+    margin: 0 30px auto auto;
+}
+
+div#button-box button{
+    margin-right: 50px;
+    padding: 5px 25px;
+}
+
+button.normal-button{
+    background-color: white;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 5px 10px;
+    transition: 0.3s;
+}
+button.normal-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+button.submit{
+    background-color: aqua;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 5px 15px;
+    transition: 0.3s;
+}
+button.submit:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+div.back-button-holder{
+    display: flex;
+    width: fit-content;
+    margin: 0px 2.3% 20px auto;
+}
+
+button.delete-button{
+    background-color: orangered;
+    border-radius: 5px;
+    font-size: 1.6rem;
+    border-width: 1px;
+    padding: 0 15px 0 15px;
+    transition: 1s;
+}
+button.delete-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 red, 10px 6px 20px 0 #00000030;
+}
+
+p.staff-id{
+    font-size: 1.4rem;
+    width: 150px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+p.staff-name{
+    font-size: 1.4rem;
+}
+
+div#header{
+    display: flex;
+}
+
+button#btn-add{
+    background-color: white;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 0 30px 0 30px;
+    transition: 0.3s;
+}
+button#btn-add:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+div#staff-main-container{
+    height: 440px;
+    border-radius: 7px;
+    width: 95%;
+    margin: auto auto 30px auto;
+    overflow-y: auto; 
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.staff-box {
+    display: flex; 
+    align-items: center;
+    background: #f2f2f2;
+    border: 1px solid #aaa;
+    border-radius: 10px;
+    padding: 20px 10px;
+    margin-bottom: 10px;
+}
+
+.staff-box .label {
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 1.2rem;
+    margin-right: 10px;
+}
+
+.staff-box .text {
+    flex: 1;
+    font-size: 13px;
+    color: #333;
+}
+
+.staff-box:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033;
+}
+
+.label{
+    font-size: 20px;
+    display: inline-block;
+    text-align: left;
+    width: 80px;
+}
+.value{
+    font-size: 20px;
+    display: inline-block;
+    text-align: left;
+}
+.datetime-local{
+    display: inline-block;
+    text-align: left;
+    flex: 1;
+}
+
+td.longer-table-text{
+    max-width: 200px;
+}
+
+th{
+    text-align: right;
+    padding-right: 20px;
+    padding-bottom: 10px;
+}
+
+.form_row {
+    font-size: 20px;
+    display: flex;
+    align-items: center; 
+    margin-bottom: 15px;  
+}
+
+.form_row label {
+    display: inline-block;
+    text-align: left;
+    width: 120px;        
+}
+
+.form_row input {
+    margin-left: 30px; 
+    width: 250px;        
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form_row input:focus {
+    border-color: #007BFF;
+}
+
+/* POP-UPのCSS */
+
+.popup{
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 15;
+    width: 50%;
+    padding: 10px 50px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-color: white;
+    font-size: 1.2rem;
+    table{
+        width: fit-content;
+        margin: auto auto 30px auto;
+    }
+}
+ 
+.popup.active{
+    display: block;
+}
+
+div#obfuscation-banner{
+    display: none;  /* flexとnoneを切り替える */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0006;
+    z-index: 2;
+}
+
+.stop-scrolling {   /*ポップアップが出たら後ろのページをスクロールさせないためにbodyにclassを付ける*/
+  height: 100%;
+  overflow: hidden;
+}
+
+.close{
+    padding-right: 20px;
+    cursor: pointer;
+    margin: auto 20px auto auto;
+}
+.popup_header{
+    display: flex;
+    justify-content: space-between;
+    margin-left: 10px;
+}
+.popup_body{
+    justify-items: center;
+    margin-bottom: 20px;
+    padding: 0 0 0 15px;
+}
+
+.popup_body label{
+    display: block;
+    margin: 15px 0 10px 0;
+}
+
+.popup_footer{
+    margin-top: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+

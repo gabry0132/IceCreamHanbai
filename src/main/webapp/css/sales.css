@@ -1,0 +1,319 @@
+div#everything-wrapper{
+    display: flex;
+    flex-direction: column;
+    font-size: 1.2rem;
+}
+
+div#top-text-holder {
+  display: flex;
+  margin-bottom: 10px;
+  span{
+    width: fit-content;
+    margin: auto 10% auto auto;
+    border-bottom: 1px solid yellowgreen;
+    padding: 0px 5px;
+    /* border: 1px solid black ; */
+  }
+}
+
+div#top-area-container{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+p#close:hover{
+    cursor : pointer;
+}
+
+div#search-params-container{
+    display: flex;
+    width: fit-content;
+}
+
+div#search-buttons-holder{
+    display: flex;
+    flex-direction: column;
+    margin: auto auto auto 30px;
+    button{
+        margin-bottom: 5px;
+    }
+}
+
+div.back-button-holder{
+    display: flex;
+    width: fit-content;
+    margin: 0px 2.3% 20px auto;
+}
+
+button.submit{
+    background-color: aqua;
+    font-size: 1rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 5px 10px;
+    transition: 0.3s;
+}
+button.submit:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+button#reset-search{
+    font-size: 1rem;
+}
+
+button.normal-button, button.edit-button, button.delete-button{
+    background-color: white;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 5px 10px;
+    transition: 0.3s;
+}
+button.normal-button:hover, button.edit-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+button.edit-button{
+    background-color: aliceblue;
+    height: fit-content;
+}
+
+button.delete-button{
+    background-color: orangered;
+    border-radius: 5px;
+    height: fit-content;
+    transition: 0.3s;
+}
+button.delete-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 red, 10px 6px 20px 0 #00000030;
+}
+
+div#pulldown-menus-container{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: 0px 30px;
+    select{
+        font-size: 1.4rem;
+        margin: 2%;
+    }
+}
+
+div#date-menus-container{
+    display: flex;
+    width: fit-content;
+}
+
+div.date-row-wrapper{
+    display: flex;
+    width: 100%;
+    margin: 2%;
+    input{
+        font-size: 1.4rem;
+    }
+    p{
+        font-size: 1rem;
+        margin: 0px 5px;
+    }
+}
+
+button#btn-add{
+    margin-right: 7%;
+}
+
+p#page-selector{
+    font-size: 1rem;
+    text-align: center;
+    span{
+        font-size: 0.8rem;
+    }
+}
+
+/* ���ꂩ��͔���f�[�^1���R�[�h���̐ݒ� */
+
+div.sale-box{
+    display: flex;
+    width: 95%;
+    margin: auto auto 20px auto;
+    border: 2px solid black;
+    border-radius: 10px;
+    justify-content: space-between;
+    font-size: 1.2rem;
+}
+
+div.sale-image-txt-holder, div.sale-button-box{
+    display: flex;
+    width: fit-content;
+    margin: 5px;
+    p{
+        width: fit-content;
+        margin: auto;
+    }
+    button{
+        margin: auto 10px;
+    }
+}
+
+a.image-wrapper-anchor{
+    display: block;
+    line-height: 0;
+}
+
+img.sale-image{
+    border: 0.5px solid black;
+    border-radius: 7px;
+    margin: 2px 25px 2px 5px;
+}
+
+form.deleteForm{
+    display: flex;
+}
+
+/* popup�̐ݒ� */
+div#black-background{
+    display: none;  /* flex��none��؂�ւ��� */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0006;
+    z-index: 2;
+}
+
+div#create-popup{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    display: none;  /* flex��none��؂�ւ��� */
+    z-index: 15;
+    width: 50%;
+    flex-direction: column;
+    padding: 10px 50px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-color: white;
+    font-size: 1.2rem;
+}
+
+div#create-pop-contents{
+    width: 60%;
+    margin: 0 auto 30px auto;
+}
+
+div#create-title-section{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+div#create-top-section{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+
+    select{
+        font-size: 1.2rem;
+        margin: auto;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+div#create-middle-section{
+    width: fit-content;
+    margin: 20px auto;
+}
+input.sale-quantity-input{
+    font-size: 1.2rem;
+}
+input.sale-staff{
+    font-size: 1.2rem;
+}
+
+td.table-left-side{
+    width: 120px;
+}
+
+div#create-buttons-holder{
+    width: fit-content;
+    margin: auto;
+    button{
+        margin: 10px 40px;
+    }
+}
+
+input.sale-time-textbox{
+    display: none; /* none��flex������������ */
+}
+
+/* popup(edit)�̐ݒ� */
+div#black-background{
+    display: none;  /* flex��none��؂�ւ��� */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0006;
+    z-index: 2;
+}
+
+div#edit-popup{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    display: none;  /* flex��none��؂�ւ��� */
+    z-index: 15;
+    width: 50%;
+    flex-direction: column;
+    padding: 10px 50px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-color: white;
+    font-size: 1.2rem;
+    z-index: 5;
+}
+div#edit-pop-contents{
+    width: 60%;
+    margin: 0 auto 30px auto;
+}
+div#edit-title-section{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+div#edit-top-section{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+
+    select{
+        height: 20px;
+        margin: auto;
+        justify-content: center;
+        align-items: center;
+    }
+}
+div#edit-middle-section{
+    width: fit-content;
+    margin: auto;
+}
+div#edit-buttons-holder{
+    width: fit-content;
+    margin: auto;
+    button{
+        margin: 10px 40px;
+    }
+}

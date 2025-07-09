@@ -1,0 +1,233 @@
+div#top-area-container{
+    display: flex;
+}
+
+div#search-params-container{
+    width: fit-content;
+    margin-left: 60px;
+}
+
+div#text-boxes-container{
+    width: fit-content;
+}
+
+div#text-boxes-container input.search-param-textfield{
+    display: inline;
+    font-size: 1.6rem;
+}
+
+div#text-boxes-container p.search-param-intro{
+    display: inline;
+    font-size: 1.6rem;
+    padding-left: 12px;
+}
+
+div#pulldown-menus-container{
+    display: flex;
+    width: fit-content;
+    margin-top: 15px;
+}
+
+div#pulldown-menus-container select{
+    margin: 0 10px;
+    font-size: 1.4rem;
+
+}
+
+div#search-buttons-holder{
+    display: flex;
+    width: fit-content;
+    flex-direction: column;
+    margin-left: 20px;
+    button{
+        margin: 5px;
+    }
+}
+
+button.submit{
+    background-color: aqua;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 5px 10px;
+    transition: 0.3s;
+}
+button.submit:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+button.normal-button{
+    background-color: white;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 5px 10px;
+    transition: 0.3s;
+}
+button.normal-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+form#search-form{
+    display: flex;
+}
+
+div#page-controls-holder{
+    width: fit-content;
+    display: flex;
+    margin: 0 30px auto auto;
+    button{
+        margin: 0 7px;
+    }
+}
+
+div#bottom-buttons-container{
+    display: flex;
+    width: fit-content;
+    margin:37px 37px 75px auto;
+}
+
+/* 商品一覧はここからです */
+
+div#all-products-container{
+    width: 95%;
+    margin: auto;
+    margin-top: 60px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+div.product-container{
+    width: 23.8%; /* 画面は100％じゃなくて、親要素です */
+    display: flex;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    border: 1px solid;
+    border-radius: 15px;
+    transition: 0.3s;
+    table{
+        margin: 7px;
+        width: 100%;
+    }
+}
+div.product-container:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+table tr td.instock-quantity-holder{
+    text-align: right;
+}
+
+table tr td.product-image-holder{
+    width: 10%; /* 画像側を短くする */
+}
+
+span{
+    color: orangered;
+}
+
+/* 商品追加のポップアップの設定はここから */
+
+.stop-scrolling {   /*ポップアップが出たら後ろのページをスクロールさせないためにbodyにclassを付ける*/
+  height: 100%;
+  overflow: hidden;
+}
+
+p.closure{
+    cursor: pointer;
+}
+
+div#obfuscation-banner{
+    display: none;  /* flexとnoneを切り替える */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0006;
+    z-index: 2;
+}
+
+div#add-product-popup{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    display: none;  /* flexとnoneを切り替える */
+    z-index: 15;
+    width: 50%;
+    flex-direction: column;
+    padding: 10px 50px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-color: white;
+    font-size: 1.2rem;
+}
+
+div#add-top-row{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+div#add-main-section{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+}
+
+div#add-right-side{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: 40%;
+    margin-left: 10px;
+}
+
+div#add-image-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+div#add-tables-wrapper{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+    justify-content: space-between;
+    table{
+        margin: 10px 20px;
+    }
+}
+
+div#add-buttons-holder{
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    margin: 20px auto;
+    button{
+        font-size: 1.4rem;
+    }
+}
+
+p.hint{
+    margin-top: 5px;
+    color: cadetblue;
+    font-size: 0.8rem;
+}
+
+td.table-left-side{
+    width: 150px;
+}
+
+span.optional-parameter-wrapper{
+    font-size: 0.8rem;
+}
