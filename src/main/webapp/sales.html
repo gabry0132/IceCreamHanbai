@@ -22,7 +22,7 @@
 
                     <div id="pulldown-menus-container">
                         
-                        <select name="product" id="product">
+                        <select name="product" id="product-Search">
                             <option hidden disabled selected value>商品を選択</option>
                             <option value="1">0001 ガリガリ君</option>
                             <option value="2">0002 </option>
@@ -31,7 +31,7 @@
                             <option value="5">0005 </option>
                         </select>
 
-                        <select name="staff" id="staff">
+                        <select name="staff" id="staff-Search">
                             <option hidden disabled selected value>販売の人事</option>
                             <option value="1">ヨウさん</option>
                             <option value="2">ガブさん</option>
@@ -158,7 +158,7 @@
             
             <div id="create-title-section">
                 <h2>売上データ作成</h2>
-                <p id="close" onclick="closeAllPopups()">✖</p>
+                <p class="close" onclick="closeAllPopups()">✖</p>
             </div>
 
             <div id="create-pop-contents">
@@ -220,7 +220,7 @@
             
             <div id="edit-title-section">
                 <h2>売上データ修正</h2>
-                <p id="close" onclick="closeAllPopups()">✖</p>
+                <p class="close" onclick="closeAllPopups()">✖</p>
             </div>
     
             <div id="edit-pop-contents">

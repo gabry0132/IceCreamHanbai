@@ -21,7 +21,7 @@ div#top-area-container{
     justify-content: space-between;
     margin-bottom: 30px;
 }
-p#close:hover{
+p.close:hover{
     cursor : pointer;
 }
 
