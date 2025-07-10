@@ -1,3 +1,90 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.ArrayList"%>
+<%
+//    request.setCharacterEncoding("UTF-8");
+//    response.setCharacterEncoding("UTF-8");
+
+//    String logout = request.getParameter("logout");
+//    if(logout != null){
+//        session.removeAttribute("userID");
+//    }
+//    String userID = (String) session.getAttribute("userID");
+//
+//    if(userID != null){
+//        response.sendRedirect("main.jsp");
+//    }
+
+    //データベースに接続するために使用する変数宣言
+    Connection con = null;
+    Statement stmt = null;
+    StringBuffer sql = null;
+    ResultSet rs = null;
+
+    //ローカルのMySqlに接続する設定
+    String user = "root";
+    String password = "root";
+    String url = "jdbc:mysql://localhost/minishopping_site";
+    String driver = "com.mysql.jdbc.Driver";
+
+    //確認メッセージ
+    StringBuffer ermsg = null;
+
+    HashMap<String,String> product = null;
+    ArrayList<HashMap<String,String>> productsList = new ArrayList<>();
+
+    try {
+
+        //オブジェクトの代入
+        Class.forName(driver).newInstance();
+        con = DriverManager.getConnection(url, user, password);
+        stmt = con.createStatement();
+
+        sql = new StringBuffer();
+        sql.append("select productID, name, quantity, alertNumber image from products ");
+        sql.append("where deleteFlag = 0");
+
+        rs = stmt.executeQuery(sql.toString());
+
+        while(rs.next()){
+            product = new HashMap<String,String>();
+            product.put("productID", rs.getString("productID"));
+            product.put("name", rs.getString("name"));
+            product.put("quantity", rs.getString("purchaseCost"));
+            product.put("image", rs.getString("image"));
+            product.put("alertNumber", rs.getString("alertNumber"));
+
+            productsList.add(product);
+        }
+
+    } catch(ClassNotFoundException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }catch(SQLException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }catch(Exception e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }
+    finally{
+        try{
+            if(rs != null){
+                rs.close();
+            }
+            if(stmt != null){
+                stmt.close();
+            }
+            if(con != null){
+                con.close();
+            }
+        }catch(SQLException e){
+            ermsg = new StringBuffer();
+            ermsg.append(e.getMessage());
+        }
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,270 +167,50 @@
 
         </div>
 
-        <div id="all-products-container">
+        <% if(productsList.isEmpty()){ %>
 
-            <!--商品箱の幅が固定だから長い商品名がカットされる。分かるようにdiv全体にtitleを付けます。ほーばーすると表示される-->
-            <div class="product-container" title="板チョコアイス">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice1.png" width="90" height="90" alt="ice1">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">板チョコアイス</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">10個</td>
-                    </tr>
-                </table>
+            <h4>商品データがありません。</h4>
+
+        <% } else { %>
+
+            <div id="all-products-container">
+
+                <!--商品箱の幅が固定だから長い商品名がカットされる。分かるようにdiv全体にtitleを付けます。ほーばーすると表示される-->
+                <% for (int i = 0; i < productsList.size(); i++) { %>
+
+                    <%
+                        boolean showAlert = false;
+                        if(Integer.parseInt(productsList.get(i).get("quantity")) < Integer.parseInt(productsList.get(i).get("alertNumber"))){
+                            showAlert = true;
+                        }
+                    %>
+
+                    <div class="product-container<% if(showAlert){ %> showAlert<% } %>" title="<%= productsList.get(i).get("name") %>">
+                        <table class="product-table">
+                            <tr>
+                                <td class="product-image-holder" rowspan="4">
+                                    <img src="images/<%= productsList.get(i).get("image") %>" width="90" height="90" alt="<%= productsList.get(i).get("name") %>">
+                                </td>
+                                <td class="product-ID-holder">ID: <%=productsList.get(i).get("productID")%></td> <!--本来は直接出力、今はJSで-->
+                            </tr>
+                            <tr>
+                                <td class="product-name-holder"><%= productsList.get(i).get("name")%></td>
+                            </tr>
+                            <tr>
+                                <td class="instock-intro-holder">在庫数<%if(showAlert){ %> ⚠<% } %></td>
+                            </tr>
+                            <tr>
+                                <td class="instock-quantity-holder"><%= productsList.get(i).get("quantity") %>個</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                <% } %>
+
             </div>
 
-            <div class="product-container" title="ブルガリア フローズンヨーグルトデザート">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice2.jpg" width="90" height="90" alt="ice2">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">ブルガリア フローズンヨーグルトデザート</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">20個</td>
-                    </tr>
-                </table>
-            </div>
+        <% } %>
 
-            <div class="product-container" title="じゃがいも　もなか">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice3.jpg" width="90" height="90" alt="ice3">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">じゃがいも　もなか</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">20個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="Häagen-Dazs 　バニラチョコレートマカデミア">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice4.jpg" width="90" height="90" alt="ice4">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">Häagen-Dazs 　バニラチョコレートマカデミア</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">4個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="PARM (chocolate)">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice5.jpg" width="90" height="90" alt="ice5">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">PARM (chocolate)</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">10個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="サクレ（もも＆いちご＆りんご）">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice6.jpg" width="90" height="90" alt="ice6">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">サクレ（もも＆いちご＆りんご）</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">40個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="午後の紅茶フローズンティーラテ">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice7.jpg" width="90" height="90" alt="ice2">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">午後の紅茶フローズンティーラテ</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">17個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="ごろろん果肉白桃タルトバー">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice8.jpg" width="90" height="90" alt="ice8">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">ごろろん果肉白桃タルトバー</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">8個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="chocomint/クールアイスバー">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice9.jpg" width="90" height="90" alt="ice9">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">chocomint/クールアイスバー</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">10個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="白くま">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice10.jpg" width="90" height="90" alt="ice10">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">白くま</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">26個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="ビスケットサンド">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice11.jpg" width="90" height="90" alt="ice11">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">ビスケットサンド</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">10個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="雪見だいふく">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice12.jpg" width="90" height="90" alt="ice12">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">雪見だいふく</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">32個</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="product-container" title="ジャイアントコーン">
-                <table class="product-table">
-                    <tr>
-                        <td class="product-image-holder" rowspan="4">
-                            <img src="images/ice13.jpg" width="90" height="90" alt="ice13">
-                        </td>
-                        <td class="product-ID-holder">ID: </td> <!--本来は直接出力、今はJSで-->
-                    </tr>
-                    <tr>
-                        <td class="product-name-holder">ジャイアントコーン</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-intro-holder">在庫数</td>
-                    </tr>
-                    <tr>
-                        <td class="instock-quantity-holder">6個</td>
-                    </tr>
-                </table>
-            </div>
-
-        </div>
 
         <div id="bottom-buttons-container">
             <form action="main.html" method="post">
