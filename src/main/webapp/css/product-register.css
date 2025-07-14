@@ -1,0 +1,27 @@
+div#everything-wrapper{
+    font-size: 1.6rem;
+}
+
+h1{
+    margin: 10% auto 15% auto;
+    text-align: center;
+}
+
+button.normal-button{
+    background-color: white;
+    border-radius: 5px;
+    font-size: 1.6rem;
+    border-width: 1px;
+    padding: 0 30px 0 30px;
+    transition: 0.3s;
+}
+button.normal-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 20px 0 #00000030;
+}
+
+form{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+}

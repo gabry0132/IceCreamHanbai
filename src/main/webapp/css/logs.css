@@ -1,0 +1,172 @@
+@charset "utf-8";
+
+body {
+  font-family: sans-serif;
+  font-size: 1.4rem;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+#search-area {
+  display: flex;
+  margin-bottom: 20px;
+  
+}
+
+#search-area .search-row {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+}
+
+#search-area input[type="date"],
+#search-area button,
+#search-area select {
+  font-size: 1.2rem;
+  padding: 5px 10px;
+}
+#search-area select {
+  width: 250px;
+  margin-right: 10px;
+}
+
+label{
+  font-size: 1rem;
+}
+
+button.normal-button{
+  background-color: white;
+  border-radius: 5px;
+  font-size: 1rem;
+  border-width: 1px;
+  padding: 5px 10px;
+  transition: 0.3s;
+}
+button.normal-button:hover{
+  cursor: pointer;
+  box-shadow: 0 4px 8px 0 #00000033, 0 6px 20px 0 #00000030;
+}
+
+button.submit{
+  background-color: aqua;
+  font-size: 1rem;
+  border-radius: 7px;
+  border-width: 2px;  
+  padding: 0 30px 0 30px;
+  transition: 0.3s;
+}
+button.submit:hover{
+  cursor: pointer;
+  box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+form#search-form{
+  display: flex;
+}
+
+div#search-buttons-holder{
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  margin-left: 20px;
+  button{
+    margin: 5px;
+  }
+}
+
+div.back-button-holder{
+  display: flex;
+  width: fit-content;
+  margin: auto 4% 0px auto;
+  form button{
+    font-size: 1.2rem;
+  }
+}
+
+#log-list {
+  border: 1px solid #333;
+  padding: 10px;
+  margin-bottom: 30px;
+}
+
+.log-item {
+  display: flex;
+  align-items: center;
+  border: 1px solid #888;
+  border-radius: 10px;
+  padding: 20px 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  div{
+    font-size: 1.2rem;
+  }
+}
+
+.log-item .log-label {
+  background: #ccc;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 1.2rem;
+  margin-right: 10px;
+ 
+}
+
+.log-item .log-text {
+  flex-grow: 1;
+}
+
+.log-item .log-date {
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+.log-image {
+  margin-right: 10px;
+  vertical-align: middle;
+  border-radius: 7px;
+  border: 0.5px solid black;
+}
+
+/* 背景色 */
+.order {
+  background-color: #f4fcd9;
+}
+
+.product {
+  background-color: #eeeeee;
+}
+
+.sales {
+  background-color: #f6cccc;
+}
+
+.notice {
+  background-color: #d2e9ff;
+}
+
+/* .pagination {
+  text-align: center;
+  margin-top: 10px;
+}
+
+
+.pagination a {
+  margin: 0 5px;
+  font-size: 14px;
+  text-decoration: none;
+  color: #000;
+} */
+
+div#page-selector-wrapper{
+  margin-bottom: 80px;
+}
+
+p#page-selector{
+  font-size: 1rem;
+  text-align: center;
+  span{
+    font-size: 0.8rem;
+  }
+}

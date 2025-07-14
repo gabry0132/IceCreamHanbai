@@ -1,0 +1,46 @@
+div#everything-wrapper{
+    font-size: 1.2rem;
+}
+
+div#button-holder{
+    width: 70%;
+    margin: 10% auto 30px auto;
+    display: flex;
+    flex-direction: column;
+    form{
+        display: flex;
+    }
+}
+
+button.normal-button{
+    margin: 0 auto 20px auto;
+    width: 30%;
+    background-color: white;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 10px 20px;
+    transition: 0.3s;
+}
+button.normal-button:hover{
+  cursor: pointer;
+  box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+div#back-button-holder{
+    display: flex;
+    width: fit-content;
+    margin: 10px 5% 10px auto;
+}
+button#back-button{
+    background-color: white;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 1px;
+    padding: 5px 15px;
+    transition: 0.3s;
+}
+button#back-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
