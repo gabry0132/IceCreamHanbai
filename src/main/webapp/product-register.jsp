@@ -83,15 +83,15 @@
 
         } else if (registerType.equals("delete")) {
 
-            int deletedRows = 0;
+            int updatedRows = 0;
 
-            sql.append("delete from products where productID= ");
+            sql.append("update products set deleteFlag = 1 where productID= ");
             sql.append(productID);
             //System.out.println(sql.toString());
-            deletedRows = stmt.executeUpdate(sql.toString());
+            updatedRows = stmt.executeUpdate(sql.toString());
 
             //取得したデータを繰り返し処理を表示する
-            if (deletedRows == 0) {
+            if (updatedRows == 0) {
 
                 ermsg = new StringBuffer();
                 ermsg.append("商品の削除が失敗しました。");
