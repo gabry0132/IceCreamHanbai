@@ -1,3 +1,55 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%
+
+    //データベースに接続するために使用する変数宣言
+    Connection con = null;
+    Statement stmt = null;
+    StringBuffer sql = null;
+    ResultSet rs = null;
+
+    //ローカルのMySqlに接続する設定
+    String user = "root";
+    String password = "root";
+    String url = "jdbc:mysql://localhost/minishopping_site";
+    String driver = "com.mysql.jdbc.Driver";
+
+    //確認メッセージ
+    StringBuffer ermsg = null;
+
+
+
+
+
+
+
+    catch(ClassNotFoundException e){
+    ermsg = new StringBuffer();
+    ermsg.append(e.getMessage());
+    }catch(SQLException e){
+    ermsg = new StringBuffer();
+    ermsg.append(e.getMessage());
+    }catch(Exception e){
+    ermsg = new StringBuffer();
+    ermsg.append(e.getMessage());
+    }
+    finally{
+        try{
+            if(rs != null){
+            rs.close();
+            }
+            if(stmt != null){
+            stmt.close();
+            }
+            if(con != null){
+            con.close();
+            }
+        }catch(SQLException e){
+            ermsg = new StringBuffer();
+            ermsg.append(e.getMessage());
+        }
+    }
+%>
 <!DOCTYPE html>
 
 <html lang="ja">
