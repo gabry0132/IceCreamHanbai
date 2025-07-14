@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,7 +107,7 @@
         
         <!-- 非表示削除フォーム -->
         <form id="delete-form" action="product-confirm.html" method="post">
-            <input type="hidden" name="productID" value="17">
+            <input type="hidden" name="productID" value="<%=productID%>">
             <input type="hidden" name="registerType" value="delete">
         </form>
 

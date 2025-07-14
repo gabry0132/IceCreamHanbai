@@ -16,6 +16,19 @@
 //        response.sendRedirect("main.jsp");
 //    }
 
+    String status = request.getParameter("status");
+    //内容修正の場合は画像を削除する？
+    String productName = request.getParameter("name");
+    String maker = request.getParameter("maker");
+    String flavor = request.getParameter("flavor");
+    String type = request.getParameter("type");
+    String cost = request.getParameter("cost");
+    String price = request.getParameter("price");
+    String instockQuantity = request.getParameter("instockQuantity");
+    String alertNumber = request.getParameter("alertNumber");
+    String autoOrderLimit = request.getParameter("autoOrderLimit");
+    String autoOrderQuantity = request.getParameter("autoOrderQuantity");
+
     //データベースに接続するために使用する変数宣言
     Connection con = null;
     Statement stmt = null;
@@ -258,11 +271,11 @@
                             <td>
                                 <select name="maker" id="maker">
                                     <option hidden disabled selected value>メーカー</option>
-                                    <option value="akagi">akagi</option>
-                                    <option value="morinaga">morinaga</option>
-                                    <option value="meiji">meiji</option>
-                                    <option value="glico">glico</option>
-                                    <option value="lotte">lotte</option>
+                                    <option value="1">akagi</option>
+                                    <option value="2">morinaga</option>
+                                    <option value="3">meiji</option>
+                                    <option value="4">glico</option>
+                                    <option value="5">lotte</option>
                                 </select>
                             </td>
                         </tr>
@@ -271,9 +284,9 @@
                             <td>
                                 <select name="flavor" id="flavor">
                                     <option hidden disabled selected value>味</option>
-                                    <option value="vanilla">vanilla</option>
-                                    <option value="strawberry">strawberry</option>
-                                    <option value="chocolate">chocolate</option>
+                                    <option value="1">vanilla</option>
+                                    <option value="2">strawberry</option>
+                                    <option value="3">chocolate</option>
                                     <option value="lemon">lemon</option>
                                 </select>  
                             </td>
@@ -352,6 +365,43 @@
         let idHolders = document.getElementsByClassName("product-ID-holder");
         for (let i = 0; i < idHolders.length; i++) {
             idHolders[i].textContent += String(i).padStart(4, '0');
+        }
+
+        //最初からポップアップを表示すべきかどうか判断
+        let showAddPopup = "<%=status%>";
+        if(showAddPopup == "returnFromAdd"){
+            //フォーム内の値を設定する。
+            document.getElementById("name").value="<%=productName%>"
+            let makerSelectChildren = Array.from(document.getElementById("maker").children);
+            makerSelectChildren.forEach(option => {
+                if(option.value == <%=maker%>){
+                    option.setAttributeNode('selected', true);
+                    break;
+                }
+            });
+            let flavorSelectChildren = Array.from(document.getElementById("flavor").children);
+            flavorSelectChildren.forEach(option => {
+                if(option.value == <%=flavor%>){
+                    option.setAttributeNode('selected', true);
+                    break;
+                }
+            });
+            let typeSelectChildren = Array.from(document.getElementById("type").children);
+            typeSelectChildren.forEach(option => {
+                if(option.value == <%=type%>){
+                    option.setAttributeNode('selected', true);
+                    break;
+                }
+            });
+            document.getElementById("cost").value="<%=cost%>";
+            document.getElementById("price").value="<%=price%>";
+            document.getElementById("instockQuantity").value="<%=instockQuantity%>";
+            document.getElementById("alertNumber").value="<%=alertNumber%>";
+            document.getElementById("autoOrderLimit").value="<%=autoOrderLimit%>";
+            document.getElementById("autoOrderQuantity").value="<%=autoOrderQuantity%>";
+
+            //ポップアップを表示する
+            openAddPopup();
         }
 
         //イベントリスナーの設定
