@@ -118,7 +118,7 @@
 
                 <div id="left-section-wrapper">
 
-                    <img class="image" src="images/<%=imagePath%>" width="100" height="100" alt="<%=productName%>">
+                    <img class="image" src="images/<%=image%>" width="100" height="100" alt="<%=productName%>">
 
                 </div>
 
