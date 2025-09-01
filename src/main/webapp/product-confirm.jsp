@@ -39,8 +39,11 @@
         PrintWriter printWriterOut;
         printWriterOut = response.getWriter();
 
-        //出力場所
-        File uploads = new File("C:\\Users\\pipit\\IdeaProjects\\IceCreamHanbai\\src\\main\\webapp\\images");
+        //出力の場所を動的に指定する
+        String relativePath = "\\images";
+        String absolutePath = application.getRealPath(relativePath);
+        File uploads = new File(absolutePath);
+
         InputStream fileContent = imagePart.getInputStream();
 
         //現在時刻を取得してファイル名に設定する。
