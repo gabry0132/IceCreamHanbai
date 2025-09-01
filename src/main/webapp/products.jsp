@@ -241,7 +241,7 @@
     <!-- 商品追加ポップアップ -->
     <div id="add-product-popup">
 
-        <form action="product-confirm.html" method="post">
+        <form action="product-confirm.jsp" method="post" enctype="multipart/form-data">
 
             <div id="add-top-row">
                 
@@ -254,7 +254,8 @@
 
                 <div id="add-image-section">
 
-                    <input type="file" name="image" id="image"> 
+                    <!-- ファイルサイズは WEB-INF/web.xml に設定しています。 -->
+                    <input type="file" name="image" id="image" accept=".jpg, .png" required>
                     <p class="hint">＊画像の写真を<br>アップロードしてください</p>
 
                 </div>
@@ -264,12 +265,12 @@
                     <table class="add-table">
                         <tr>
                             <td class="add-table-left-side">商品名</td>
-                            <td><input type="text" name="name" id="name"></td>
+                            <td><input type="text" name="name" id="name" required></td>
                         </tr>
                         <tr>
                             <td>メーカー</td>
                             <td>
-                                <select name="maker" id="maker">
+                                <select name="maker" id="maker" required>
                                     <option hidden disabled selected value>メーカー</option>
                                     <option value="1">akagi</option>
                                     <option value="2">morinaga</option>
@@ -282,7 +283,7 @@
                         <tr>
                             <td>味</td>
                             <td>
-                                <select name="flavor" id="flavor">
+                                <select name="flavor" id="flavor" required>
                                     <option hidden disabled selected value>味</option>
                                     <option value="1">vanilla</option>
                                     <option value="2">strawberry</option>
@@ -294,7 +295,7 @@
                         <tr>
                             <td>種類</td>
                             <td>
-                                <select name="type" id="type">
+                                <select name="type" id="type" required>
                                     <option hidden disabled selected value>種類</option>
                                     <option value="bar">bar</option>
                                     <option value="cone">cone</option>
@@ -305,12 +306,12 @@
                         </tr>
                         <tr>
                             <td>購入コスト</td>
-                            <td><input type="text" name="cost" id="cost"></td>
+                            <td><input type="text" name="cost" id="cost" required></td>
                             <td>円</td>
                         </tr>
                         <tr>
                             <td>販売値段</td>
-                            <td><input type="text" name="price" id="price"></td>
+                            <td><input type="text" name="price" id="price" required></td>
                             <td>円</td>
                         </tr>
                     </table>
@@ -328,12 +329,12 @@
                         </tr>
                         <tr>
                             <td>自動発注限界</td>
-                            <td><input type="number" name="autoOrderLimit" id="autoOrderLimit" min="0" max="999"></td>
+                            <td><input type="number" name="autoOrderLimit" id="autoOrderLimit" min="0" max="999" required></td>
                             <td>個</td>
                         </tr>
                         <tr>
                             <td>自動発注個数</td>
-                            <td><input type="number" name="autoOrderQuantity" id="autoOrderQuantity" min="0" max="999"></td>
+                            <td><input type="number" name="autoOrderQuantity" id="autoOrderQuantity" min="0" max="999" required></td>
                             <td>個</td>
                         </tr>
                     </table>
@@ -376,21 +377,18 @@
             makerSelectChildren.forEach(option => {
                 if(option.value == <%=maker%>){
                     option.setAttributeNode('selected', true);
-                    break;
                 }
             });
             let flavorSelectChildren = Array.from(document.getElementById("flavor").children);
             flavorSelectChildren.forEach(option => {
                 if(option.value == <%=flavor%>){
                     option.setAttributeNode('selected', true);
-                    break;
                 }
             });
             let typeSelectChildren = Array.from(document.getElementById("type").children);
             typeSelectChildren.forEach(option => {
                 if(option.value == <%=type%>){
                     option.setAttributeNode('selected', true);
-                    break;
                 }
             });
             document.getElementById("cost").value="<%=cost%>";
