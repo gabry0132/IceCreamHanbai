@@ -18,6 +18,8 @@
     //確認メッセージ
     StringBuffer ermsg = null;
 
+    HashMap<String,String> order = null;
+    ArrayList<HashMap<String,String>> orderList = new ArrayList<>();
 
     try {
 
@@ -27,10 +29,22 @@
         stmt = con.createStatement();
 
         sql = new StringBuffer();
-        sql.append("select ");
+        sql.append("select orderID, productID, initiator, quantity, statDateTime, stoppedFlag from Orders");
+        sql.append("where deleteFlag = 0");
 
         rs = stmt.executeQuery(sql.toString());
 
+        while(rs.next()){
+            order = new HashMap<String,String>();
+            order.put("orderID", rs.getString("orderID"));
+            order.put("productID", rs.getString("productID"));
+            order.put("initiator", rs.getString("initiator"));
+            order.put("quantity", rs.getString("quantity"));
+            order.put("statDateTime", rs.getString("statDateTime"));
+            order.put("stoppedFlag", rs.getString("stoppedFlag"));
+
+            orderList.add(order);
+        }
 
 
     } catch(ClassNotFoundException e){
@@ -126,9 +140,14 @@
             </div>
 
         </div>
+        <% if(orderList.isEmpty()){ %>
 
+        <h4>発注データがありません。</h4>
+
+        <% } else { %>
         <div>
           <dl>
+              <% for (int i = 0; i < orderList.size(); i++) { %>
 
             <table class="order">
               <tr>
@@ -191,8 +210,10 @@
                 <td class="status">入荷済み</td>
               </tr>
             </table>
+              <% } %>
           </dl>
         </div>
+        <% } %>
 
     </div>
 
@@ -220,7 +241,7 @@
 
                 <div id="add-image-section">
 
-                    <img src="images/ice12.jpg" width="90" height="90">
+                    <img src="images/ice12.jpg" width="90" height="90" alt="">
                     <select>
                       <option>商品a</option>
                       <option>商品b</option>
@@ -286,7 +307,7 @@
 
                 <div id="add-image-section">
 
-                    <img src="images/ice12.jpg" width="90" height="90">
+                    <img src="images/ice12.jpg" width="90" height="90" alt="">
 
                 </div>
 
