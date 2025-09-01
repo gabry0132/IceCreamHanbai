@@ -1,3 +1,93 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.ArrayList"%>
+<%
+//    request.setCharacterEncoding("UTF-8");
+//    response.setCharacterEncoding("UTF-8");
+
+//    String logout = request.getParameter("logout");
+//    if(logout != null){
+//        session.removeAttribute("userID");
+//    }
+//    String userID = (String) session.getAttribute("userID");
+//
+//    if(userID != null){
+//        response.sendRedirect("main.jsp");
+//    }
+
+    //String status = request.getParameter("status");
+    //String productName = request.getParameter("name");
+
+    //データベースに接続するために使用する変数宣言
+    Connection con = null;
+    Statement stmt = null;
+    StringBuffer sql = null;
+    ResultSet rs = null;
+
+    //ローカルのMySqlに接続する設定
+    String user = "root";
+    String password = "root";
+    String url = "jdbc:mysql://localhost/minishopping_site";
+    String driver = "com.mysql.jdbc.Driver";
+
+    //確認メッセージ
+    StringBuffer ermsg = null;
+
+    HashMap<String,String> staff = null;
+    ArrayList<HashMap<String,String>> staffList = new ArrayList<>();
+
+    try {
+
+    //オブジェクトの代入
+    Class.forName(driver).newInstance();
+    con = DriverManager.getConnection(url, user, password);
+    stmt = con.createStatement();
+
+    sql = new StringBuffer();
+    sql.append("select staffID, password, name, tel, address, workStartDate, ");
+    sql.append("recordTimestamp, adminFlag, quitFlag, deleteFlag from staff ");
+    sql.append("where deleteFlag = 0");
+
+    rs = stmt.executeQuery(sql.toString());
+
+    while(rs.next()){
+        staff = new HashMap<String,String>();
+        staff.put("staffID", rs.getString("staffID"));
+        staff.put("name", rs.getString("name"));
+        staff.put("tel", rs.getString("tel"));
+        staff.put("address", rs.getString("address"));
+        staff.put("workStartDate", rs.getString("workStartDate"));
+
+        staffList.add(staff);
+    }
+    } catch(ClassNotFoundException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }catch(SQLException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }catch(Exception e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }
+    finally{
+        try{
+            if(rs != null){
+            rs.close();
+            }
+        if(stmt != null){
+            stmt.close();
+            }
+        if(con != null){
+            con.close();
+            }
+        }catch(SQLException e){
+            ermsg = new StringBuffer();
+            ermsg.append(e.getMessage());
+        }
+    }
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -11,7 +101,7 @@
     <h1>人事管理</h1>
     <div id="header">
         <div id="text-box">
-            <form action="staff.html" method="post">
+            <form action="staff.jsp" method="post">
                 <label>人事ID</label>
                 <input type="text" name="staffID" value="" size="10">
                 <label>人事名</label>
@@ -26,56 +116,19 @@
     </div>
 
     <div id="staff-main-container">
-        
-        <div class="staff-box">
-            <p class="staff-id">123456</p>
-            <p class="staff-name">伊藤 太郎</p>
-        </div>
+<%     if(staffList.isEmpty()){ %>
+            <div>
+                <p>データがありません。</p>
+            </div>
+<%      }else{               %>
+<%            for (int i = 0; i<staffList.size(); i++){  %>
+                <div class="staff-box">
+                    <p class="staff-id"><%=staffList.get(i).get("staffID") %></p>
+                    <p class="staff-name"><%=staffList.get(i).get("name") %></p>
+                </div>
+<%             }                 %>
+<%        }                      %>
 
-        <div class="staff-box">
-            <p class="staff-id">567891</p>
-            <p class="staff-name">ピピトネ ガブリエレ</p>
-        </div>
-
-        <div class="staff-box">
-            <p class="staff-id">122730</p>
-            <p class="staff-name">入合憂政</p>
-        </div>
-                                
-        <div class="staff-box">
-            <p class="staff-id">220310</p>
-            <p class="staff-name">富田拓</p>
-        </div>
-                                
-        <div class="staff-box">
-            <p class="staff-id">122030</p>
-            <p class="staff-name">谷はぐみ</p>
-        </div>
-                                
-        <div class="staff-box">
-            <p class="staff-id">220317</p>
-            <p class="staff-name">ヨウシンニ</p>
-        </div>
-                                
-        <div class="staff-box">
-            <p class="staff-id">220304</p>
-            <p class="staff-name">蟹江麻央</p>
-        </div>
-                                
-        <div class="staff-box">
-            <p class="staff-id">111111</p>
-            <p class="staff-name">HAL太郎</p>
-        </div>
-                                
-        <div class="staff-box">
-            <p class="staff-id">222222</p>
-            <p class="staff-name">HAL花子</p>
-        </div>
-                                
-        <div class="staff-box">
-            <p class="staff-id">333333</p>
-            <p class="staff-name">HAL京子</p>
-        </div>
 
     </div>
 
@@ -162,6 +215,11 @@
             <button onclick="change_open()" class="normal-button">個人情報修正</button>
             <!--ポップアップ開いた時点でstaffIDの値を設定する。-->
             <form action="staff-confirm.html" method="post">
+                <input type="hidden" name="status" value="delete">
+                <input type="hidden" name="staffID" value="">
+            </form>
+
+            <form action="staff-delete-confirm.html" method="post">
                 <input type="hidden" name="status" value="delete">
                 <input type="hidden" name="staffID" value="">
                 <button class="delete-button">アカウント削除</button>
