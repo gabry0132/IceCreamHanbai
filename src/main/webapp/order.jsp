@@ -120,7 +120,7 @@
             </div>
 
             <div id="back">
-              <form>
+              <form action="main.html" method="post">
                 <button id="back">戻る</button>
               </form>
             </div>
