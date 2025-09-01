@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.ArrayList"%>
 <%
-
     //データベースに接続するために使用する変数宣言
     Connection con = null;
     Statement stmt = null;
@@ -18,31 +19,40 @@
     StringBuffer ermsg = null;
 
 
+    try {
+
+        //オブジェクトの代入
+        Class.forName(driver).newInstance();
+        con = DriverManager.getConnection(url, user, password);
+        stmt = con.createStatement();
+
+        sql = new StringBuffer();
+        sql.append("select ");
+
+        rs = stmt.executeQuery(sql.toString());
 
 
 
-
-
-    catch(ClassNotFoundException e){
-    ermsg = new StringBuffer();
-    ermsg.append(e.getMessage());
+    } catch(ClassNotFoundException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
     }catch(SQLException e){
-    ermsg = new StringBuffer();
-    ermsg.append(e.getMessage());
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
     }catch(Exception e){
-    ermsg = new StringBuffer();
-    ermsg.append(e.getMessage());
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
     }
     finally{
         try{
             if(rs != null){
-            rs.close();
+                rs.close();
             }
             if(stmt != null){
-            stmt.close();
+                stmt.close();
             }
             if(con != null){
-            con.close();
+                con.close();
             }
         }catch(SQLException e){
             ermsg = new StringBuffer();
@@ -78,10 +88,10 @@
 
             <div>
 
-                <form action="order.html" method="post">
-                    
+                <form action="order.jsp" method="post">
+
                     <div id="pulldown-menus">
-                        
+
                         <select>
                             <option hidden disabled selected>商品を選択</option>
                             <option value="">a</option>
@@ -191,7 +201,7 @@
 
     <!-- ポップアップ表示が使うバナー -->
     <div id="obfuscation-banner">
-        
+
     </div>
 
     <!-- 商品追加ポップアップ -->
@@ -200,12 +210,12 @@
         <form action="order-details.html" method="post">
 
             <div id="add-top-row">
-                
+
                 <h2>発注開始</h2>
                 <p class="closure">✖</p>
-                
+
             </div>
-            
+
             <div id="add-main-section">
 
                 <div id="add-image-section">
@@ -222,7 +232,7 @@
                 </div>
 
                 <div id="add-tables-wrapper">
-    
+
                     <table class="add-table">
                         <tr>
                             <td class="add-table-left-side">発注個数</td>
@@ -243,7 +253,7 @@
                     </table>
 
                 </div>
-                
+
             </div>
 
             <!-- 登録を個別するための非表示項目 -->
@@ -253,9 +263,9 @@
                 <button type="button" class="normal-button" id="btn-add-cancel">キャンセル</button>
                 <button class="normal-button" type="submit">発注開始</button>
             </div>
-                
+
         </form>
-            
+
     </div>
 
 
@@ -266,12 +276,12 @@
         <form action="order-register.html" method="post">
 
             <div id="add-top-row">
-                
+
                 <h2>発注キャンセル</h2>
                 <p class="closure">✖</p>
-                
+
             </div>
-            
+
             <div id="add-main-section">
 
                 <div id="add-image-section">
@@ -281,7 +291,7 @@
                 </div>
 
                 <div id="add-tables-wrapper">
-    
+
                     <table class="add-table">
                         <tr>
                             <td>発注日時</td>
@@ -298,7 +308,7 @@
                     </table>
 
                 </div>
-                
+
             </div>
 
             <!-- 登録を個別するための非表示項目 -->
@@ -309,13 +319,13 @@
                 <button type="button" class="normal-button" id="btn-stop-cancel">キャンセル</button>
                 <button class="normal-button" type="submit">発注停止</button>
             </div>
-                
+
         </form>
-            
+
     </div>
 
 
-        
+
     <script>
         //ポップアップに使う変数取得
         let addPopup = document.getElementById("add-product-popup");
