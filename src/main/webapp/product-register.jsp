@@ -35,7 +35,7 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icehanbaikanri";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
@@ -85,7 +85,7 @@
 
             int updatedRows = 0;
 
-            sql.append("update products set deleteFlag = 1 where productID= ");
+            sql.append("update products set deleteFlag = 1 where productID = ");
             sql.append(productID);
             //System.out.println(sql.toString());
             updatedRows = stmt.executeUpdate(sql.toString());
