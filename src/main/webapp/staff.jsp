@@ -52,9 +52,11 @@
     rs = stmt.executeQuery(sql.toString());
 
     while(rs.next()){
+        //修正のためまずデータ取得する
         staff = new HashMap<String,String>();
         staff.put("staffID", rs.getString("staffID"));
         staff.put("name", rs.getString("name"));
+        staff.put("password", rs.getString("password"));
         staff.put("tel", rs.getString("tel"));
         staff.put("address", rs.getString("address"));
         staff.put("workStartDate", rs.getString("workStartDate"));
@@ -120,7 +122,7 @@
             <div>
                 <p>データがありません。</p>
             </div>
-<%      }else{               %>
+<%      }else {                  %>
 <%            for (int i = 0; i<staffList.size(); i++){  %>
                 <div class="staff-box">
                     <p class="staff-id"><%=staffList.get(i).get("staffID") %></p>
@@ -128,7 +130,6 @@
                 </div>
 <%             }                 %>
 <%        }                      %>
-
 
     </div>
 
@@ -219,7 +220,7 @@
                 <input type="hidden" name="staffID" value="">
             </form>
 
-            <form action="staff-delete-confirm.html" method="post">
+            <form action="staff-confirm.html" method="post">
                 <input type="hidden" name="status" value="delete">
                 <input type="hidden" name="staffID" value="">
                 <button class="delete-button">アカウント削除</button>
