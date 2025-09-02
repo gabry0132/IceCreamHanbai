@@ -22,7 +22,7 @@
     String autoOrderQuantity = request.getParameter("autoOrderQuantity");
     String confirmDays = request.getParameter("confirmDays");
     String shippingDays = request.getParameter("shippingDays");
-    String image = request.getParameter("image");
+    String imageFileName = request.getParameter("imageFileName");
 
     //追加の場合は既に画像を登録してある
 
@@ -68,7 +68,7 @@
             sql.append(autoOrderQuantity + ", ");
             sql.append(confirmDays + ", ");
             sql.append(shippingDays + ", ");
-            sql.append(image + ", ");
+            sql.append(imageFileName + ", ");
             sql.append(" ) ");
             //System.out.println(sql.toString());
             addedRows = stmt.executeUpdate(sql.toString());

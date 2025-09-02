@@ -25,7 +25,9 @@
     String cost = request.getParameter("cost");
     String price = request.getParameter("price");
     String instockQuantity = request.getParameter("instockQuantity");
+    if(instockQuantity == null) instockQuantity = "0";
     String alertNumber = request.getParameter("alertNumber");
+    if(alertNumber == null) alertNumber = "0";
     String autoOrderLimit = request.getParameter("autoOrderLimit");
     String autoOrderQuantity = request.getParameter("autoOrderQuantity");
     String imageFileName = "";
@@ -184,11 +186,11 @@
                             <td><%=instockQuantity%></td>
                         </tr>
                         <tr>
-                            <td class="table-left-side">autoOrderLimit</td>
+                            <td class="table-left-side">自動発注限界</td>
                             <td><%=autoOrderLimit%></td>
                         </tr>
                         <tr>
-                            <td class="table-left-side">autoOrderQuantity</td>
+                            <td class="table-left-side">自動発注個数</td>
                             <td><%=autoOrderQuantity%></td>
                         </tr>
                     </table>
@@ -212,10 +214,13 @@
                     <input type="hidden" name="instockQuantity" value="<%=instockQuantity%>">
                     <input type="hidden" name="alertNumber" value="<%=alertNumber%>">
                     <input type="hidden" name="autoOrderLimit" value="<%=autoOrderLimit%>">
+                    <input type="hidden" name="autoOrderQuantity" value="<%=autoOrderQuantity%>">
+                    <input type="hidden" name="imageFileName" value="<%=imageFileName%>">
+
                     <button class="normal-button">内容を修正する</button>
                 </form>
 
-                <form action="product-register.html" method="post">
+                <form action="product-register.jsp" method="post">
 
                     <input type="hidden" name="registerType" value="<%=registerType%>">
 
@@ -228,8 +233,9 @@
                     <input type="hidden" name="instockQuantity" value="<%=instockQuantity%>">
                     <input type="hidden" name="alertNumber" value="<%=alertNumber%>">
                     <input type="hidden" name="autoOrderLimit" value="<%=autoOrderLimit%>">
+                    <input type="hidden" name="autoOrderQuantity" value="<%=autoOrderQuantity%>">
+                    <input type="hidden" name="imageFileName" value="<%=imageFileName%>">
 
-<%--                    <input type="hidden" name="image" value="<%=image%>">--%>
                     <!--処理による文字列を変更する。特に削除の場合は、ボタンを赤くする-->
                     <button class="normal-button">登録</button>
                 </form>

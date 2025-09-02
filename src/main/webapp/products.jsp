@@ -2,9 +2,10 @@
 <%@ page import="java.sql.*" %>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.ArrayList"%>
+<%@ page import="java.io.File" %>
 <%
-//    request.setCharacterEncoding("UTF-8");
-//    response.setCharacterEncoding("UTF-8");
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
 
 //    String logout = request.getParameter("logout");
 //    if(logout != null){
@@ -25,9 +26,12 @@
     String cost = request.getParameter("cost");
     String price = request.getParameter("price");
     String instockQuantity = request.getParameter("instockQuantity");
+    if(instockQuantity == null || instockQuantity.equals("0")) instockQuantity = "";
     String alertNumber = request.getParameter("alertNumber");
+    if(alertNumber == null || alertNumber.equals("0")) alertNumber = "";
     String autoOrderLimit = request.getParameter("autoOrderLimit");
     String autoOrderQuantity = request.getParameter("autoOrderQuantity");
+    String imageFileName = request.getParameter("imageFileName");
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -53,6 +57,18 @@
         Class.forName(driver).newInstance();
         con = DriverManager.getConnection(url, user, password);
         stmt = con.createStatement();
+
+        //「商品追加」処理をキャンセルして本画面に戻った場合は途中でアップロードされた画像の削除を行う
+        if(!imageFileName.isEmpty()){
+            //出力場所を取得する
+            String relativePath = "\\images";
+            String targetUrl = application.getRealPath(relativePath);
+            File file = new File(targetUrl + "\\" + imageFileName);
+            if(!file.delete()){
+                System.out.println("Error deleting file");
+            }
+
+        }
 
         sql = new StringBuffer();
         sql.append("select productID, name, quantity, alertNumber image from products ");
@@ -371,24 +387,25 @@
         //最初からポップアップを表示すべきかどうか判断
         let showAddPopup = "<%=status%>";
         if(showAddPopup == "returnFromAdd"){
+            console.log("must open popup");
             //フォーム内の値を設定する。
             document.getElementById("name").value="<%=productName%>"
             let makerSelectChildren = Array.from(document.getElementById("maker").children);
             makerSelectChildren.forEach(option => {
-                if(option.value == <%=maker%>){
-                    option.setAttributeNode('selected', true);
+                if(option.value == "<%=maker%>"){
+                    option.selected = true;
                 }
             });
             let flavorSelectChildren = Array.from(document.getElementById("flavor").children);
             flavorSelectChildren.forEach(option => {
-                if(option.value == <%=flavor%>){
-                    option.setAttributeNode('selected', true);
+                if(option.value == "<%=flavor%>"){
+                    option.selected = true;
                 }
             });
             let typeSelectChildren = Array.from(document.getElementById("type").children);
             typeSelectChildren.forEach(option => {
-                if(option.value == <%=type%>){
-                    option.setAttributeNode('selected', true);
+                if(option.value == "<%=type%>"){
+                    option.selected = true;
                 }
             });
             document.getElementById("cost").value="<%=cost%>";
