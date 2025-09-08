@@ -25,7 +25,7 @@
     String tel = request.getParameter("tel");
     String address = request.getParameter("address");
     String workStartDate = request.getParameter("workStartDate");
-
+    //String password = request.getParameter("password");
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -51,83 +51,10 @@
         sql = new StringBuffer();
 
         if(registerType.equals("add")) {
-
             int addedRows = 0;
-            //追加の時ランタイムIDとpassword機能
-            //まずA-Z,a-z,0-9のASCII codeを加減してArray[]のsizeを決める
-            int password_totalSize = ('Z'-'A'+1)+('z'-'a'+1)+('9'-'0'+1);
-            int id_totalSize = ('9'-'0'+1);
-            //A-Z,a-z,0-9全部入るArray[]の生成
-            char[] PasswordCharArray = new char[password_totalSize];
-            char[] IdCharArray = new char[id_totalSize];
-            int index = 0;
-            int ID_index = 0;
-            //追加CharArray[]中にA-Zを入る
-            for (char put ='A'; put <='Z'; put++){
-                PasswordCharArray[index++] = put;
-            }
-            //追加CharArray[]中にa-zを入る
-            for (char put ='a'; put <='z'; put++){
-                PasswordCharArray[index++] = put;
-            }
-            //追加CharArray[]中に0-9を入る
-            for (char put ='0'; put <='9'; put++){
-                PasswordCharArray[index++] = put;
-                IdCharArray[ID_index++] = put;
-            }
-            //それで、PasswordCharArrayはA-Z,a-z,0-9の文字入った
-            //IdCharArrayは0-9の文字入った
-            //次はパスワードと社員ID(6桁の数字)を生成する と重複排除
-            boolean repeated = true;
-            while (repeated) {
-                password= "";
-                for (int i = 0; i < 7; i++) {
-                    int randomun = (int) (Math.random() * password_totalSize);
-                    password += PasswordCharArray[randomun];
-                }
-                sql.setLength(0);
-                // => sql = new StringBuffer();
-                sql.append("select count(password) as same from staff ");
-                sql.append("where password = '");
-                sql.append(password);
-                sql.append("'");
-                rs = stmt.executeQuery(sql.toString());
-                if (rs.next()) {
-                    int count = rs.getInt("same");
-                    if (count == 0) {
-                        repeated = false;
-                    }
-                }
-            }
-            repeated = true;
-            while (repeated) {
-                staffID = "";
-                int randomun = 0 ;
-                randomun = 1+(int)(Math.random() * (id_totalSize-1));
-                staffID+= IdCharArray[randomun];
-                for (int i = 0; i < 5; i++) {
-                    randomun =(int) (Math.random() * id_totalSize);
-                    staffID += IdCharArray[randomun];
-                }
-                sql.setLength(0);
-                sql.append("select count(staffID) as same from staff ");
-                sql.append("where staffID = '");
-                sql.append(staffID);
-                sql.append("'");
-                rs = stmt.executeQuery(sql.toString());
-                if (rs.next()) {
-                    int count = rs.getInt("same");
-                    if (count == 0) {
-                        repeated = false;
-                    }
-                }
-            }
-
-            sql = new StringBuffer();
             //SQLステートメントの作成と発行
             sql.append("insert into staff (staffID, password, name, tel, address, workStartDate, ");
-            sql.append("recordTimestamp from staff ");
-            sql.append(" values( ");
+            sql.append("from staff values( ");
             sql.append("'" + staffID + "', ");
             sql.append("' " + password + "', ");
             sql.append("'" + name + "', ");
@@ -137,13 +64,11 @@
             sql.append(" ) ");
             //System.out.println(sql.toString());
             addedRows = stmt.executeUpdate(sql.toString());
-
             //取得したデータを繰り返し処理を表示する
             if (addedRows == 0) {
                 ermsg = new StringBuffer();
                 ermsg.append("人事の追加が失敗しました。");
             }
-
         } else if (registerType.equals("change")) {
             int changedRows = 0;
             sql.append("update name set ");
