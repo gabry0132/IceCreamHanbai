@@ -100,7 +100,7 @@
 
         <div id="top-area-container">
 
-            <form action="sales.html" method="post" id="search-form">
+            <form action="sales.jsp" method="post" id="search-form">
                 
                 <div id="search-params-container">
 
@@ -157,7 +157,7 @@
         </div>
 
         <div class="back-button-holder">
-            <form action="main.html" method="post">
+            <form action="main.jsp" method="post">
                 <button class="normal-button">戻る</button>
             </form>
         </div>
@@ -190,14 +190,14 @@
         </div>
 
         <div class="back-button-holder">
-            <form action="main.html" method="post">
+            <form action="main.jsp" method="post">
                 <button class="normal-button">戻る</button>
             </form>
         </div>
 
         <!--本来は複数のaタグにするか、スパンのテキストに応じてJavaScriptで検索開始-->
         <div id="page-selector-wrapper">
-            <a href="sales.html">
+            <a href="sales.jsp">
                 <p id="page-selector">1　<span>2</span></p>
             </a>
         </div>
