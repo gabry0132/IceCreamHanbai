@@ -9,6 +9,7 @@
 
     String tag = request.getParameter("tag");
     String tagTypeID = request.getParameter("tag");
+    String tagToDeleteID = request.getParameter("tagToDelete");
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -51,6 +52,20 @@
             if(updatedRows == 0){
                 ermsg = new StringBuffer();
                 ermsg.append("追加が失敗しました。");
+            }
+        }
+
+        //削除の場合は
+        if(tagToDeleteID != null){
+            sql = new StringBuffer();
+            sql.append("update tags set deleteFlag = 1 where tagID = ");
+            sql.append(tagToDeleteID);
+
+            updatedRows += stmt.executeUpdate(sql.toString());
+
+            if(updatedRows == 0){
+                ermsg = new StringBuffer();
+                ermsg.append("削除が失敗しました。");
             }
         }
 
