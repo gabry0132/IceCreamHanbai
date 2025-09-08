@@ -225,11 +225,13 @@
                     <select name="product" id="product">
                         <!--動的に画像を変更する-->
                         <option hidden disabled selected value>商品を選択</option>
-                        <option value="1">0001 ガリガリ君</option>
-                        <option value="2">0002 </option>
-                        <option value="3">0003 </option>
-                        <option value="4">0004 </option>
-                        <option value="5">0005 </option>
+                        <%
+                            for(int i=0; i<products_list.size(); i++){
+                        %>
+                        <option value="<%= i+1 %>"><%= products_list.get(i).get("productID") %> <%= products_list.get(i).get("name") %></option>
+                        <%
+                            }
+                        %>
                     </select>
                 </div>
     
@@ -286,11 +288,13 @@
                     <img src="images/ice1.png" class="sale-image" alt="ice1" width="120" height="120">
                     <select name="product" id="product-edit">
                         <option hidden disabled selected value>商品を選択</option>
-                        <option value="1">0001 ガリガリ君</option>
-                        <option value="2">0002 </option>
-                        <option value="3">0003 </option>
-                        <option value="4">0004 </option>
-                        <option value="5">0005 </option>
+                        <%
+                            for(int i=0; i<products_list.size(); i++){
+                        %>
+                        <option value="<%= i+1 %>"><%= products_list.get(i).get("productID") %> <%= products_list.get(i).get("name") %></option>
+                        <%
+                            }
+                        %>
                     </select>
                 </div>
     
