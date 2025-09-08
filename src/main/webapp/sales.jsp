@@ -8,7 +8,7 @@
     // データベース接続情報
     String USER = "root";
     String PASSWORD = "root";
-    String URL = "jdbc:mysql://localhost/shushoku_db";
+    String URL = "jdbc:mysql://localhost/icehanbaikanri";
     String DRIVER = "com.mysql.jdbc.Driver";
 
     // エラーメッセージ格納用
