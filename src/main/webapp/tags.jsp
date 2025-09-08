@@ -1,7 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.ArrayList" %>
 
 <%
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
+
+    String tag = request.getParameter("tag");
+    String tagTypeID = request.getParameter("tag");
+
     //データベースに接続するために使用する変数宣言
     Connection con = null;
     Statement stmt = null;
@@ -11,11 +19,17 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icehanbaikanri";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
     StringBuffer ermsg = null;
+    HashMap<String,String> map;
+    HashMap<String,String> typeMap;
+    ArrayList<HashMap<String,String>> tags = new ArrayList<>();
+    ArrayList<HashMap<String,String>> tagtypes = new ArrayList<>();
+    //追加と削除のチェックに使う
+    int updatedRows = 0;
 
     try {
         //オブジェクトの代入
@@ -23,12 +37,41 @@
         con = DriverManager.getConnection(url, user, password);
         stmt = con.createStatement();
 
+        //新しいタグを登録する場合
+        if(tag != null){
+            sql = new StringBuffer();
+            sql.append("insert into tags(tagTypeID, value) values (");
+            sql.append(tagTypeID);
+            sql.append(", '");
+            sql.append(tag);
+            sql.append("')");
+
+            updatedRows += stmt.executeUpdate(sql.toString());
+
+            if(updatedRows == 0){
+                ermsg = new StringBuffer();
+                ermsg.append("追加が失敗しました。");
+            }
+        }
+
+
         sql = new StringBuffer();
-        sql.append(" ");
+        sql.append("select tagID, value, type, tagtypes.tagTypeID from tags inner join tagtypes on tags.tagtypeID = tagtypes.tagtypeID where tags.deleteFlag=0");
 
         rs = stmt.executeQuery(sql.toString());
-
-
+        while (rs.next()){
+            map = new HashMap<>();
+            map.put("tagID", rs.getString("tagID"));
+            map.put("value", rs.getString("value"));
+            map.put("type", rs.getString("type"));
+            if(!tagtypes.contains(rs.getString("type"))){
+                typeMap = new HashMap<>();
+                typeMap.put("tagTypeID", rs.getString("tagTypeID"));
+                typeMap.put("type", rs.getString("type"));
+                tagtypes.add(typeMap);
+            }
+            tags.add(map);
+        }
 
     } catch(ClassNotFoundException e){
         ermsg = new StringBuffer();
@@ -73,56 +116,61 @@
         タグ管理
     </h1>
 
+    <% if(ermsg != null){ %>
+
+        <h4>エラーが発生しました</h4>
+        <p><%=ermsg%></p>
+
+    <% } else { %>
+
+
     <div id="search-box">
         <input type="text" class="search-input" id="search-input" placeholder="検索">
     </div>
 
-    <div id="all-tag-types-holder">
+    <% if(tags.size() == 0){ %>
 
-        <div class="type-holder">
-            <p class="type-intro">メーカー</p>
-            <div class="types-button-holder">
-                <div class="tag-container">
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">森永</p><span class="tag-close">✕</span></button></form>
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">ロッテ</p><span class="tag-close">✕</span></button></form>
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">井村屋</p><span class="tag-close">✕</span></button></form>
+        <h2>タグがありません。</h2>
+
+    <% } else { %>
+
+        <div id="all-tag-types-holder">
+
+            <%
+                for (int i = 0; i < tagtypes.size(); i++) {
+            %>
+
+                <div class="type-holder">
+                    <p class="type-intro"><%=tagtypes.get(i).get("type")%></p>
+                    <div class="types-button-holder">
+                        <div class="tag-container">
+                            <%
+                                for (int j = 0; j < tags.size(); j++) {
+                            %>
+
+                                <form action="tags.jsp" method="post" name="<%=tags.get(j).get("tagID")%>">
+                                    <input type="hidden" name="tagToDelete" value="<%=tags.get(j).get("tagID")%>">
+                                    <button class="tag" type="button" onclick= "startDelete('<%=tags.get(j).get("tagID")%>','<%=tagtypes.get(i).get("type")%>')"><%=tags.get(j).get("value")%><span class="tag-close">✕</span></button>
+                                </form>
+
+
+                            <%
+                                }
+                            %>
+                        </div>
+                        <div class="add-button-holder">
+                            <button type="button" class="add-button normal-button" onclick="openPopup('<%=tagtypes.get(i).get("type")%>','<%=tagtypes.get(i).get("type")%>')">＋追加</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="add-button-holder">
-                    <button type="button" class="add-button normal-button" onclick="openPopup('メーカーを追加する')">＋追加</button>
-                </div>
-            </div>
+
+            <%
+                }
+            %>
+
         </div>
 
-        <div class="type-holder">
-            <p class="type-intro">種類</p>
-            <div class="types-button-holder">
-                <div class="tag-container">
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">アイスバー</p><span class="tag-close">✕</span></button></form>
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">アイスクリーム</p><span class="tag-close">✕</span></button></form>
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">アイス大福</p><span class="tag-close">✕</span></button></form>
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">氷菓</p><span class="tag-close">✕</span></button></form>
-                </div>
-                <div class="add-button-holder">
-                    <button type="button" class="add-button normal-button" onclick="openPopup('種類を追加する')">＋追加</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="type-holder">
-            <p class="type-intro">味</p>
-            <div class="types-button-holder">
-                <div class="tag-container">
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">イチゴ</p><span class="tag-close">✕</span></button></form>
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">チョコ</p><span class="tag-close">✕</span></button></form>
-                    <form action="#" method="post"><button class="tag"><p class="tag-text">パクチー</p><span class="tag-close">✕</span></button></form>
-                </div>
-                <div class="add-button-holder">
-                    <button type="button" class="add-button normal-button" onclick="openPopup('味を追加する')">＋追加</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
+    <% } %>
                
     <div id="modoru-holder">
         <form action="main.html" method="post">
@@ -135,15 +183,17 @@
     </div>
 
     <div id="add-popup">
-        <form action="#" method="post" id="add-form">
+        <form action="tags.jsp" method="post" id="add-form">
 
             <div id="add-top">
-                <h3>を追加する</h3>
+                <h3>タグを追加する</h3>
             </div>
             
             <div id="add-center">
                 <input type="text" name="tag" id="tag-search" required>
             </div>
+
+            <input type="hidden" name="tagTypeID" id="tagTypeIDHolder" value="">
 
             <div id="add-bottom">
                 <button type="button" onclick="closePopup()">キャンセル</button>
@@ -160,6 +210,7 @@
         searchBox.addEventListener("input", applySearch);
 
         function applySearch(){
+            if (searchBox.value == "" || searchBox.value == undefined) return;
             for (let i = 0; i < tags.length; i++) {
                 const tagText = tags[i];
                 if(tagText.innerHTML.includes(searchBox.value)){
@@ -171,9 +222,17 @@
             }
         }
 
-        function openPopup(text){
+        function startDelete(tagID, tagType){
+            form = document.getElementsByName(tagID)[0];
+            if(confirm(tagType + "を削除します。よろしいですか。")){
+                form.submit();
+            }
+        }
+
+        function openPopup(type, tagTypeID){
             let popupTitle = document.getElementsByTagName("h3")[0];
-            popupTitle.innerHTML = text;
+            popupTitle.innerHTML = type + "を追加する";
+            document.getElementById("tagTypeIDHolder").value = tagTypeID;
             document.getElementById("black-background").style.display = "flex";
             document.getElementById("add-popup").style.display = "flex";
         }
@@ -183,6 +242,10 @@
             document.getElementById("add-popup").style.display = "none";
 
         }
+
     </script>
+
+    <% } %>
+
 </body>
 </html>
