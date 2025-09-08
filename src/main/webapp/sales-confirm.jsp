@@ -50,7 +50,7 @@
         <div id="buttons-holder">
             <!--どこから来たのか非表示のinputでわかるはずなので「内容を修正」ボタンで正しい場所へ戻される。-->
             <!--設定変更の場合は詳細ページに戻ったら自動的に正しいポップアップを出すようにする。-->
-            <form action="sales.html" method="post">
+            <form action="sales.jsp" method="post">
                 <button class="normal-button">内容を修正する</button>
             </form>
             <form action="sales-register.html" method="post">
