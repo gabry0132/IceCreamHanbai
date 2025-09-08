@@ -1,5 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.io.PrintWriter" %>
+<%@ page import="javax.servlet.http.Part" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.nio.file.Paths" %>
+<%@ page import="java.io.InputStream" %>
+<%@ page import="java.time.Instant" %>
+<%@ page import="java.nio.file.Files" %>
+<%@ page import="java.nio.file.StandardCopyOption" %>
 <%
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
@@ -9,7 +17,7 @@
     //修正と削除の場合のパラメータ
     String productID = request.getParameter("productID");
 
-    //追加の場合のパラメータ
+    //追加の場合のパラメータ。enctype="multipart/form-data"の形で来るのでPartsとして設定する必要があります。
     String productName = request.getParameter("name");
     String maker = request.getParameter("maker");
     String flavor = request.getParameter("flavor");
@@ -17,18 +25,42 @@
     String cost = request.getParameter("cost");
     String price = request.getParameter("price");
     String instockQuantity = request.getParameter("instockQuantity");
+    if(instockQuantity == null) instockQuantity = "0";
     String alertNumber = request.getParameter("alertNumber");
+    if(alertNumber == null) alertNumber = "0";
     String autoOrderLimit = request.getParameter("autoOrderLimit");
     String autoOrderQuantity = request.getParameter("autoOrderQuantity");
-    //image足りない
-    String image = "";
-
-    //追加の場合は今の時点で画像を登録する
-
+    String imageFileName = "";
+    Part imagePart = request.getPart("image");
 
     //削除
     String quantity;
-    if(registerType.equals("delete")){
+    if(registerType.equals("add")){
+
+        //追加の場合は今の時点で画像を登録する
+        PrintWriter printWriterOut;
+        printWriterOut = response.getWriter();
+
+        //出力の場所を動的に指定する
+        String relativePath = "\\images";
+        String absolutePath = application.getRealPath(relativePath);
+        File uploads = new File(absolutePath);
+
+        InputStream fileContent = imagePart.getInputStream();
+
+        //現在時刻を取得してファイル名に設定する。
+        long timestampMillis = Instant.now().toEpochMilli();    //新しいファイル名になる
+        //拡張子を取得
+        String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
+        String ext = fileName.substring(fileName.lastIndexOf('.'));
+        //ファイル名を設定する。
+        imageFileName = timestampMillis + ext;
+
+        //書き込む
+        File image = new File(uploads, imageFileName);
+        Files.copy(fileContent, image.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+    else if(registerType.equals("delete")){
         //データベースに接続するために使用する変数宣言
         Connection con = null;
         Statement stmt = null;
@@ -38,7 +70,7 @@
         //ローカルのMySqlに接続する設定
         String user = "root";
         String password = "root";
-        String url = "jdbc:mysql://localhost/minishopping_site";
+        String url = "jdbc:mysql://localhost/icehanbaikanri";
         String driver = "com.mysql.jdbc.Driver";
 
         //確認メッセージ
@@ -61,7 +93,7 @@
             if(rs.next()){
                 productName = rs.getString("name");
                 quantity = rs.getString("quantity");
-                image = rs.getString("string");
+                imageFileName = rs.getString("image");
             }
 
         } catch(ClassNotFoundException e){
@@ -118,7 +150,7 @@
 
                 <div id="left-section-wrapper">
 
-                    <img class="image" src="images/<%=image%>" width="100" height="100" alt="<%=productName%>">
+                    <img class="image" src="images/<%=imageFileName%>" width="100" height="100" alt="<%=productName%>">
 
                 </div>
 
@@ -154,11 +186,11 @@
                             <td><%=instockQuantity%></td>
                         </tr>
                         <tr>
-                            <td class="table-left-side">autoOrderLimit</td>
+                            <td class="table-left-side">自動発注限界</td>
                             <td><%=autoOrderLimit%></td>
                         </tr>
                         <tr>
-                            <td class="table-left-side">autoOrderQuantity</td>
+                            <td class="table-left-side">自動発注個数</td>
                             <td><%=autoOrderQuantity%></td>
                         </tr>
                     </table>
@@ -182,10 +214,13 @@
                     <input type="hidden" name="instockQuantity" value="<%=instockQuantity%>">
                     <input type="hidden" name="alertNumber" value="<%=alertNumber%>">
                     <input type="hidden" name="autoOrderLimit" value="<%=autoOrderLimit%>">
+                    <input type="hidden" name="autoOrderQuantity" value="<%=autoOrderQuantity%>">
+                    <input type="hidden" name="imageFileName" value="<%=imageFileName%>">
+
                     <button class="normal-button">内容を修正する</button>
                 </form>
 
-                <form action="product-register.html" method="post">
+                <form action="product-register.jsp" method="post">
 
                     <input type="hidden" name="registerType" value="<%=registerType%>">
 
@@ -198,8 +233,9 @@
                     <input type="hidden" name="instockQuantity" value="<%=instockQuantity%>">
                     <input type="hidden" name="alertNumber" value="<%=alertNumber%>">
                     <input type="hidden" name="autoOrderLimit" value="<%=autoOrderLimit%>">
+                    <input type="hidden" name="autoOrderQuantity" value="<%=autoOrderQuantity%>">
+                    <input type="hidden" name="imageFileName" value="<%=imageFileName%>">
 
-<%--                    <input type="hidden" name="image" value="<%=image%>">--%>
                     <!--処理による文字列を変更する。特に削除の場合は、ボタンを赤くする-->
                     <button class="normal-button">登録</button>
                 </form>

@@ -2,9 +2,10 @@
 <%@ page import="java.sql.*" %>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.ArrayList"%>
+<%@ page import="java.io.File" %>
 <%
-//    request.setCharacterEncoding("UTF-8");
-//    response.setCharacterEncoding("UTF-8");
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
 
 //    String logout = request.getParameter("logout");
 //    if(logout != null){
@@ -25,9 +26,12 @@
     String cost = request.getParameter("cost");
     String price = request.getParameter("price");
     String instockQuantity = request.getParameter("instockQuantity");
+    if(instockQuantity == null || instockQuantity.equals("0")) instockQuantity = "";
     String alertNumber = request.getParameter("alertNumber");
+    if(alertNumber == null || alertNumber.equals("0")) alertNumber = "";
     String autoOrderLimit = request.getParameter("autoOrderLimit");
     String autoOrderQuantity = request.getParameter("autoOrderQuantity");
+    String imageFileName = request.getParameter("imageFileName");
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -38,7 +42,7 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icehanbaikanri";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
@@ -53,6 +57,18 @@
         Class.forName(driver).newInstance();
         con = DriverManager.getConnection(url, user, password);
         stmt = con.createStatement();
+
+        //「商品追加」処理をキャンセルして本画面に戻った場合は途中でアップロードされた画像の削除を行う
+        if(!imageFileName.isEmpty()){
+            //出力場所を取得する
+            String relativePath = "\\images";
+            String targetUrl = application.getRealPath(relativePath);
+            File file = new File(targetUrl + "\\" + imageFileName);
+            if(!file.delete()){
+                System.out.println("Error deleting file");
+            }
+
+        }
 
         sql = new StringBuffer();
         sql.append("select productID, name, quantity, alertNumber image from products ");
@@ -241,7 +257,7 @@
     <!-- 商品追加ポップアップ -->
     <div id="add-product-popup">
 
-        <form action="product-confirm.html" method="post">
+        <form action="product-confirm.jsp" method="post" enctype="multipart/form-data">
 
             <div id="add-top-row">
                 
@@ -254,7 +270,8 @@
 
                 <div id="add-image-section">
 
-                    <input type="file" name="image" id="image"> 
+                    <!-- ファイルサイズは WEB-INF/web.xml に設定しています。 -->
+                    <input type="file" name="image" id="image" accept=".jpg, .png" required>
                     <p class="hint">＊画像の写真を<br>アップロードしてください</p>
 
                 </div>
@@ -264,12 +281,12 @@
                     <table class="add-table">
                         <tr>
                             <td class="add-table-left-side">商品名</td>
-                            <td><input type="text" name="name" id="name"></td>
+                            <td><input type="text" name="name" id="name" required></td>
                         </tr>
                         <tr>
                             <td>メーカー</td>
                             <td>
-                                <select name="maker" id="maker">
+                                <select name="maker" id="maker" required>
                                     <option hidden disabled selected value>メーカー</option>
                                     <option value="1">akagi</option>
                                     <option value="2">morinaga</option>
@@ -282,7 +299,7 @@
                         <tr>
                             <td>味</td>
                             <td>
-                                <select name="flavor" id="flavor">
+                                <select name="flavor" id="flavor" required>
                                     <option hidden disabled selected value>味</option>
                                     <option value="1">vanilla</option>
                                     <option value="2">strawberry</option>
@@ -294,7 +311,7 @@
                         <tr>
                             <td>種類</td>
                             <td>
-                                <select name="type" id="type">
+                                <select name="type" id="type" required>
                                     <option hidden disabled selected value>種類</option>
                                     <option value="bar">bar</option>
                                     <option value="cone">cone</option>
@@ -305,12 +322,12 @@
                         </tr>
                         <tr>
                             <td>購入コスト</td>
-                            <td><input type="text" name="cost" id="cost"></td>
+                            <td><input type="text" name="cost" id="cost" required></td>
                             <td>円</td>
                         </tr>
                         <tr>
                             <td>販売値段</td>
-                            <td><input type="text" name="price" id="price"></td>
+                            <td><input type="text" name="price" id="price" required></td>
                             <td>円</td>
                         </tr>
                     </table>
@@ -328,12 +345,12 @@
                         </tr>
                         <tr>
                             <td>自動発注限界</td>
-                            <td><input type="number" name="autoOrderLimit" id="autoOrderLimit" min="0" max="999"></td>
+                            <td><input type="number" name="autoOrderLimit" id="autoOrderLimit" min="0" max="999" required></td>
                             <td>個</td>
                         </tr>
                         <tr>
                             <td>自動発注個数</td>
-                            <td><input type="number" name="autoOrderQuantity" id="autoOrderQuantity" min="0" max="999"></td>
+                            <td><input type="number" name="autoOrderQuantity" id="autoOrderQuantity" min="0" max="999" required></td>
                             <td>個</td>
                         </tr>
                     </table>
@@ -370,27 +387,25 @@
         //最初からポップアップを表示すべきかどうか判断
         let showAddPopup = "<%=status%>";
         if(showAddPopup == "returnFromAdd"){
+            console.log("must open popup");
             //フォーム内の値を設定する。
             document.getElementById("name").value="<%=productName%>"
             let makerSelectChildren = Array.from(document.getElementById("maker").children);
             makerSelectChildren.forEach(option => {
-                if(option.value == <%=maker%>){
-                    option.setAttributeNode('selected', true);
-                    break;
+                if(option.value == "<%=maker%>"){
+                    option.selected = true;
                 }
             });
             let flavorSelectChildren = Array.from(document.getElementById("flavor").children);
             flavorSelectChildren.forEach(option => {
-                if(option.value == <%=flavor%>){
-                    option.setAttributeNode('selected', true);
-                    break;
+                if(option.value == "<%=flavor%>"){
+                    option.selected = true;
                 }
             });
             let typeSelectChildren = Array.from(document.getElementById("type").children);
             typeSelectChildren.forEach(option => {
-                if(option.value == <%=type%>){
-                    option.setAttributeNode('selected', true);
-                    break;
+                if(option.value == "<%=type%>"){
+                    option.selected = true;
                 }
             });
             document.getElementById("cost").value="<%=cost%>";
