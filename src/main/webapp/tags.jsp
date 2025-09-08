@@ -1,3 +1,64 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+
+<%
+    //データベースに接続するために使用する変数宣言
+    Connection con = null;
+    Statement stmt = null;
+    StringBuffer sql = null;
+    ResultSet rs = null;
+
+    //ローカルのMySqlに接続する設定
+    String user = "root";
+    String password = "root";
+    String url = "jdbc:mysql://localhost/minishopping_site";
+    String driver = "com.mysql.jdbc.Driver";
+
+    //確認メッセージ
+    StringBuffer ermsg = null;
+
+    try {
+        //オブジェクトの代入
+        Class.forName(driver).newInstance();
+        con = DriverManager.getConnection(url, user, password);
+        stmt = con.createStatement();
+
+        sql = new StringBuffer();
+        sql.append(" ");
+
+        rs = stmt.executeQuery(sql.toString());
+
+
+
+    } catch(ClassNotFoundException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }catch(SQLException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }catch(Exception e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }
+    finally{
+        try{
+            if(rs != null){
+                rs.close();
+            }
+            if(stmt != null){
+                stmt.close();
+            }
+            if(con != null){
+                con.close();
+            }
+        }catch(SQLException e){
+            ermsg = new StringBuffer();
+            ermsg.append(e.getMessage());
+        }
+    }
+
+%>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -5,6 +66,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>タグ管理画面</title>
          <link rel="stylesheet" type="text/css" href="css/tag.css">
+
 </head>
 <body>
     <h1>
