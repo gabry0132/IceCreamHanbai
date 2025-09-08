@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.ArrayList"%>
+<%@ page import="java.util.HashMap"%>
+<%@ page import="java.util.ArrayList"%>
 <%
 //    request.setCharacterEncoding("UTF-8");
 //    response.setCharacterEncoding("UTF-8");
@@ -39,28 +39,31 @@
 
     try {
 
-    //オブジェクトの代入
-    Class.forName(driver).newInstance();
-    con = DriverManager.getConnection(url, user, password);
-    stmt = con.createStatement();
+        //オブジェクトの代入
+        Class.forName(driver).newInstance();
+        con = DriverManager.getConnection(url, user, password);
+        stmt = con.createStatement();
 
-    sql = new StringBuffer();
-    sql.append("select staffID, password, name, tel, address, workStartDate, ");
-    sql.append("recordTimestamp, adminFlag, quitFlag, deleteFlag from staff ");
-    sql.append("where deleteFlag = 0");
+        //削除・修正・追加の確認画面と操作完了提示画面を分けるためのflag
+        String registerType = request.getParameter("registerType");
 
-    rs = stmt.executeQuery(sql.toString());
+        sql = new StringBuffer();
+        sql.append("select staffID, password, name, tel, address, workStartDate, ");
+        sql.append("recordTimestamp, adminFlag, quitFlag, deleteFlag from staff ");
+        sql.append("where deleteFlag = 0");
+        rs = stmt.executeQuery(sql.toString());
 
-    while(rs.next()){
-        staff = new HashMap<String,String>();
-        staff.put("staffID", rs.getString("staffID"));
-        staff.put("name", rs.getString("name"));
-        staff.put("tel", rs.getString("tel"));
-        staff.put("address", rs.getString("address"));
-        staff.put("workStartDate", rs.getString("workStartDate"));
-
-        staffList.add(staff);
-    }
+        while(rs.next()){
+            //人事一覧のstaff-List、または修正のためまずデータ取得する
+            staff = new HashMap<String,String>();
+            staff.put("staffID", rs.getString("staffID"));
+            staff.put("name", rs.getString("name"));
+            staff.put("password", rs.getString("password"));
+            staff.put("tel", rs.getString("tel"));
+            staff.put("address", rs.getString("address"));
+            staff.put("workStartDate", rs.getString("workStartDate"));
+            staffList.add(staff);
+        }
     } catch(ClassNotFoundException e){
         ermsg = new StringBuffer();
         ermsg.append(e.getMessage());
@@ -120,7 +123,7 @@
             <div>
                 <p>データがありません。</p>
             </div>
-<%      }else{               %>
+<%      }else {                  %>
 <%            for (int i = 0; i<staffList.size(); i++){  %>
                 <div class="staff-box">
                     <p class="staff-id"><%=staffList.get(i).get("staffID") %></p>
@@ -128,7 +131,6 @@
                 </div>
 <%             }                 %>
 <%        }                      %>
-
 
     </div>
 
@@ -151,27 +153,28 @@
         <div class="popup_body">
             <div class="form_row">
                 <label for="staff_name">名前</label>
-                <input type="text" id="staff_name">
+                <input type="text" id="name">
             </div>
 
             <div class="form_row">
                 <label for="staff_phone">電話番号</label>
-                <input type="text" id="staff_phone">
+                <input type="text" id="tel">
             </div>
             
             <div class="form_row">
                 <label for="staff_address">住所</label>
-                <input type="text" id="staff_address">
+                <input type="text" id="address">
             </div>
 
             <div class="form_row">
                 <label for="staff_comeday">入店日付</label>
-                <input type="datetime-local" id="staff_comeday">
+                <input type="datetime-local" id="workStartDate">
             </div>
         </div>
         <div class="popup_footer">
             <button class="cancel-popup normal-button">キャンセル</button>
             <form action="staff-confirm.html" method="post">
+                <input type="hidden" name="registerType" value="add">
                 <button class="normal-button">登録</button>
             </form>
         </div>
@@ -187,27 +190,27 @@
         <table>
             <tr>
                 <th class="table-left-side">名前</th>
-                <td>伊藤 太郎</td>
+                <td></td>
             </tr>
             <tr>
                 <th>人事ID</th>
-                <td>123456</td>
+                <td></td>
             </tr>
             <tr>
                 <th>パスワード</th>
-                <td>A12b34C</td>
+                <td></td>
             </tr>
             <tr>
                 <th>電話番号</th>
-                <td>12-4321-2222</td>
+                <td></td>
             </tr>
             <tr>
                 <th>住所</th>
-                <td class="longer-table-text">静岡県浜松市</td>
+                <td class="longer-table-text"></td>
             </tr>
             <tr>
                 <th>入店日付</th>
-                <td>2023/02/11</td>
+                <td></td>
             </tr>
         </table>
         
@@ -215,18 +218,17 @@
             <button onclick="change_open()" class="normal-button">個人情報修正</button>
             <!--ポップアップ開いた時点でstaffIDの値を設定する。-->
             <form action="staff-confirm.html" method="post">
-                <input type="hidden" name="status" value="delete">
-                <input type="hidden" name="staffID" value="">
+                <input type="hidden" name="registerType" value="delete">
+                <input type="hidden" name="staffID" value="staffID">
             </form>
 
-            <form action="staff-delete-confirm.html" method="post">
-                <input type="hidden" name="status" value="delete">
-                <input type="hidden" name="staffID" value="">
+            <form action="staff-confirm.html" method="post">
+                <input type="hidden" name="registerType" value="delete">
+                <input type="hidden" name="staffID" value="staffID">
                 <button class="delete-button">アカウント削除</button>
             </form>
         </div>
     </div>
-
 
     <!--個人情報修正  -->
     <div id="staff_change_popup"  class="popup">
@@ -235,44 +237,48 @@
             <span class="close">✖</span>
         </div>
         <form action="staff-confirm.html" method="post">
-
             <div class="popup_body">
 
                 <div class="form_row">
                     <label for="name_change">名前</label>
-                    <input type="text" name="name" id="name_change" value="伊藤 太郎">
+                    <input type="text" name="name" id="name_change" value="name">
                 </div>
                 
                 <div class="form_row">
                     <label for="id_change">人事ID</label>
-                    <input type="text" name="id" id="id_change" value="123456" disabled>
+                    <input type="text" name="id" id="id_change" value="staffID" disabled>
                 </div>
         
                 <div class="form_row">
                     <label for="password_change">パスワード</label>
-                    <input type="text" name="password" id="password_change" value="A12b34C">
+                    <input type="text" name="password" id="password_change" value="password">
                 </div>
         
                 <div class="form_row">
                     <label for="phone_change">電話番号</label>
-                    <input type="text" name="tel" id="phone_change" value="12-4321-2222">
+                    <input type="text" name="tel" id="phone_change" value="tel">
                 </div>
                 
                 <div class="form_row">
                     <label for="address_change">住所</label>
-                    <input type="text" name="address" id="address_change" value="静岡県清水">
+                    <input type="text" name="address" id="address_change" value="address">
                 </div>
 
                 <div class="form_row">
                     <label for="startDate_change">入店日付</label>
-                    <input type="text" name="startDate" id="startDate_change" value="静岡県清水" disabled>
+                    <input type="text" name="startDate" id="startDate_change" value="workStartDate" disabled>
                 </div>
 
             </div>
 
             <div class="popup_footer">
                 <button class="normal-button cancel-popup" type="button">キャンセル</button>
-                <button class="submit">修正</button>
+
+                <form action="staff-confirm.html" method="post">
+                    <input type="hidden" name="registerType" value="change">
+                    <input type="hidden" name="staffID" value="staffID">
+                    <button class="submit">修正</button>
+                </form>
             </div>
 
         </form>
