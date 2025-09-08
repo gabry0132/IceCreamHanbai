@@ -1,3 +1,49 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*, java.util.*" %>
+<%
+    // 文字コードの指定
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
+
+    // データベース接続情報
+    String USER = "root";
+    String PASSWORD = "root";
+    String URL = "jdbc:mysql://localhost/shushoku_db";
+    String DRIVER = "com.mysql.jdbc.Driver";
+
+    // エラーメッセージ格納用
+    String ERMSG = null;
+
+    // 結果格納用リスト
+    ArrayList<HashMap<String, String>> list = new ArrayList<>();
+
+    try {
+        // JDBCドライバのロード
+        Class.forName(DRIVER);
+
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT p.name AS productName, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID;")
+        ) {
+
+            // データ抽出
+            while (rs.next()) {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("productName", rs.getString("productName"));
+                map.put("dateTime", rs.getString("dateTime"));
+                map.put("quantity", rs.getString("quantity"));
+                map.put("staffID", rs.getString("staffID"));
+                map.put("staffName", rs.getString("staffName"));
+
+                // リストに追加
+                list.add(map);
+            }
+        }
+    } catch (Exception e) {
+        ERMSG = e.getMessage();
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -75,60 +121,29 @@
         </div>
 
         <div id="sales-holder">
-
-            <div class="sale-box">
-                <div class="sale-image-txt-holder">
-                    <!--?product=xxx&previousPage=sales.jspを追加する。-->
-                    <a href="product-details.jsp" class="image-wrapper-anchor">
-                        <img class="sale-image" src="images/ice1.png" width="100" height="100" alt="ice1">
-                    </a>
-                    <p class="sale-text">板チョコアイスが 2025/6/23に 1個 販売されました。(入合憂政より)</p>
+<%
+            for(int i=0; i<list.size(); i++){
+%>
+                <div class="sale-box">
+                    <div class="sale-image-txt-holder">
+                        <!--?product=xxx&previousPage=sales.jspを追加する。-->
+                        <a href="product-details.jsp" class="image-wrapper-anchor">
+                            <img class="sale-image" src="images/ice1.png" width="100" height="100" alt="ice1">
+                        </a>
+                        <p class="sale-text"><%= list.get(i).get("productName") %>が <%= list.get(i).get("dateTime") %>に <%= list.get(i).get("quantity") %>個 販売されました。(<%= list.get(i).get("staffName") %>より)</p>
+                    </div>
+                    <div class="sale-button-box">
+                        <button type="button" class="edit-button" onclick="openEditPopup()">修正</button>
+                        <form action="sales-confirm.jsp" method="post" class="deleteForm">
+                            <input type="hidden" name="status" value="delete">
+                            <input type="hidden" name="saleID" value="">
+                            <button type="submit" class="delete-button">削除</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="sale-button-box">
-                    <button type="button" class="edit-button" onclick="openEditPopup()">修正</button>
-                    <form action="sales-confirm.jsp" method="post" class="deleteForm">
-                        <input type="hidden" name="status" value="delete">
-                        <input type="hidden" name="saleID" value="">
-                        <button type="submit" class="delete-button">削除</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="sale-box">
-                <div class="sale-image-txt-holder">
-                    <!--?product=xxx&previousPage=sales.jspを追加する。-->
-                    <a href="product-details.jsp" class="image-wrapper-anchor">
-                        <img class="sale-image" src="images/ice1.png" width="100" height="100" alt="ice1">
-                    </a>
-                    <p class="sale-text">板チョコアイスが 2025/6/23に 1個 販売されました。(入合憂政より)</p>
-                </div>
-                <div class="sale-button-box">
-                    <button type="button" class="edit-button" onclick="openEditPopup()">修正</button>
-                    <form action="sales-confirm.jsp" method="post" class="deleteForm">
-                        <input type="hidden" name="status" value="delete">
-                        <input type="hidden" name="saleID" value="">
-                        <button type="submit" class="delete-button">削除</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="sale-box">
-                <div class="sale-image-txt-holder">
-                    <!--?product=xxx&previousPage=sales.jspを追加する。-->
-                    <a href="product-details.jsp" class="image-wrapper-anchor">
-                        <img class="sale-image" src="images/ice1.png" width="100" height="100" alt="ice1">
-                    </a>
-                    <p class="sale-text">板チョコアイスが 2025/6/23に 1個 販売されました。(入合憂政より)</p>
-                </div>
-                <div class="sale-button-box">
-                    <button type="button" class="edit-button" onclick="openEditPopup()">修正</button>
-                    <form action="sales-confirm.jsp" method="post" class="deleteForm">
-                        <input type="hidden" name="status" value="delete">
-                        <input type="hidden" name="saleID" value="">
-                        <button type="submit" class="delete-button">削除</button>
-                    </form>
-                </div>
-            </div>
+<%
+            }
+%>
 
         </div>
 

@@ -19,7 +19,7 @@
     <form action="products.jsp" method="post">
       <button class="normal-button">商品管理</button>
     </form>
-    <form action="sales.html" method="post">
+    <form action="sales.jsp" method="post">
       <button class="normal-button">売上管理</button>
     </form>
     <form action="order.jsp" method="post">

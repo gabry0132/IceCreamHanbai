@@ -1,3 +1,12 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+
+<%
+    String errorMsg = (String)request.getAttribute("errorMsg");
+    if (errorMsg == null) {
+        errorMsg = "エラーが発生しました。";
+    }
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -12,9 +21,9 @@
         エラーが発生しました。
     </h1>
     <p>
-        エラーメッセージ
+        <%= errorMsg %>
     </p>
-    <form action="main.html" method="post">
+    <form action="index.jsp" method="post">
         <button class="normal-button">
             トップページへ戻る
         </button>
