@@ -22,7 +22,7 @@
     String autoOrderQuantity = request.getParameter("autoOrderQuantity");
     String confirmDays = request.getParameter("confirmDays");
     String shippingDays = request.getParameter("shippingDays");
-    String image = request.getParameter("image");
+    String imageFileName = request.getParameter("imageFileName");
 
     //追加の場合は既に画像を登録してある
 
@@ -35,7 +35,7 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icehanbaikanri";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
@@ -68,7 +68,7 @@
             sql.append(autoOrderQuantity + ", ");
             sql.append(confirmDays + ", ");
             sql.append(shippingDays + ", ");
-            sql.append(image + ", ");
+            sql.append(imageFileName + ", ");
             sql.append(" ) ");
             //System.out.println(sql.toString());
             addedRows = stmt.executeUpdate(sql.toString());
@@ -83,15 +83,15 @@
 
         } else if (registerType.equals("delete")) {
 
-            int deletedRows = 0;
+            int updatedRows = 0;
 
-            sql.append("delete from products where productID= ");
+            sql.append("update products set deleteFlag = 1 where productID = ");
             sql.append(productID);
             //System.out.println(sql.toString());
-            deletedRows = stmt.executeUpdate(sql.toString());
+            updatedRows = stmt.executeUpdate(sql.toString());
 
             //取得したデータを繰り返し処理を表示する
-            if (deletedRows == 0) {
+            if (updatedRows == 0) {
 
                 ermsg = new StringBuffer();
                 ermsg.append("商品の削除が失敗しました。");

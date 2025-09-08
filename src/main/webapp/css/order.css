@@ -1,0 +1,222 @@
+@charset "utf-8";
+
+div#next{
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 20px;
+}
+button#btn-add{
+    font-size: 1.4rem;
+    background-color: white;
+    border-radius: 7px;
+    transition: 0.3s;
+}
+button#btn-add:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+button.submit{
+    background-color: aqua;
+    font-size: 1.4rem;
+    border-radius: 7px;
+    transition: 0.3s;
+}
+button.submit:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+button.normal-button{
+    background-color: white;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 0 30px 0 30px;
+    transition: 0.3s;
+}
+div#back{
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 20px;
+}
+button#back{
+    font-size: 1.2rem;
+    background-color: white;
+    border-radius: 7px;
+    transition: 0.3s;
+}
+button#back:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+div#pulldown-menus select{
+    margin: 5px 10px;
+    font-size: 1.2rem;
+    width: 300px;
+}
+div#pulldown-menus input{
+    margin: 5px 10px;
+    font-size: 1.2rem;
+}
+div#pulldown-menus button{
+  font-size: 1.2rem;
+}
+dl{
+  height: 550px;
+  overflow-y: scroll;
+  border: 1px solid #000;
+}
+table{
+  width: 97%;
+  border: 1px solid #000;
+  margin: 20px;
+}
+td{
+    font-size: 1.2rem;
+}
+td.status{
+    width: 100px;
+    padding-right: 40px;
+}
+td.photo{
+    width: 90px;
+}
+p.status{
+    display: flex;
+    margin: auto;
+}
+button#stop{
+    background-color: aqua;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    transition: 0.3s;
+}
+button#stop:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}
+
+
+p.closure{
+    cursor: pointer;
+    text-align: right;
+}
+
+div#obfuscation-banner{
+    display: none;  /* flexとnoneを切り替える */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0006;
+    z-index: 2;
+}
+
+
+div#add-product-popup{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    display: none;  /* flexとnoneを切り替える */
+    z-index: 15;
+    width: 50%;
+    flex-direction: column;
+    padding: 10px 50px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-color: white;
+    font-size: 1.2rem;
+}
+
+div#cancel-popup{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    display: none;  /* flexとnoneを切り替える */
+    z-index: 15;
+    width: 50%;
+    flex-direction: column;
+    padding: 10px 50px;
+    border: 2px solid black;
+    border-radius: 35px;
+    background-color: white;
+    font-size: 1.2rem;
+}
+
+
+div#add-top-row{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+div#add-main-section{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+}
+
+
+div#add-right-side{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: 40%;
+    margin-left: 10px;
+}
+
+div#add-image-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+div#add-tables-wrapper{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+    justify-content: space-between;
+    table{
+        margin: 10px 20px;
+    }
+}
+
+div#add-buttons-holder{
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    margin: 20px auto;
+    button{
+        font-size: 1.2rem;
+    }
+}
+
+
+table.add-table{
+    border: none;
+}
+
+p.hint{
+    margin-top: 5px;
+    color: cadetblue;
+    font-size: 0.8rem;
+}
+
+td.table-left-side{
+    width: 150px;
+}
+
+span.optional-parameter-wrapper{
+    font-size: 0.8rem;
+}
+div#cancel-popup p{
+    text-align: center;
+}
