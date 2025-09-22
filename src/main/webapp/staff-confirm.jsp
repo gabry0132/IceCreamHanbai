@@ -296,6 +296,7 @@
             <form action="staff.jsp" method="post">
                 <button class="normal-button">キャンセル</button>
             </form>
+            <form action="staff-register.jsp" method="post">
                 <input type="hidden" name="staffID" value="<%=staffID%>">
                 <button class="normal-button">削除</button>
             </form>
