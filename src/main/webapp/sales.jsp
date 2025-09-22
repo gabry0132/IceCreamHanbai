@@ -8,19 +8,22 @@
     // データベース接続情報
     String USER = "root";
     String PASSWORD = "root";
-    String URL = "jdbc:mysql://localhost/shushoku_db";
+    String URL = "jdbc:mysql://localhost/icehanbaikanri";
     String DRIVER = "com.mysql.jdbc.Driver";
 
     // エラーメッセージ格納用
     String ERMSG = null;
 
     // 結果格納用リスト
-    ArrayList<HashMap<String, String>> list = new ArrayList<>();
+    ArrayList<HashMap<String, String>> sales_list = new ArrayList<>();
+    ArrayList<HashMap<String, String>> staff_list = new ArrayList<>();
+    ArrayList<HashMap<String, String>> products_list = new ArrayList<>();
 
     try {
         // JDBCドライバのロード
         Class.forName(DRIVER);
 
+        //-----売上一覧-----
         try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT p.name AS productName, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID;")
@@ -36,9 +39,44 @@
                 map.put("staffName", rs.getString("staffName"));
 
                 // リストに追加
-                list.add(map);
+                sales_list.add(map);
             }
         }
+
+        //-----スタッフ一覧-----
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery("select staffID, name from staff;")
+        ) {
+
+            // データ抽出
+            while (rs.next()) {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("staffID", rs.getString("staffID"));
+                map.put("name", rs.getString("name"));
+
+                // リストに追加
+                staff_list.add(map);
+            }
+        }
+
+        //-----商品一覧-----
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery("select productID, name from products;")
+        ) {
+
+            // データ抽出
+            while (rs.next()) {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("productID", rs.getString("productID"));
+                map.put("name", rs.getString("name"));
+
+                // リストに追加
+                products_list.add(map);
+            }
+        }
+
     } catch (Exception e) {
         ERMSG = e.getMessage();
     }
@@ -62,7 +100,7 @@
 
         <div id="top-area-container">
 
-            <form action="sales.html" method="post" id="search-form">
+            <form action="sales.jsp" method="post" id="search-form">
                 
                 <div id="search-params-container">
 
@@ -70,20 +108,24 @@
                         
                         <select name="product" id="product-Search">
                             <option hidden disabled selected value>商品を選択</option>
-                            <option value="1">0001 ガリガリ君</option>
-                            <option value="2">0002 </option>
-                            <option value="3">0003 </option>
-                            <option value="4">0004 </option>
-                            <option value="5">0005 </option>
+<%
+                            for(int i=0; i<products_list.size(); i++){
+%>
+                            <option value="<%= i+1 %>"><%= products_list.get(i).get("productID") %> <%= products_list.get(i).get("name") %></option>
+<%
+                            }
+%>
                         </select>
 
                         <select name="staff" id="staff-Search">
                             <option hidden disabled selected value>販売の人事</option>
-                            <option value="1">ヨウさん</option>
-                            <option value="2">ガブさん</option>
-                            <option value="3">かくくん</option>
-                            <option value="4">ゆうがくん</option>
-                            <option value="5">田中さん</option>
+<%
+                            for(int i=0; i<staff_list.size(); i++){
+%>
+                            <option value="<%= i+1 %>"><%= staff_list.get(i).get("staffID") %> <%= staff_list.get(i).get("name") %></option>
+<%
+                            }
+%>
                         </select>
                         
                     </div>
@@ -115,14 +157,14 @@
         </div>
 
         <div class="back-button-holder">
-            <form action="main.html" method="post">
+            <form action="main.jsp" method="post">
                 <button class="normal-button">戻る</button>
             </form>
         </div>
 
         <div id="sales-holder">
 <%
-            for(int i=0; i<list.size(); i++){
+            for(int i=0; i<sales_list.size(); i++){
 %>
                 <div class="sale-box">
                     <div class="sale-image-txt-holder">
@@ -130,7 +172,7 @@
                         <a href="product-details.jsp" class="image-wrapper-anchor">
                             <img class="sale-image" src="images/ice1.png" width="100" height="100" alt="ice1">
                         </a>
-                        <p class="sale-text"><%= list.get(i).get("productName") %>が <%= list.get(i).get("dateTime") %>に <%= list.get(i).get("quantity") %>個 販売されました。(<%= list.get(i).get("staffName") %>より)</p>
+                        <p class="sale-text"><%= sales_list.get(i).get("productName") %>が <%= sales_list.get(i).get("dateTime") %>に <%= sales_list.get(i).get("quantity") %>個 販売されました。(<%= sales_list.get(i).get("staffName") %>より)</p>
                     </div>
                     <div class="sale-button-box">
                         <button type="button" class="edit-button" onclick="openEditPopup()">修正</button>
@@ -148,14 +190,14 @@
         </div>
 
         <div class="back-button-holder">
-            <form action="main.html" method="post">
+            <form action="main.jsp" method="post">
                 <button class="normal-button">戻る</button>
             </form>
         </div>
 
         <!--本来は複数のaタグにするか、スパンのテキストに応じてJavaScriptで検索開始-->
         <div id="page-selector-wrapper">
-            <a href="sales.html">
+            <a href="sales.jsp">
                 <p id="page-selector">1　<span>2</span></p>
             </a>
         </div>
@@ -183,11 +225,13 @@
                     <select name="product" id="product">
                         <!--動的に画像を変更する-->
                         <option hidden disabled selected value>商品を選択</option>
-                        <option value="1">0001 ガリガリ君</option>
-                        <option value="2">0002 </option>
-                        <option value="3">0003 </option>
-                        <option value="4">0004 </option>
-                        <option value="5">0005 </option>
+                        <%
+                            for(int i=0; i<products_list.size(); i++){
+                        %>
+                        <option value="<%= i+1 %>"><%= products_list.get(i).get("productID") %> <%= products_list.get(i).get("name") %></option>
+                        <%
+                            }
+                        %>
                     </select>
                 </div>
     
@@ -244,11 +288,13 @@
                     <img src="images/ice1.png" class="sale-image" alt="ice1" width="120" height="120">
                     <select name="product" id="product-edit">
                         <option hidden disabled selected value>商品を選択</option>
-                        <option value="1">0001 ガリガリ君</option>
-                        <option value="2">0002 </option>
-                        <option value="3">0003 </option>
-                        <option value="4">0004 </option>
-                        <option value="5">0005 </option>
+                        <%
+                            for(int i=0; i<products_list.size(); i++){
+                        %>
+                        <option value="<%= i+1 %>"><%= products_list.get(i).get("productID") %> <%= products_list.get(i).get("name") %></option>
+                        <%
+                            }
+                        %>
                     </select>
                 </div>
     
