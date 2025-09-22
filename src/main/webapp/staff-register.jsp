@@ -5,6 +5,8 @@
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="com.sun.jmx.snmp.SnmpUnknownAccContrModelException" %>
 <%
+    //Button押す→Confirm以上の社員データを追加していいですか？→Register　人事追加は成功しました
+    //ここではooの処理が成功したの画面、それでバックエンド側データベースの処理
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
