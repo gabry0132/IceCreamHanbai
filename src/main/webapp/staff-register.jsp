@@ -38,7 +38,7 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icekanrihanbai";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ

@@ -40,7 +40,7 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icekanrihanbai";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
@@ -81,33 +81,37 @@
             //IdCharArrayは0-9の文字入った
             //次はパスワードと社員ID(6桁の数字)を生成する と重複排除
             boolean repeated = true;
+            for (int i = 0; i < 7; i++) {
+                int randomun = (int) (Math.random() * password_totalSize);
+                generatedPassword += PasswordCharArray[randomun];
+            }
             while (repeated) {
-                    for (int i = 0; i < 7; i++) {
-                        int randomun = (int) (Math.random() * password_totalSize);
-                        generatedPassword += PasswordCharArray[randomun];
-                    }
-                    sql.setLength(0);
-                    // => sql = new StringBuffer();
-                    sql.append("select count(password) as same from staff ");
-                    sql.append("where password = '");
-                    sql.append(generatedPassword);
-                    sql.append("'");
-                    rs = stmt.executeQuery(sql.toString());
+                sql.setLength(0);
+                // => sql = new StringBuffer();
+                sql.append("select count(password) as same from staff ");
+                sql.append("where password = '");
+                sql.append(generatedPassword);
+                sql.append("'");
+                rs = stmt.executeQuery(sql.toString());
                     if (rs.next() && rs.getInt("same") == 0 ) {
                             repeated = false;
+                    }else {
+                        generatedPassword = "";
+                        for (int i = 0; i < 7; i++) {
+                            int randomun = (int) (Math.random() * password_totalSize);
+                            generatedPassword += PasswordCharArray[randomun];
                         }
-
+                    }
                 }
 
                 //同じのやり方で生成されたIDを重複排除する
                 repeated = true;
+                int randomun = 1 + (int) (Math.random() * (id_totalSize - 1));
+                for (int i = 0; i < 5; i++) {
+                    randomun = (int) (Math.random() * id_totalSize);
+                    generatedID += IdCharArray[randomun];
+                }
                 while (repeated) {
-                    int randomun = 1 + (int) (Math.random() * (id_totalSize - 1));
-                    staffID += IdCharArray[randomun];
-                    for (int i = 0; i < 5; i++) {
-                        randomun = (int) (Math.random() * id_totalSize);
-                        generatedID += IdCharArray[randomun];
-                    }
                     sql.setLength(0);
                     sql.append("select count(staffID) as same from staff ");
                     sql.append("where staffID = '");
@@ -115,7 +119,13 @@
                     sql.append("'");
                     rs = stmt.executeQuery(sql.toString());
                     if (rs.next() && rs.getInt("same")==0) {
-                            repeated = false;
+                             repeated = false;
+                    }else {
+                        generatedID="";
+                        for (int i = 0; i < 5; i++) {
+                            randomun = (int) (Math.random() * id_totalSize);
+                            generatedID += IdCharArray[randomun];
+                        }
                     }
                 }
                 sql = new StringBuffer();
