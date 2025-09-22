@@ -1,3 +1,11 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*, java.util.*" %>
+<%
+        // 文字コードの指定
+        request.setCharacterEncoding("UTF-8")
+        response.setCharacterEncoding("UTF-8");
+%>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -53,7 +61,7 @@
             <form action="sales.jsp" method="post">
                 <button class="normal-button">内容を修正する</button>
             </form>
-            <form action="sales-register.html" method="post">
+            <form action="sales-register.jsp" method="post">
                 <!--処理による文字列を変更する。特に削除の場合は、ボタンを赤くする-->
                 <button class="normal-button">登録</button>
             </form>
