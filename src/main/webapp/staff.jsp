@@ -20,7 +20,6 @@
     //確認画面の修正ボタンを押すとstaff.jspは直接修正popupを開く
     String chosen_staff = request.getParameter("staffID");
 
-
     //データベースに接続するために使用する変数宣言
     Connection con = null;
     Statement stmt = null;
@@ -37,6 +36,7 @@
     StringBuffer ermsg = null;
     HashMap<String,String> staff = null;
     ArrayList<HashMap<String,String>> staffList = new ArrayList<>();
+    ArrayList<HashMap<String,String>> staffdata = new ArrayList<>();
 
     try {
 
@@ -65,8 +65,6 @@
             staff.put("workStartDate", rs.getString("workStartDate"));
             staffList.add(staff);
         }
-        sql.setLength(0);
-
     } catch(ClassNotFoundException e){
         ermsg = new StringBuffer();
         ermsg.append(e.getMessage());
@@ -189,7 +187,6 @@
             <h2>社員情報</h2>
             <span class="close">✖</span>
         </div>
-    
         <table>
             <tr>
                 <th class="table-left-side">名前</th>
@@ -197,7 +194,7 @@
             </tr>
             <tr>
                 <th>人事ID</th>
-                <td id="staffID" name="staffID"></td>
+                <td id="check_id" name="check_id"></td>
             </tr>
             <tr>
                 <th>パスワード</th>
@@ -205,7 +202,7 @@
             </tr>
             <tr>
                 <th>電話番号</th>
-                <td id="check_tel" name="check_tel"> </td>
+                <td id="check_tel" name="check_tel"></td>
             </tr>
             <tr>
                 <th>住所</th>
@@ -216,12 +213,11 @@
                 <td id="check_workStartDate" name="check_workStartDate"></td>
             </tr>
         </table>
-        
+
         <div class="popup_footer">
-            <button onclick="change_open()" class="normal-button">個人情報修正</button>
             <!--ポップアップ開いた時点でstaffIDの値を設定する。-->
             <form action="staff-confirm.jsp" method="post">
-                <input type="hidden" name="registerType" value="delete">
+                <button onclick="change_open()" class="normal-button">個人情報修正</button>
                 <input type="hidden" name="staffID" value="staffID">
             </form>
 
@@ -249,7 +245,7 @@
                 
                 <div class="form_row">
                     <label for="id_change">人事ID</label>
-                    <input type="text" name="id" id="id_change" value="staffID" disabled>
+                    <input type="text" name="id" id="staffID" value="staffID" disabled>
                 </div>
         
                 <div class="form_row">
@@ -275,11 +271,15 @@
             </div>
 
             <div class="popup_footer">
-                <button class="normal-button cancel-popup" type="button">キャンセル</button>
+                <button class="normal-button cancel-popup" type="button" onclick="close_all_popups()">キャンセル</button>
 
                 <form action="staff-confirm.jsp" method="post">
                     <input type="hidden" name="registerType" value="change">
                     <input type="hidden" name="staffID" value="staffID">
+                    <input type="hidden" name="name_change" value="name">
+                    <input type="hidden" name="password_change" value="password">
+                    <input type="hidden" name="address_change" value="address">
+                    <input type="hidden" name="workStartDate" value="workStartDate">
                     <button class="submit">修正</button>
                 </form>
             </div>

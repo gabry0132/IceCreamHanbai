@@ -16,10 +16,10 @@
     //修正・削除の場合のパラメータ
     String staffID = request.getParameter("staffID");
     //修正から取得のデータ
-    String changed_staff_name = request.getParameter("name");
-    String changed_staff_password = request.getParameter("password");
-    String changed_staff_tel = request.getParameter("tel");
-    String changed_staff_address = request.getParameter("address");
+    String changed_staff_name = request.getParameter("changed_staff_name");
+    String changed_staff_password = request.getParameter("changed_staff_password");
+    String changed_staff_tel = request.getParameter("changed_staff_tel");
+    String changed_staff_address = request.getParameter("changed_staff_address");
 
 
     //追加の場合のパラメータ
@@ -27,7 +27,8 @@
     String tel = request.getParameter("tel");
     String address = request.getParameter("address");
     String workStartDate = request.getParameter("workStartDate");
-    //String password = request.getParameter("password");
+    String generatedPassword = request.getParameter("generatedPassword");
+    String generatedID = request.getParameter("generatedID");
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -57,8 +58,8 @@
             //SQLステートメントの作成と発行
             sql.append("insert into staff (staffID, password, name, tel, address, workStartDate, ");
             sql.append("from staff values( ");
-            sql.append("'" + staffID + "', ");
-            sql.append("' " + password + "', ");
+            sql.append("'" + generatedID + "', ");
+            sql.append("' " + generatedPassword + "', ");
             sql.append("'" + name + "', ");
             sql.append("'" + tel + "', ");
             sql.append("'" + address + "', ");

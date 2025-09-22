@@ -3,6 +3,7 @@
 <%@ page import="java.util.HashMap"%>
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.util.List" %>
 <%
     //Button押す→Confirm以上の社員データを追加していいですか？→Register　人事追加は成功しました
     //ここでは追加してもいいですかの処理、社員IDと初期パスポートの生成はこちら
@@ -10,7 +11,9 @@
     response.setCharacterEncoding("UTF-8");
     String registerType = request.getParameter("registerType");
 
+    HashMap<String,String> map = null;
     //削除の場合のパラメータ
+    List<HashMap> deletelist = new ArrayList<>();
     String staffID = request.getParameter("staffID");
     String delete_staff_name = request.getParameter("check_name");
     String delete_staff_password = request.getParameter("check_password");
@@ -18,6 +21,7 @@
     String delete_staff_address = request.getParameter("check_address");
     String delete_staff_workStartDate = request.getParameter("check_workStartDate");
     //修正の場合のパラメータ
+    List<HashMap> changelist = new ArrayList<>();
     String changed_staff_name = request.getParameter("name_change");
     String changed_staff_password = request.getParameter("password_change");
     String changed_staff_tel = request.getParameter("tel_change");
@@ -130,13 +134,8 @@
                 }
                 sql = new StringBuffer();
 
-        } else if (registerType.equals("change")) {
-
-
-        } else if (registerType.equals("delete")){
-
-
         }
+
     } catch(ClassNotFoundException e){
         ermsg = new StringBuffer();
         ermsg.append(e.getMessage());
@@ -214,11 +213,18 @@
                 内容を修正する
             </button> -->
             <form action="staff.jsp" method="post">
-                <input type="hidden" name="staffID" value="<%=staffID%>">
-                <input type="hidden" name="change_open()" value="true">
                 <button class="normal-button">内容を修正する</button>
             </form>
+            <form action="staff-register.jsp" method="post">
+                <input type="hidden" name="generatedID" value="<%=generatedID%>">
+                <input type="hidden" name="name" value="<%=name%>">
+                <input type="hidden" name="generatedPassword" value="<%=generatedPassword%>">
+                <input type="hidden" name="tel" value="<%=tel%>">
+                <input type="hidden" name="address" value="<%=address%>">
+                <input type="hidden" name="workStartDate" value="<%=workStartDate%>">
+                <input type="hidden" name="change_open()" value="true">
                 <button class="normal-button">登録</button>
+            </form>
         </div>
     </div>
 </div>
