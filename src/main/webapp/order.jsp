@@ -12,7 +12,7 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icehanbaikanri";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
@@ -20,6 +20,7 @@
 
     HashMap<String,String> order = null;
     ArrayList<HashMap<String,String>> orderList = new ArrayList<>();
+
 
     try {
 
@@ -108,21 +109,22 @@
 
                         <select>
                             <option hidden disabled selected>商品を選択</option>
-                            <option value="">a</option>
-                            <option value="">b</option>
-                            <option value="">c</option>
-                            <option value="">d</option>
-                            <option value="">e</option>
+                            <option value="a">商品a</option>
+                            <option value="b">商品b</option>
+                            <option value="c">商品c</option>
+                            <option value="d">商品d</option>
+                            <option value="e">商品e</option>
                         </select>
                         <input type="date">から
                         <br>
                         <select>
                          <option hidden disabled selected>発注実行者を選択</option>
-                          <option value="">A</option>
-                          <option value="">B</option>
-                          <option value="">C</option>
-                          <option value="">D</option>
-                          <option value="">E</option>
+                          <option value="A">Aさん</option>
+                          <option value="B">Bさん</option>
+                          <option value="C">Cさん</option>
+                          <option value="D">Dさん</option>
+                            <option value="E">Eさん</option>
+                            <option value="自動発注">自動発注</option>
                         </select>
                         <input type="date">まで
                         <button class="submit">この条件で検索</button>
@@ -134,7 +136,7 @@
             </div>
 
             <div id="back">
-              <form action="main.html" method="post">
+              <form action="main.jsp" method="post">
                 <button id="back">戻る</button>
               </form>
             </div>
@@ -144,72 +146,42 @@
 
         <h4>発注データがありません。</h4>
 
+        <table class="order">
+            <tr>
+                <td class="photo">
+                    <img src="images/ice1.png" width="90" height="90" alt="ice1">
+                </td>
+                <td>
+                    <p class="status">板チョコアイスが9月24日に30個発注された(○○より)</p>
+                </td>
+                <td class="status">発注確認中<br><button id="stop">発注停止</button></td>
+            </tr>
+        </table>
+
         <% } else { %>
         <div>
           <dl>
               <% for (int i = 0; i < orderList.size(); i++) { %>
 
-            <table class="order">
-              <tr>
-                <td class="photo">
-                  <img src="images/ice1.png" width="90" height="90" alt="ice1">
-                </td>
-                <td>
-                  <p class="status">板チョコアイスが9月24日に30個発注された(○○より)</p>
-                </td>
-                <td class="status">発注確認中<br><button id="stop">発注停止</button></td>
-              </tr>
-            </table>
+              <table class="order">
+                  <tr>
+                      <td class="photo">
+                          <img src="images/ice<%=i%>.png" width="90" height="90" alt="ice1">
+                      </td>
+                      <td>
+                          <p class="status"><%=orderList.get(i).get("productID")%>が<%=orderList.get(i).get("statDateTime")%>に<%=orderList.get(i).get("quantity")%>個発注された(<%=orderList.get(i).get("initiator")%>より)</p>
+                      </td>
+                      <!-- 「配達時間」と「入荷時間」を比較して判断-->
+                      <% if (orderList.get(i).get("statDateTime") == ""){%>
+                      <td class="status">発注確認中<br><button id="stop">発注停止</button></td>
+                      <% } else if (orderList.get(i).get("statDateTime") == ""){%>
+                      <td class="status">配達中</td>
+                      <% } else {%>
+                      <td class="status">入荷済み</td>
+                      <% }%>
+                  </tr>
+              </table>
 
-
-
-            <table class="order">
-              <tr>
-                <td class="photo">
-                  <img src="images/ice3.jpg" width="90" height="90" alt="ice1">
-                </td>
-                <td>
-                  <p class="status">じゃがいも　もなかが7月29日に30個発注された(自動発注より)</p>
-                </td>
-                <td class="status">配達中</td>
-              </tr>
-            </table>
-
-            <table class="order">
-              <tr>
-                <td class="photo">
-                  <img src="images/ice4.jpg" width="90" height="90" alt="ice1">
-                </td>
-                <td>
-                  <p class="status">Häagen-Dazs 　バニラチョコレートマカデミアが7月3日に30個発注された(○○より)</p>
-                </td>
-                <td class="status">配達中</td>
-              </tr>
-            </table>
-
-            <table class="order">
-              <tr>
-                <td class="photo">
-                  <img src="images/ice5.jpg" width="90" height="90" alt="ice1">
-                </td>
-                <td>
-                  <p class="status">PARM (chocolate)が6月15日に25個発注された(自動発注より)</p>
-                </td>
-                <td class="status">入荷済み</td>
-              </tr>
-            </table>
-
-            <table class="order">
-              <tr>
-                <td class="photo">
-                  <img src="images/ice6.jpg" width="90" height="90" alt="ice1">
-                </td>
-                <td>
-                  <p class="status">午後の紅茶フローズンティーラテが5月25日に40個発注された(○○より)</p>
-                </td>
-                <td class="status">入荷済み</td>
-              </tr>
-            </table>
               <% } %>
           </dl>
         </div>
@@ -228,7 +200,7 @@
     <!-- 商品追加ポップアップ -->
     <div id="add-product-popup">
 
-        <form action="order-details.html" method="post">
+        <form action="order-details.jsp" method="post">
 
             <div id="add-top-row">
 
@@ -241,13 +213,13 @@
 
                 <div id="add-image-section">
 
-                    <img src="images/ice12.jpg" width="90" height="90" alt="">
-                    <select>
-                      <option>商品a</option>
-                      <option>商品b</option>
-                      <option>商品c</option>
-                      <option>商品d</option>
-                      <option>商品e</option>
+                    <img src="images/ice2.jpg" width="90" height="90" alt="">
+                    <select id="productID">
+                      <option value="">商品a</option>
+                      <option value="">商品b</option>
+                      <option value="">商品c</option>
+                      <option value="">商品d</option>
+                      <option value="">商品e</option>
                     </select>
 
                 </div>
@@ -257,7 +229,7 @@
                     <table class="add-table">
                         <tr>
                             <td class="add-table-left-side">発注個数</td>
-                            <td><input type="text" name="name" id="name"></td>
+                            <td><input type="number" min="0" max="999" id="unitPerBox">箱</td>
                         </tr>
                         <tr>
                             <td class="table-left-side">発注確認時間</td>
@@ -277,8 +249,7 @@
 
             </div>
 
-            <!-- 登録を個別するための非表示項目 -->
-            <input type="hidden" name="registerType" value="add">
+            <input type="hidden" id="initiator">
 
             <div id="add-buttons-holder">
                 <button type="button" class="normal-button" id="btn-add-cancel">キャンセル</button>
@@ -294,7 +265,7 @@
     <!-- 発注キャンセルポップアップ -->
     <div id="cancel-popup">
 
-        <form action="order-register.html" method="post">
+        <form action="order-register.jsp" method="post">
 
             <div id="add-top-row">
 
@@ -332,14 +303,14 @@
 
             </div>
 
-            <!-- 登録を個別するための非表示項目 -->
-            <input type="hidden" name="registerType" value="add">
-
               <p>発注を停止しますか？</p>
             <div id="add-buttons-holder">
                 <button type="button" class="normal-button" id="btn-stop-cancel">キャンセル</button>
                 <button class="normal-button" type="submit">発注停止</button>
             </div>
+
+            <!-- 登録を個別するための非表示項目 -->
+            <input type="hidden" name="registerType" value="delete">
 
         </form>
 
