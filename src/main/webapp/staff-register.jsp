@@ -5,6 +5,8 @@
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="com.sun.jmx.snmp.SnmpUnknownAccContrModelException" %>
 <%
+    //Button押す→Confirm以上の社員データを追加していいですか？→Register　人事追加は成功しました
+    //ここではooの処理が成功したの画面、それでバックエンド側データベースの処理
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
@@ -14,10 +16,10 @@
     //修正・削除の場合のパラメータ
     String staffID = request.getParameter("staffID");
     //修正から取得のデータ
-    String changed_staff_name = request.getParameter("name");
-    String changed_staff_password = request.getParameter("password");
-    String changed_staff_tel = request.getParameter("tel");
-    String changed_staff_address = request.getParameter("address");
+    String changed_staff_name = request.getParameter("changed_staff_name");
+    String changed_staff_password = request.getParameter("changed_staff_password");
+    String changed_staff_tel = request.getParameter("changed_staff_tel");
+    String changed_staff_address = request.getParameter("changed_staff_address");
 
 
     //追加の場合のパラメータ
@@ -25,7 +27,8 @@
     String tel = request.getParameter("tel");
     String address = request.getParameter("address");
     String workStartDate = request.getParameter("workStartDate");
-    //String password = request.getParameter("password");
+    String generatedPassword = request.getParameter("generatedPassword");
+    String generatedID = request.getParameter("generatedID");
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -36,7 +39,7 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icekanrihanbai";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
@@ -55,8 +58,8 @@
             //SQLステートメントの作成と発行
             sql.append("insert into staff (staffID, password, name, tel, address, workStartDate, ");
             sql.append("from staff values( ");
-            sql.append("'" + staffID + "', ");
-            sql.append("' " + password + "', ");
+            sql.append("'" + generatedID + "', ");
+            sql.append("' " + generatedPassword + "', ");
             sql.append("'" + name + "', ");
             sql.append("'" + tel + "', ");
             sql.append("'" + address + "', ");
