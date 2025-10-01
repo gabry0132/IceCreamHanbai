@@ -2,6 +2,9 @@
 <%@ page import="java.sql.*" %>
 
 <%
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
+
     String errorMsg = (String)request.getAttribute("errorMsg");
     if (errorMsg == null) {
         errorMsg = "エラーが発生しました。";

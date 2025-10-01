@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
 <%
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
+
     String staffID = request.getParameter("staffID");
     String pass = request.getParameter("pass");
     //データベースに接続するために使用する変数宣言
@@ -12,7 +15,7 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/minishopping_site";
+    String url = "jdbc:mysql://localhost/icehanbaikanri";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
