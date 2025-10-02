@@ -28,7 +28,7 @@
     <form action="sales.jsp" method="post">
       <button class="normal-button">売上管理</button>
     </form>
-    <form action="order.html" method="post">
+    <form action="order.jsp" method="post">
       <button class="normal-button">発注管理</button>
     </form>
     <form action="system-menu.html" method="post">
