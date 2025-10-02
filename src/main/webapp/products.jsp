@@ -31,7 +31,11 @@
     if(alertNumber == null || alertNumber.equals("0")) alertNumber = "";
     String autoOrderLimit = request.getParameter("autoOrderLimit");
     String autoOrderQuantity = request.getParameter("autoOrderQuantity");
+    String unitPerBox = request.getParameter("unitPerBox");
     String imageFileName = request.getParameter("imageFileName");
+
+    //画像データの保存場所を指定する。
+//    String absolutePath = application.getRealPath("\\images");
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -49,7 +53,9 @@
     StringBuffer ermsg = null;
 
     HashMap<String,String> product = null;
+    HashMap<String,String> tag = null;
     ArrayList<HashMap<String,String>> productsList = new ArrayList<>();
+    ArrayList<HashMap<String,String>> tags = new ArrayList<>();
 
     try {
 
@@ -59,7 +65,7 @@
         stmt = con.createStatement();
 
         //「商品追加」処理をキャンセルして本画面に戻った場合は途中でアップロードされた画像の削除を行う
-        if(!imageFileName.isEmpty()){
+        if(imageFileName != null){
             //出力場所を取得する
             String relativePath = "\\images";
             String targetUrl = application.getRealPath(relativePath);
@@ -67,11 +73,26 @@
             if(!file.delete()){
                 System.out.println("Error deleting file");
             }
+        }
+
+        //タグとタグタイプを取得します。
+        sql = new StringBuffer();
+        sql.append("select tags.tagID, tags.value, tags.tagTypeID, t.type from tags inner join icehanbaikanri.tagtypes t on tags.tagTypeID = t.tagTypeID where tags.deleteFlag = 0");
+        rs = stmt.executeQuery(sql.toString());
+
+        while(rs.next()){
+
+            tag = new HashMap<>();
+            tag.put("tagID", rs.getString("tagID"));
+            tag.put("value", rs.getString("value"));
+            tag.put("tagTypeID", rs.getString("tagTypeID"));
+            tag.put("tagType", rs.getString("type"));
+            tags.add(tag);
 
         }
 
         sql = new StringBuffer();
-        sql.append("select productID, name, quantity, alertNumber image from products ");
+        sql.append("select productID, name, quantity, alertNumber, image from products ");
         sql.append("where deleteFlag = 0");
 
         rs = stmt.executeQuery(sql.toString());
@@ -80,9 +101,9 @@
             product = new HashMap<String,String>();
             product.put("productID", rs.getString("productID"));
             product.put("name", rs.getString("name"));
-            product.put("quantity", rs.getString("purchaseCost"));
-            product.put("image", rs.getString("image"));
+            product.put("quantity", rs.getString("quantity"));
             product.put("alertNumber", rs.getString("alertNumber"));
+            product.put("image", rs.getString("image"));
 
             productsList.add(product);
         }
@@ -132,7 +153,7 @@
 
             <div id="search-params-container">
 
-                <form action="products.html" method="post" id="search-form">
+                <form action="products.jsp" method="post" id="search-form">
                     
                     <div id="search-params-outerWrapper">
                         <div id="text-boxes-container">
@@ -146,30 +167,32 @@
                         </div>
                         
                         <div id="pulldown-menus-container">
-                            
+
                             <select name="searchMaker" id="searchMaker">
                                 <option hidden disabled selected value>メーカー</option>
-                                <option value="akagi">akagi</option>
-                                <option value="morinaga">morinaga</option>
-                                <option value="meiji">meiji</option>
-                                <option value="glico">glico</option>
-                                <option value="lotte">lotte</option>
+                                <% for(int i = 0; i < tags.size(); i++) { %>
+                                    <% if(tags.get(i).get("tagType").equals("メーカー")){ %>
+                                        <option value="<%=tags.get(i).get("tagID")%>"><%=tags.get(i).get("value")%></option>
+                                    <% } %>
+                                <% } %>
                             </select>
-                            
+
                             <select name="searchFlavor" id="searchFlavor">
                                 <option hidden disabled selected value>味</option>
-                                <option value="vanilla">vanilla</option>
-                                <option value="strawberry">strawberry</option>
-                                <option value="chocolate">chocolate</option>
-                                <option value="lemon">lemon</option>
+                                <% for(int i = 0; i < tags.size(); i++) { %>
+                                    <% if(tags.get(i).get("tagType").equals("味")){ %>
+                                        <option value="<%=tags.get(i).get("tagID")%>"><%=tags.get(i).get("value")%></option>
+                                    <% } %>
+                                <% } %>
                             </select>    
                             
                             <select name="searchType" id="searchType">
                                 <option hidden disabled selected value>種類</option>
-                                <option value="bar">bar</option>
-                                <option value="cone">cone</option>
-                                <option value="sando">sando</option>
-                                <option value="cup">cup</option>
+                                <% for(int i = 0; i < tags.size(); i++) { %>
+                                    <% if(tags.get(i).get("tagType").equals("種類")){ %>
+                                        <option value="<%=tags.get(i).get("tagID")%>"><%=tags.get(i).get("value")%></option>
+                                    <% } %>
+                                <% } %>
                             </select>
                             
                         </div>
@@ -188,7 +211,7 @@
             <div id="page-controls-holder">
 
                 <button class="normal-button" id="btn-add">商品追加</button>
-                <form action="main.html" method="post">
+                <form action="main.jsp" method="post">
                     <button class="normal-button">戻る</button>
                 </form>
 
@@ -214,13 +237,15 @@
                         }
                     %>
 
-                    <div class="product-container<% if(showAlert){ %> showAlert<% } %>" title="<%= productsList.get(i).get("name") %>">
+                    <div class="product-container<% if(showAlert){ %> showAlert<% } %>" title="<%= productsList.get(i).get("name") %>" onclick="window.open('product-details.jsp?productID=<%=productsList.get(i).get("productID")%>', '_self')">
                         <table class="product-table">
                             <tr>
                                 <td class="product-image-holder" rowspan="4">
-                                    <img src="images/<%= productsList.get(i).get("image") %>" width="90" height="90" alt="<%= productsList.get(i).get("name") %>">
+                                    <img src="<%=request.getContextPath()%>/images/<%=productsList.get(i).get("image")%>" width="90" height="90" alt="<%= productsList.get(i).get("name") %>">
                                 </td>
-                                <td class="product-ID-holder">ID: <%=productsList.get(i).get("productID")%></td> <!--本来は直接出力、今はJSで-->
+                                <!-- IDを5桁表示にします。 -->
+                                <% int zeroesToPad = 5 - productsList.get(i).get("productID").length(); %>
+                                <td class="product-ID-holder">ID: <% for (int j = 0; j < zeroesToPad; j++) { %>0<% } %><%=productsList.get(i).get("productID")%></td>
                             </tr>
                             <tr>
                                 <td class="product-name-holder"><%= productsList.get(i).get("name")%></td>
@@ -242,7 +267,7 @@
 
 
         <div id="bottom-buttons-container">
-            <form action="main.html" method="post">
+            <form action="main.jsp" method="post">
                 <button class="normal-button">戻る</button>
             </form>
         </div>
@@ -277,83 +302,115 @@
                 </div>
 
                 <div id="add-tables-wrapper">
-    
-                    <table class="add-table">
-                        <tr>
-                            <td class="add-table-left-side">商品名</td>
-                            <td><input type="text" name="name" id="name" required></td>
-                        </tr>
-                        <tr>
-                            <td>メーカー</td>
-                            <td>
-                                <select name="maker" id="maker" required>
-                                    <option hidden disabled selected value>メーカー</option>
-                                    <option value="1">akagi</option>
-                                    <option value="2">morinaga</option>
-                                    <option value="3">meiji</option>
-                                    <option value="4">glico</option>
-                                    <option value="5">lotte</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>味</td>
-                            <td>
-                                <select name="flavor" id="flavor" required>
-                                    <option hidden disabled selected value>味</option>
-                                    <option value="1">vanilla</option>
-                                    <option value="2">strawberry</option>
-                                    <option value="3">chocolate</option>
-                                    <option value="lemon">lemon</option>
-                                </select>  
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>種類</td>
-                            <td>
-                                <select name="type" id="type" required>
-                                    <option hidden disabled selected value>種類</option>
-                                    <option value="bar">bar</option>
-                                    <option value="cone">cone</option>
-                                    <option value="sando">sando</option>
-                                    <option value="cup">cup</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>購入コスト</td>
-                            <td><input type="text" name="cost" id="cost" required></td>
-                            <td>円</td>
-                        </tr>
-                        <tr>
-                            <td>販売値段</td>
-                            <td><input type="text" name="price" id="price" required></td>
-                            <td>円</td>
-                        </tr>
-                    </table>
 
-                    <table class="add-table">
-                        <tr>
-                            <td class="table-left-side">在庫数</td>
-                            <td><input type="number" name="instockQuantity" id="instockQuantity" min="0" max="999"></td>
-                            <td>個<span class="optional-parameter-wrapper">（任意）</span></td>
-                        </tr>
-                        <tr>
-                            <td>アラート限界</td>
-                            <td><input type="number" name="alertNumber" id="alertNumber" min="0" max="999"></td>
-                            <td>個<span class="optional-parameter-wrapper">（任意）</span></td>
-                        </tr>
-                        <tr>
-                            <td>自動発注限界</td>
-                            <td><input type="number" name="autoOrderLimit" id="autoOrderLimit" min="0" max="999" required></td>
-                            <td>個</td>
-                        </tr>
-                        <tr>
-                            <td>自動発注個数</td>
-                            <td><input type="number" name="autoOrderQuantity" id="autoOrderQuantity" min="0" max="999" required></td>
-                            <td>個</td>
-                        </tr>
-                    </table>
+                    <div id="add-top-tables-wrapper">
+    
+                        <table class="add-table">
+                            <tr>
+                                <td class="add-table-left-side">商品名</td>
+                                <td><input type="text" name="name" id="name" required></td>
+                            </tr>
+                            <tr>
+                                <td>メーカー</td>
+                                <td>
+                                    <select name="maker" id="maker" required>
+                                        <option hidden disabled selected value>メーカー</option>
+                                        <% for(int i = 0; i < tags.size(); i++) { %>
+                                            <% if(tags.get(i).get("tagType").equals("メーカー")){ %>
+                                                <option value="<%=tags.get(i).get("tagID")%>"><%=tags.get(i).get("value")%></option>
+                                            <% } %>
+                                        <% } %>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>味</td>
+                                <td>
+                                    <select name="flavor" id="flavor" required>
+                                        <option hidden disabled selected value>味</option>
+                                        <% for(int i = 0; i < tags.size(); i++) { %>
+                                            <% if(tags.get(i).get("tagType").equals("味")){ %>
+                                                <option value="<%=tags.get(i).get("tagID")%>"><%=tags.get(i).get("value")%></option>
+                                            <% } %>
+                                        <% } %>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>種類</td>
+                                <td>
+                                    <select name="type" id="type" required>
+                                        <option hidden disabled selected value>種類</option>
+                                        <% for(int i = 0; i < tags.size(); i++) { %>
+                                            <% if(tags.get(i).get("tagType").equals("種類")){ %>
+                                                <option value="<%=tags.get(i).get("tagID")%>"><%=tags.get(i).get("value")%></option>
+                                            <% } %>
+                                        <% } %>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>購入コスト</td>
+                                <td><input type="text" name="cost" id="cost" required></td>
+                                <td>円</td>
+                            </tr>
+                            <tr>
+                                <td>販売値段</td>
+                                <td><input type="text" name="price" id="price" required></td>
+                                <td>円</td>
+                            </tr>
+                        </table>
+
+                        <table class="add-table">
+                            <tr>
+                                <td class="table-left-side">在庫数</td>
+                                <td><input type="number" name="instockQuantity" id="instockQuantity" min="0" max="999"></td>
+                                <td>個<span class="optional-parameter-wrapper">（任意）</span></td>
+                            </tr>
+                            <tr>
+                                <td>アラート限界</td>
+                                <td><input type="number" name="alertNumber" id="alertNumber" min="0" max="999"></td>
+                                <td>個<span class="optional-parameter-wrapper">（任意、個数）</span></td>
+                            </tr>
+                            <tr>
+                                <td>自動発注限界</td>
+                                <td><input type="number" name="autoOrderLimit" id="autoOrderLimit" min="0" max="999" required></td>
+                                <td>個<span class="optional-parameter-wrapper">（個数）</span></td>
+                            </tr>
+                            <tr>
+                                <td>自動発注数量</td>
+                                <td><input type="number" name="autoOrderQuantity" id="autoOrderQuantity" min="0" max="999" required></td>
+                                <td>箱<span class="optional-parameter-wrapper">（箱数）</span></td>
+                            </tr>
+                        </table>
+
+                    </div>
+
+                    <div id="add-bottom-tables-wrapper">
+                        <table class="add-table">
+                            <tr>
+                                <td>１箱数量</td>
+                                <td><input type="number" name="unitPerBox" id="unitPerBox" min="0" max="999" required></td>
+                                <td>個</td>
+                            </tr>
+                        </table>
+
+                        <table class="add-table">
+                            <tr>
+                                <td>発注確認日数</td>
+                                <td><input type="number" name="confirmDays" id="confirmDays" min="0" max="999" required></td>
+                                <td>日</td>
+                            </tr>
+                        </table>
+
+                        <table class="add-table">
+                            <tr>
+                                <td>発注配達日数</td>
+                                <td><input type="number" name="shippingDays" id="shippingDays" min="0" max="999" required></td>
+                                <td>日</td>
+                            </tr>
+                        </table>
+                    </div>
 
                 </div>
                 
@@ -378,16 +435,9 @@
         let obfuscationBanner = document.getElementById("obfuscation-banner");
         let body = document.getElementsByTagName("body")[0];
 
-        //IDの動的設定。本来はJavaにする
-        let idHolders = document.getElementsByClassName("product-ID-holder");
-        for (let i = 0; i < idHolders.length; i++) {
-            idHolders[i].textContent += String(i).padStart(4, '0');
-        }
-
         //最初からポップアップを表示すべきかどうか判断
         let showAddPopup = "<%=status%>";
         if(showAddPopup == "returnFromAdd"){
-            console.log("must open popup");
             //フォーム内の値を設定する。
             document.getElementById("name").value="<%=productName%>"
             let makerSelectChildren = Array.from(document.getElementById("maker").children);
@@ -414,6 +464,7 @@
             document.getElementById("alertNumber").value="<%=alertNumber%>";
             document.getElementById("autoOrderLimit").value="<%=autoOrderLimit%>";
             document.getElementById("autoOrderQuantity").value="<%=autoOrderQuantity%>";
+            document.getElementById("unitPerBox").value="<%=unitPerBox%>";
 
             //ポップアップを表示する
             openAddPopup();
@@ -425,9 +476,6 @@
         document.getElementById("btn-add-cancel").addEventListener("click", closeAllPopups);
         obfuscationBanner.addEventListener("click", closeAllPopups);
         let productHolders = document.getElementsByClassName("product-container");
-        for (let i = 0; i < productHolders.length; i++) {
-            productHolders[i].addEventListener("click", () => window.open("product-details.html", "_self"));
-        }
 
         //追加ポップアップの表示
         function openAddPopup(){

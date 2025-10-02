@@ -18,7 +18,6 @@
 
     <button type="button" class="normal-button">商品</button>
     <button type="button" class="normal-button">売上</button>
-    <button type="button" class="normal-button">人事</button>
     <button type="button" class="normal-button">お知らせ</button>
     <button type="button" class="normal-button">すべて</button>
 </div>

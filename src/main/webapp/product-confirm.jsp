@@ -25,65 +25,90 @@
     String cost = request.getParameter("cost");
     String price = request.getParameter("price");
     String instockQuantity = request.getParameter("instockQuantity");
-    if(instockQuantity == null) instockQuantity = "0";
+    if(instockQuantity.isEmpty()) instockQuantity = "0";
     String alertNumber = request.getParameter("alertNumber");
-    if(alertNumber == null) alertNumber = "0";
+    if(alertNumber.isEmpty()) alertNumber = "0";
     String autoOrderLimit = request.getParameter("autoOrderLimit");
     String autoOrderQuantity = request.getParameter("autoOrderQuantity");
+    String confirmDays = request.getParameter("confirmDays");
+    String shippingDays = request.getParameter("shippingDays");
+    String unitPerBox = request.getParameter("unitPerBox");
     String imageFileName = "";
     Part imagePart = request.getPart("image");
+    String makerName = "";
+    String flavorName = "";
+    String typeName = "";
 
     //削除
     String quantity;
-    if(registerType.equals("add")){
 
-        //追加の場合は今の時点で画像を登録する
-        PrintWriter printWriterOut;
-        printWriterOut = response.getWriter();
+    //データベースに接続するために使用する変数宣言
+    Connection con = null;
+    Statement stmt = null;
+    StringBuffer sql = null;
+    ResultSet rs = null;
 
-        //出力の場所を動的に指定する
-        String relativePath = "\\images";
-        String absolutePath = application.getRealPath(relativePath);
-        File uploads = new File(absolutePath);
+    //ローカルのMySqlに接続する設定
+    String user = "root";
+    String password = "root";
+    String url = "jdbc:mysql://localhost/icehanbaikanri";
+    String driver = "com.mysql.jdbc.Driver";
 
-        InputStream fileContent = imagePart.getInputStream();
+    //確認メッセージ
+    StringBuffer ermsg = null;
 
-        //現在時刻を取得してファイル名に設定する。
-        long timestampMillis = Instant.now().toEpochMilli();    //新しいファイル名になる
-        //拡張子を取得
-        String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
-        String ext = fileName.substring(fileName.lastIndexOf('.'));
-        //ファイル名を設定する。
-        imageFileName = timestampMillis + ext;
+    try {
 
-        //書き込む
-        File image = new File(uploads, imageFileName);
-        Files.copy(fileContent, image.toPath(), StandardCopyOption.REPLACE_EXISTING);
-    }
-    else if(registerType.equals("delete")){
-        //データベースに接続するために使用する変数宣言
-        Connection con = null;
-        Statement stmt = null;
-        StringBuffer sql = null;
-        ResultSet rs = null;
+        //オブジェクトの代入
+        Class.forName(driver).newInstance();
+        con = DriverManager.getConnection(url, user, password);
+        stmt = con.createStatement();
+        sql = new StringBuffer();
 
-        //ローカルのMySqlに接続する設定
-        String user = "root";
-        String password = "root";
-        String url = "jdbc:mysql://localhost/icehanbaikanri";
-        String driver = "com.mysql.jdbc.Driver";
+        if(registerType.equals("add")){
 
-        //確認メッセージ
-        StringBuffer ermsg = null;
+            //表示に必要なタグ名を取得します。
+            sql.append("select tagID, value from tags where deleteFlag = 0 and tagID in(");
+            sql.append(maker);
+            sql.append(",");
+            sql.append(type);
+            sql.append(",");
+            sql.append(flavor);
+            sql.append(")");
+            rs = stmt.executeQuery(sql.toString());
 
-        try {
+            while(rs.next()){
+                if(rs.getString("tagID").equals(maker)) makerName = rs.getString("value");
+                else if(rs.getString("tagID").equals(flavor)) flavorName = rs.getString("value");
+                else if(rs.getString("tagID").equals(type)) typeName = rs.getString("value");
+            }
 
-            //オブジェクトの代入
-            Class.forName(driver).newInstance();
-            con = DriverManager.getConnection(url, user, password);
-            stmt = con.createStatement();
+            //追加の場合は今の時点で画像を登録する
+            PrintWriter printWriterOut;
+            printWriterOut = response.getWriter();
 
-            sql = new StringBuffer();
+            //出力の場所を動的に指定する
+            String relativePath = "\\images";
+            String absolutePath = application.getRealPath(relativePath);
+            File uploads = new File(absolutePath);
+
+            InputStream fileContent = imagePart.getInputStream();
+
+            //現在時刻を取得してファイル名に設定する。
+            long timestampMillis = Instant.now().toEpochMilli();    //新しいファイル名になる
+            //拡張子を取得
+            String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
+            String ext = fileName.substring(fileName.lastIndexOf('.'));
+            //ファイル名を設定する。
+            imageFileName = timestampMillis + ext;
+
+            //書き込む
+            File image = new File(uploads, imageFileName);
+            Files.copy(fileContent, image.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        }
+        else if(registerType.equals("delete")){
+
             sql.append("select name, quantity, image from products ");
             sql.append("where deleteFlag = 0 and productID=");
             sql.append(productID);
@@ -96,31 +121,32 @@
                 imageFileName = rs.getString("image");
             }
 
-        } catch(ClassNotFoundException e){
-            ermsg = new StringBuffer();
-            ermsg.append(e.getMessage());
+        }
+
+    } catch(ClassNotFoundException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }catch(SQLException e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }catch(Exception e){
+        ermsg = new StringBuffer();
+        ermsg.append(e.getMessage());
+    }
+    finally{
+        try{
+            if(rs != null){
+                rs.close();
+            }
+            if(stmt != null){
+                stmt.close();
+            }
+            if(con != null){
+                con.close();
+            }
         }catch(SQLException e){
             ermsg = new StringBuffer();
             ermsg.append(e.getMessage());
-        }catch(Exception e){
-            ermsg = new StringBuffer();
-            ermsg.append(e.getMessage());
-        }
-        finally{
-            try{
-                if(rs != null){
-                    rs.close();
-                }
-                if(stmt != null){
-                    stmt.close();
-                }
-                if(con != null){
-                    con.close();
-                }
-            }catch(SQLException e){
-                ermsg = new StringBuffer();
-                ermsg.append(e.getMessage());
-            }
         }
     }
 
@@ -150,7 +176,7 @@
 
                 <div id="left-section-wrapper">
 
-                    <img class="image" src="images/<%=imageFileName%>" width="100" height="100" alt="<%=productName%>">
+                    <img class="image" src="<%=request.getContextPath()%>/images/<%=imageFileName%>" width="100" height="100" alt="<%=productName%>">
 
                 </div>
 
@@ -163,35 +189,55 @@
                         </tr>
                         <tr>
                             <td class="table-left-side">メーカー</td>
-                            <td><%=maker%></td>
+                            <td><%=makerName%></td>
                         </tr>
                         <tr>
                             <td class="table-left-side">味</td>
-                            <td><%=flavor%></td>
+                            <td><%=flavorName%></td>
                         </tr>
                         <tr>
                             <td class="table-left-side">種類</td>
-                            <td><%=type%></td>
+                            <td><%=typeName%></td>
                         </tr>
                         <tr>
                             <td class="table-left-side">購入コスト</td>
-                            <td><%=cost%></td>
+                            <td><%=cost%>円</td>
                         </tr>
                         <tr>
                             <td class="table-left-side">値段</td>
-                            <td><%=price%></td>
+                            <td><%=price%>円</td>
                         </tr>
-                        <tr>
-                            <td class="table-left-side">在庫数</td>
-                            <td><%=instockQuantity%></td>
-                        </tr>
+                        <% if(Integer.parseInt(instockQuantity) > 0){ %>
+                            <tr>
+                                <td class="table-left-side">在庫数</td>
+                                <td><%=instockQuantity%>個</td>
+                            </tr>
+                        <% } %>
+                        <% if(Integer.parseInt(alertNumber) > 0){ %>
+                            <tr>
+                                <td class="table-left-side">アラート限界</td>
+                                <td><%=alertNumber%>個</td>
+                            </tr>
+                        <% } %>
                         <tr>
                             <td class="table-left-side">自動発注限界</td>
-                            <td><%=autoOrderLimit%></td>
+                            <td><%=autoOrderLimit%>個</td>
                         </tr>
                         <tr>
-                            <td class="table-left-side">自動発注個数</td>
-                            <td><%=autoOrderQuantity%></td>
+                            <td class="table-left-side">１箱数量</td>
+                            <td><%=unitPerBox%>個</td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">自動発注数量</td>
+                            <td id="totalQuantityPerOrder"><%=autoOrderQuantity%>箱</td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">発注確認日数</td>
+                            <td><%=confirmDays%>日</td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">発注配達日数</td>
+                            <td><%=shippingDays%>日</td>
                         </tr>
                     </table>
 
@@ -215,6 +261,9 @@
                     <input type="hidden" name="alertNumber" value="<%=alertNumber%>">
                     <input type="hidden" name="autoOrderLimit" value="<%=autoOrderLimit%>">
                     <input type="hidden" name="autoOrderQuantity" value="<%=autoOrderQuantity%>">
+                    <input type="hidden" name="confirmDays" value="<%=confirmDays%>">
+                    <input type="hidden" name="shippingDays" value="<%=shippingDays%>">
+                    <input type="hidden" name="unitPerBox" value="<%=unitPerBox%>">
                     <input type="hidden" name="imageFileName" value="<%=imageFileName%>">
 
                     <button class="normal-button">内容を修正する</button>
@@ -234,6 +283,9 @@
                     <input type="hidden" name="alertNumber" value="<%=alertNumber%>">
                     <input type="hidden" name="autoOrderLimit" value="<%=autoOrderLimit%>">
                     <input type="hidden" name="autoOrderQuantity" value="<%=autoOrderQuantity%>">
+                    <input type="hidden" name="confirmDays" value="<%=confirmDays%>">
+                    <input type="hidden" name="shippingDays" value="<%=shippingDays%>">
+                    <input type="hidden" name="unitPerBox" value="<%=unitPerBox%>">
                     <input type="hidden" name="imageFileName" value="<%=imageFileName%>">
 
                     <!--処理による文字列を変更する。特に削除の場合は、ボタンを赤くする-->
@@ -270,11 +322,11 @@
             }
         %>
 
-
-
-
-
     </div>
-
+    <script>
+        let unitsPerBox = <%=unitPerBox%>;
+        let boxesToOrder = <%=autoOrderQuantity%>;
+        document.getElementById("totalQuantityPerOrder").innerHTML += "　合計: " + (unitsPerBox * boxesToOrder) + "個";
+    </script>
 </body>
 </html>

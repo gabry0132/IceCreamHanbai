@@ -134,6 +134,14 @@ span{
     color: orangered;
 }
 
+a.product-anchor{
+    display: block;
+    width: fit-content;
+    height: fit-content;
+    text-decoration: none;
+    color: black;
+}
+
 /* 商品追加のポップアップの設定はここから */
 
 .stop-scrolling {   /*ポップアップが出たら後ろのページをスクロールさせないためにbodyにclassを付ける*/
@@ -164,7 +172,7 @@ div#add-product-popup{
     transform: translate(-50%, -50%);
     display: none;  /* flexとnoneを切り替える */
     z-index: 15;
-    width: 50%;
+    width: 60%;
     flex-direction: column;
     padding: 10px 50px;
     border: 2px solid black;
@@ -204,9 +212,27 @@ div#add-image-section{
 
 div#add-tables-wrapper{
     display: flex;
+    flex-direction: column;
     width: fit-content;
     margin: auto;
     justify-content: space-between;
+}
+
+div#add-top-tables-wrapper{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+    justify-content: space-between;
+    table{
+        margin: 10px 20px;
+    }
+}
+
+
+div#add-bottom-tables-wrapper{
+    display: flex;
+    width: fit-content;
+    margin: 2% auto;
     table{
         margin: 10px 20px;
     }

@@ -3,7 +3,7 @@ div#everything-wrapper{
     width: 100%;
     align-items: center;
     height: fit-content;
-    margin: 10% auto;
+    margin: 5% auto auto;
     display: flex;
     flex-direction: column;
 }

@@ -214,7 +214,7 @@
     </div>
 
     <div id="modoru-holder">
-        <form action="main.html" method="post">
+        <form action="main.jsp" method="post">
             <button id="modoru" class="normal-button">戻る</button>
         </form>
     </div>
@@ -256,9 +256,14 @@
 
         function applySearch(){
             console.log(searchBox.value);
-            if (searchBox.value == "" || searchBox.value == undefined) return;
+            if (searchBox.value == undefined) return;
+            if (searchBox.value == ""){
+                for (let i = 0; i < tags.length; i++) {
+                    tagBoxes[i].style.display = "flex";
+                }
+                return;
+            }
             for (let i = 0; i < tags.length; i++) {
-                console.log("we in here");
                 const tagText = tags[i];
                 if(tagText.innerHTML.includes(searchBox.value)){
                     tagBoxes[i].style.display = "flex";
