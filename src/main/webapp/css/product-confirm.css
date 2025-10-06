@@ -52,6 +52,118 @@ button.normal-button:hover{
     box-shadow: 0 4px 8px 0 #00000033, 0 6px 20px 0 #00000030;
 }
 
+/* detailsUpdateの設定がここから */
+
+
+div#update-wrapper{
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    margin: auto;
+    table tr{
+        text-align: center;
+        th{
+            padding-bottom: 10px;
+        }
+        td{
+            padding: 0px 10px;
+        }
+    }
+}
+
+td.row-intro{
+    text-align: left;
+}
+
+div#update-top-row{
+    display: flex;
+    width: 80%;
+    justify-content: space-evenly;
+    margin: 60px auto 70px auto;
+}
+
+div#update-buttons-holder{
+    display: flex;
+    width: 80%;
+    justify-content: space-between;
+    margin: 30px auto;
+}
+
+form#update-return-form{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+}
+
+/* detailsUpdateの設定がここまで */
+
+/* alertUpdateの設定はここから */
+
+div#alertUpdate-wrapper{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+    table tr{
+        text-align: center;
+        td{
+            padding: 0px 10px;
+        }
+    }
+}
+div#alertUpdate-top-row{
+    display: flex;
+    width: 80%;
+    justify-content: space-between;
+    margin: 60px auto 70px auto;
+}
+
+div#alertUpdate-buttons-holder{
+    display: flex;
+    width: 80%;
+    justify-content: space-between;
+    margin: 30px auto;
+}
+
+/* alertUpdateの設定はここまで */
+
+/* 削除の設定はここから */
+
+h2#delete-h2{
+    margin-bottom: 30px;
+}
+
+div#delete-top-row{
+    display: flex;
+    width: fit-content;
+    margin: auto auto 50px auto;
+    img{
+        margin-right: 20px;
+    }
+}
+p#quantity-warning{
+    text-decoration: underline;
+    text-decoration-color: orangered;
+}
+span.quantity-symbol{
+    color: orangered;
+}
+
+div#delete-buttons-holder{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+    div{
+        display: flex;
+        width: 100%;
+        justify-content: space-evenly;
+        margin-bottom: 50px;
+        button{
+            margin: 10px;
+        }
+    }
+}
 
 button.delete-button{
     background-color: orangered;
@@ -66,4 +178,5 @@ button.delete-button:hover{
     box-shadow: 0 4px 8px 0 #00000033, 0 6px 20px 0 #00000030;
 }
 
+/* 削除の設定はここまで */
 

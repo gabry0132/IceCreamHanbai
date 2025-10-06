@@ -6,6 +6,8 @@
 
     String staffID = request.getParameter("staffID");
     String pass = request.getParameter("pass");
+    String logout = request.getParameter("logout");
+
     //データベースに接続するために使用する変数宣言
     Connection con = null;
     Statement stmt = null;
@@ -21,63 +23,87 @@
     //確認メッセージ
     StringBuffer ermsg = null;
 
-    try {
-        //オブジェクトの代入
-        Class.forName(driver).newInstance();
-        con = DriverManager.getConnection(url, user, password);
-        stmt = con.createStatement();
-
-        sql = new StringBuffer();
-        sql.append("select staffID, password from  staff ");
-        sql.append("where staffID = '");
-        sql.append(staffID);
-        sql.append("' ");
-        sql.append("and password = '");
-        sql.append(pass);
-        sql.append("'");
-
-
-        rs = stmt.executeQuery(sql.toString());
-
-        if (rs.next()) {
-            // ログイン成功
-            session.setAttribute("staffID", staffID);
-            response.sendRedirect("main.jsp");
-            return; // ここで処理終了
-        } else {
-            // ログイン失敗
-            request.setAttribute("errorMsg", "社員番号またはパスワードが違います。");
-            RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-            rd.forward(request, response);
-            return;
-        }
-
-    } catch(ClassNotFoundException e){
-        ermsg = new StringBuffer();
-        ermsg.append(e.getMessage());
-    }catch(SQLException e){
-        ermsg = new StringBuffer();
-        ermsg.append(e.getMessage());
-    }catch(Exception e){
-        ermsg = new StringBuffer();
-        ermsg.append(e.getMessage());
+    if(logout != null){
+        session.removeAttribute("staffID");
+        session.removeAttribute("isAdmin");
     }
-    finally{
-        try{
-            if(rs != null){
-                rs.close();
+
+    if(staffID != null){
+
+        try {
+            //オブジェクトの代入
+            Class.forName(driver).newInstance();
+            con = DriverManager.getConnection(url, user, password);
+            stmt = con.createStatement();
+
+            sql = new StringBuffer();
+            sql.append("select staffID, password, adminFlag from  staff ");
+            sql.append("where staffID = '");
+            sql.append(staffID);
+            sql.append("' ");
+
+            rs = stmt.executeQuery(sql.toString());
+
+            if (rs.next()) {
+
+                if(staffID.equals(rs.getString("staffID")) && pass.equals(rs.getString("password"))){
+                    // ログイン成功
+//                    session.setMaxInactiveInterval(300);
+                    session.setAttribute("staffID", staffID);
+                    if(rs.getInt("adminFlag") == 1){
+                        session.setAttribute("isAdmin", true);
+                    } else {
+                        session.setAttribute("isAdmin", false);
+                    }
+
+                    response.sendRedirect("main.jsp");
+                    return; // ここで処理終了
+
+                } else {
+                    // ログイン失敗
+                    request.setAttribute("errorMsg", "社員番号またはパスワードが違います。");
+                    RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+                    rd.forward(request, response);
+                    return;
+
+                }
+
+            } else {
+                // ログイン失敗
+                request.setAttribute("errorMsg", "社員番号またはパスワードが違います。");
+                RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+                rd.forward(request, response);
+                return;
             }
-            if(stmt != null){
-                stmt.close();
-            }
-            if(con != null){
-                con.close();
-            }
+
+        } catch(ClassNotFoundException e){
+            ermsg = new StringBuffer();
+            ermsg.append(e.getMessage());
         }catch(SQLException e){
-                ermsg = new StringBuffer();
-                ermsg.append(e.getMessage());
+            ermsg = new StringBuffer();
+            ermsg.append(e.getMessage());
+        }catch(Exception e){
+            ermsg = new StringBuffer();
+            ermsg.append(e.getMessage());
+        }
+        finally{
+            try{
+                if(rs != null){
+                    rs.close();
+                }
+                if(stmt != null){
+                    stmt.close();
+                }
+                if(con != null){
+                    con.close();
+                }
+            }catch(SQLException e){
+                    ermsg = new StringBuffer();
+                    ermsg.append(e.getMessage());
+            }
         }
     }
+
 %>
 <!DOCTYPE html>
 

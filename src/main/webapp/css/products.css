@@ -119,7 +119,10 @@ div.product-container:hover{
 }
 
 div.showAlert{
-    border: "2px solid orangered";
+    border: 2px solid orangered;
+}
+span.alert-span{
+    color: orangered;
 }
 
 table tr td.instock-quantity-holder{

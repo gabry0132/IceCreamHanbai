@@ -232,7 +232,7 @@
 
                     <%
                         boolean showAlert = false;
-                        if(Integer.parseInt(productsList.get(i).get("quantity")) < Integer.parseInt(productsList.get(i).get("alertNumber"))){
+                        if(Integer.parseInt(productsList.get(i).get("quantity")) <= Integer.parseInt(productsList.get(i).get("alertNumber"))){
                             showAlert = true;
                         }
                     %>
@@ -251,7 +251,7 @@
                                 <td class="product-name-holder"><%= productsList.get(i).get("name")%></td>
                             </tr>
                             <tr>
-                                <td class="instock-intro-holder">在庫数<%if(showAlert){ %> ⚠<% } %></td>
+                                <td class="instock-intro-holder">在庫数<%if(showAlert){ %><span class="alert-span"> ⚠</span><% } %></td>
                             </tr>
                             <tr>
                                 <td class="instock-quantity-holder"><%= productsList.get(i).get("quantity") %>個</td>
@@ -494,17 +494,17 @@
         }
 
         //アラートの表示。本来はJavaにする。今回はただ10個以下ならアラートだとします。
-        let stockHolders = document.getElementsByClassName("instock-quantity-holder");
-        let stockIntroHolders = document.getElementsByClassName("instock-intro-holder");
-        for (let i = 0; i < stockHolders.length; i++) {
-            let quantity = stockHolders[i].textContent.substring(0, stockHolders[i].textContent.length - 1);
-            if(quantity < 10) {
-                let warning = document.createElement("span");
-                warning.innerHTML = " ⚠"; 
-                stockIntroHolders[i].appendChild(warning);   
-                productHolders[i].style.border = "2px solid orangered";  
-            }         
-        }
+        // let stockHolders = document.getElementsByClassName("instock-quantity-holder");
+        // let stockIntroHolders = document.getElementsByClassName("instock-intro-holder");
+        // for (let i = 0; i < stockHolders.length; i++) {
+        //     let quantity = stockHolders[i].textContent.substring(0, stockHolders[i].textContent.length - 1);
+        //     if(quantity < 10) {
+        //         let warning = document.createElement("span");
+        //         warning.innerHTML = " ⚠";
+        //         stockIntroHolders[i].appendChild(warning);
+        //         productHolders[i].style.border = "2px solid orangered";
+        //     }
+        // }
 
         //商品名の長さチェック
         let nameHolders = document.getElementsByClassName("product-name-holder");
