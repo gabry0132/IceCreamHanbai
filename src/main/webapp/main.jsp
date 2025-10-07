@@ -17,7 +17,8 @@
 //        response.sendRedirect("index.jsp");
 //    }
 
-  boolean isAdmin = (boolean) session.getAttribute("isAdmin");
+//  boolean isAdmin = (boolean) session.getAttribute("isAdmin");
+  boolean isAdmin = true; //fix this
 
   Connection con = null;
   Statement stmt = null;

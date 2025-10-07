@@ -17,6 +17,19 @@
 //        response.sendRedirect("main.jsp");
 //    }
 
+    //検索条件
+    String searchName = request.getParameter("searchName");
+    if(searchName != null){
+        if(searchName.isEmpty()) searchName = null;
+    }
+    String searchID = request.getParameter("searchID");
+    if(searchID != null){
+        if(searchID.isEmpty()) searchID = null;
+    }
+    String searchMaker = request.getParameter("searchMaker");
+    String searchFlavor = request.getParameter("searchFlavor");
+    String searchType = request.getParameter("searchType");
+
     String status = request.getParameter("status");
     //内容修正の場合は画像を削除する？
     String productName = request.getParameter("name");
@@ -90,10 +103,35 @@
             tags.add(tag);
 
         }
+        boolean hasTagsSearchParams = (searchMaker != null || searchFlavor != null || searchType != null);
 
+        boolean passedFirst = false;
         sql = new StringBuffer();
-        sql.append("select productID, name, quantity, alertNumber, image from products ");
-        sql.append("where deleteFlag = 0");
+        sql.append("select products.productID, name, quantity, alertNumber, image from products inner join hastags on products.productID = hastags.productID ");
+        sql.append("where products.deleteFlag = 0 ");
+        if(searchName != null) sql.append(" and name like '%" + searchName +"%' ");
+        if(searchID != null) sql.append(" and products.productID = " + searchID);
+        //クエリが複雑にならないようにorで全部の該当商品を取得して、Java側で余計なものを捨てます。
+        if(hasTagsSearchParams){
+            sql.append(" and ( ");
+            if(searchMaker != null) {
+                if(passedFirst) sql.append(" or ");
+                sql.append(" hastags.tagID = " + searchMaker);
+                passedFirst = true;
+            }
+            if(searchFlavor != null) {
+                if(passedFirst) sql.append(" or ");
+                sql.append(" hastags.tagID = " + searchFlavor);
+                passedFirst = true;
+            }
+            if(searchType != null) {
+                if(passedFirst) sql.append(" or ");
+                sql.append(" hastags.tagID = " + searchType);
+                passedFirst = true;
+            }
+            sql.append(" ) ");
+        }
+        sql.append(" group by products.productID ");
 
         rs = stmt.executeQuery(sql.toString());
 
@@ -106,6 +144,70 @@
             product.put("image", rs.getString("image"));
 
             productsList.add(product);
+        }
+
+        //タグの検索条件があればタグを取得して、不要な商品を捨てます。
+        if(hasTagsSearchParams && !productsList.isEmpty()){
+            passedFirst = false;
+            sql = new StringBuffer();
+            sql.append("SELECT\n" +
+                    "    h1.productID,\n" +
+                    "    h1.tagID AS tagID1,\n" +
+                    "    tt1.type as tagType1,\n" +
+                    "    h2.tagID AS tagID2,\n" +
+                    "    tt2.type as tagType2,\n" +
+                    "    h3.tagID AS tagID3,\n" +
+                    "    tt3.type as tagType3\n" +
+                    "FROM\n" +
+                    "    hastags h1\n" +
+                    "        LEFT JOIN\n" +
+                    "    hastags h2 ON h1.productID = h2.productID AND h2.tagID = (\n" +
+                    "        SELECT MIN(h_sub.tagID) FROM hastags h_sub WHERE h_sub.productID = h1.productID AND h_sub.tagID > h1.tagID\n" +
+                    "    )\n" +
+                    "        LEFT JOIN\n" +
+                    "    hastags h3 ON h1.productID = h3.productID AND h3.tagID = (\n" +
+                    "        SELECT MIN(h_sub.tagID) FROM hastags h_sub WHERE h_sub.productID = h1.productID AND h_sub.tagID > h2.tagID\n" +
+                    "    )\n" +
+                    "    inner join tags t1 on h1.tagID = t1.tagID inner join tagtypes tt1 on t1.tagTypeID = tt1.tagTypeID\n" +
+                    "    inner join tags t2 on h2.tagID = t2.tagID inner join tagtypes tt2 on t2.tagTypeID = tt2.tagTypeID\n" +
+                    "    inner join tags t3 on h3.tagID = t3.tagID inner join tagtypes tt3 on t3.tagTypeID = tt3.tagTypeID\n" +
+                    "WHERE\n" +
+                    "    h1.tagID = (SELECT MIN(tagID) FROM hastags WHERE productID = h1.productID)");
+            sql.append(" and h1.productID in (");
+            for (int i = 0; i < productsList.size(); i++) {
+                if(passedFirst) sql.append(",");
+                sql.append(productsList.get(i).get("productID"));
+                passedFirst = true;
+            }
+            sql.append(")");
+            rs = stmt.executeQuery(sql.toString());
+
+            while(rs.next()){
+                for (int i = 0; i < productsList.size(); i++) {
+                    if(productsList.get(i).get("productID").equals(rs.getString("productID"))){
+                        boolean keepProduct = true;
+                        if(searchMaker != null){
+                            if(rs.getString("tagType1").equals("メーカー") && !rs.getString("tagID1").equals(searchMaker)) keepProduct = false;
+                            else if(rs.getString("tagType2").equals("メーカー") && !rs.getString("tagID2").equals(searchMaker)) keepProduct = false;
+                            else if(rs.getString("tagType3").equals("メーカー") && !rs.getString("tagID3").equals(searchMaker)) keepProduct = false;
+                        }
+                        if(searchFlavor != null){
+                            if(rs.getString("tagType1").equals("味") && !rs.getString("tagID1").equals(searchFlavor)) keepProduct = false;
+                            else if(rs.getString("tagType2").equals("味") && !rs.getString("tagID2").equals(searchFlavor)) keepProduct = false;
+                            else if(rs.getString("tagType3").equals("味") && !rs.getString("tagID3").equals(searchFlavor)) keepProduct = false;
+                        }
+                        if(searchType != null){
+                            if(rs.getString("tagType1").equals("種類") && !rs.getString("tagID1").equals(searchType)) keepProduct = false;
+                            else if(rs.getString("tagType2").equals("種類") && !rs.getString("tagID2").equals(searchType)) keepProduct = false;
+                            else if(rs.getString("tagType3").equals("種類") && !rs.getString("tagID3").equals(searchType)) keepProduct = false;
+                        }
+                        if(!keepProduct) productsList.remove(i);
+                        break;
+                    }
+                }
+            }
+
+
         }
 
     } catch(ClassNotFoundException e){
@@ -159,10 +261,10 @@
                         <div id="text-boxes-container">
                             
                             <p class="search-param-intro">商品名</p>
-                            <input type="text" class="search-param-textfield" name="searchName" id="searchName" size="10">
+                            <input type="text" class="search-param-textfield" name="searchName" id="searchName" size="10" <%if(searchName!=null){%>value="<%=searchName%>"<%}%>>
                             
                             <p class="search-param-intro">商品ID</p>
-                            <input type="text" class="search-param-textfield" name="searchId" id="searchId" size="10">
+                            <input type="text" class="search-param-textfield" name="searchID" id="searchID" size="10" <%if(searchID!=null){%>value="<%=searchID%>"<%}%>>
                             
                         </div>
                         
@@ -201,7 +303,7 @@
 
                     <div id="search-buttons-holder">
                         <button class="submit">この条件で検索</button>
-                        <button class="normal-button" type="reset">条件をクリア</button>
+                        <button class="normal-button" id="reset-search-params" type="button">条件をクリア</button>
                     </div>
                     
                 </form>
@@ -435,6 +537,19 @@
         let obfuscationBanner = document.getElementById("obfuscation-banner");
         let body = document.getElementsByTagName("body")[0];
 
+        //検索条件があれば動的に設定します
+        let searchName = "<%=searchName%>";
+        let searchID = "<%=searchID%>";
+        let searchMaker = "<%=searchMaker%>";
+        let searchFlavor = "<%=searchFlavor%>";
+        let searchType = "<%=searchType%>";
+        console.log(searchID);
+        if(searchName !== "null") document.getElementById("searchName").value = searchName;
+        if(searchID !== "null") document.getElementById("searchID").value = searchID;
+        if(searchMaker !== "null") document.getElementById("searchMaker").value = searchMaker;
+        if(searchFlavor !== "null") document.getElementById("searchFlavor").value = searchFlavor;
+        if(searchType !== "null") document.getElementById("searchType").value = searchType;
+
         //最初からポップアップを表示すべきかどうか判断
         let showAddPopup = "<%=status%>";
         if(showAddPopup == "returnFromAdd"){
@@ -493,18 +608,6 @@
             body.classList.remove("stop-scrolling");
         }
 
-        //アラートの表示。本来はJavaにする。今回はただ10個以下ならアラートだとします。
-        // let stockHolders = document.getElementsByClassName("instock-quantity-holder");
-        // let stockIntroHolders = document.getElementsByClassName("instock-intro-holder");
-        // for (let i = 0; i < stockHolders.length; i++) {
-        //     let quantity = stockHolders[i].textContent.substring(0, stockHolders[i].textContent.length - 1);
-        //     if(quantity < 10) {
-        //         let warning = document.createElement("span");
-        //         warning.innerHTML = " ⚠";
-        //         stockIntroHolders[i].appendChild(warning);
-        //         productHolders[i].style.border = "2px solid orangered";
-        //     }
-        // }
 
         //商品名の長さチェック
         let nameHolders = document.getElementsByClassName("product-name-holder");
