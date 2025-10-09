@@ -221,6 +221,15 @@ div#update-left-side{
     }
 }
 
+div.to-tags-holder{
+    width: fit-content;
+    margin: auto;
+    display: flex;
+    button{
+        font-size: 1rem;
+    }
+}
+
 div#update-bottom{
     display: flex;
     width: 60%;
@@ -236,15 +245,6 @@ p.hint{
     color: cadetblue;
     font-size: 0.8rem;
 }
-
-
-
-
-
-
-
-
-
 
 /* アラート・自動発注設定変更ポップアップ */
 

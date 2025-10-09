@@ -16,9 +16,16 @@
 //        response.sendRedirect("main.jsp");
 //    }
 
-    //人事一覧中に社員欄を押すとその社員のデータを取り出して表す
-    //確認画面の修正ボタンを押すとstaff.jspは直接修正popupを開く
-    String chosen_staff = request.getParameter("staffID");
+    //検索条件
+    String receivedName = request.getParameter("searchName");
+    if(receivedName != null){
+        if(receivedName.isEmpty()) receivedName = null;
+    }
+    String receivedID = request.getParameter("searchID");
+    if(receivedID != null){
+        if(receivedID.isEmpty()) receivedID = null;
+    }
+    String includeQuit = request.getParameter("includeQuit");
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -29,14 +36,13 @@
     //ローカルのMySqlに接続する設定
     String user = "root";
     String password = "root";
-    String url = "jdbc:mysql://localhost/icekanrihanbai";
+    String url = "jdbc:mysql://localhost/icehanbaikanri";
     String driver = "com.mysql.jdbc.Driver";
 
     //確認メッセージ
     StringBuffer ermsg = null;
     HashMap<String,String> staff = null;
     ArrayList<HashMap<String,String>> staffList = new ArrayList<>();
-    ArrayList<HashMap<String,String>> staffdata = new ArrayList<>();
 
     try {
 
@@ -45,13 +51,14 @@
         con = DriverManager.getConnection(url, user, password);
         stmt = con.createStatement();
 
-        //削除・修正・追加の確認画面と操作完了提示画面を分けるためのflag
-        String registerType = request.getParameter("registerType");
-
         sql = new StringBuffer();
         sql.append("select staffID, password, name, tel, address, workStartDate, ");
         sql.append("recordTimestamp, adminFlag, quitFlag, deleteFlag from staff ");
-        sql.append("where deleteFlag = 0");
+        sql.append("where deleteFlag = 0 ");
+        if(receivedName != null) sql.append(" and name like '%" + receivedName + "%' ");
+        if(receivedID != null) sql.append(" and staffID = '" + receivedID + "' ");
+        if(includeQuit == null) sql.append("  and quitFlag = 0 order by adminFlag ");
+        else sql.append(" order by adminFlag, quitFlag ");
         rs = stmt.executeQuery(sql.toString());
 
         while(rs.next()){
@@ -63,6 +70,7 @@
             staff.put("tel", rs.getString("tel"));
             staff.put("address", rs.getString("address"));
             staff.put("workStartDate", rs.getString("workStartDate"));
+            staff.put("quitFlag", rs.getString("quitFlag"));
             staffList.add(staff);
         }
     } catch(ClassNotFoundException e){
@@ -102,20 +110,30 @@
     <title>人事管理</title>
 </head>
 <body>
+<% if(ermsg != null){ %>
+
+    <h2>エラーが発生しました。</h2>
+    <p><%=ermsg%></p>
+
+<% } else { %>
+
     <h1>人事管理</h1>
     <div id="header">
         <div id="text-box">
             <form action="staff.jsp" method="post">
-                <label>人事ID</label>
-                <input type="text" name="staffID" value="" size="10">
                 <label>人事名</label>
-                <input type="text" name="staffName" value="" size="20">
+                <input type="text" name="searchName" <%if(receivedName != null){%>value="<%=receivedName%>"<%}%> size="20">
+                <label>人事ID</label>
+                <input type="text" name="searchID" <%if(receivedID != null){%>value="<%=receivedID%>"<%}%> size="10">
                 <button type="reset" class="normal-button">クリア</button>
-                <button type="submit" class="submit" id="searchBtn">検索</button>			
+                <button type="submit" class="submit" id="searchBtn">検索</button>
+                <br>
+                <input type="checkbox" name="includeQuit" id="includeQuit-checkbox" <%if(includeQuit != null){%> checked <%}%>>
+                <label>退職者を含む</label>
             </form>
         </div>
         <div id="button-box">
-            <button id="btn-add" onclick="add_open()">登録</button>
+            <button id="btn-add" onclick="add_open()">新規登録</button>
         </div>
     </div>
 
@@ -126,7 +144,7 @@
             </div>
 <%      }else {                  %>
 <%            for (int i = 0; i<staffList.size(); i++){  %>
-                <div class="staff-box" onclick="check_open(<%=staffList.get(i).get("staffID")%>)">
+                <div class="staff-box<%if(staffList.get(i).get("quitFlag").equals("1")){%> quit<%}%>" onclick="check_open('<%=staffList.get(i).get("staffID")%>')">
                     <p class="staff-id"><%=staffList.get(i).get("staffID") %></p>
                     <p class="staff-name"><%=staffList.get(i).get("name") %></p>
                 </div>
@@ -147,38 +165,38 @@
     
     <!--人事登録のpopup  -->
     <form action="staff-confirm.jsp" method="post">
-    <div id="staff_add_popup"  class="popup">
-        <div class="popup_header">
-            <h2>人事登録</h2>
-            <span class="close">✖</span>
-        </div>
-        <div class="popup_body">
-            <div class="form_row">
-                <label for="staff_name">名前</label>
-                <input type="text" id="name" name="name">
+        <div id="staff_add_popup"  class="popup">
+            <div class="popup_header">
+                <h2>人事登録</h2>
+                <span class="close">✖</span>
             </div>
+            <div class="popup_body">
+                <div class="form_row">
+                    <label for="name">名前</label>
+                    <input type="text" id="name" name="name">
+                </div>
 
-            <div class="form_row">
-                <label for="staff_phone">電話番号</label>
-                <input type="text" id="tel" name="tel">
-            </div>
-            
-            <div class="form_row">
-                <label for="staff_address">住所</label>
-                <input type="text" id="address" name="address">
-            </div>
+                <div class="form_row">
+                    <label for="tel">電話番号</label>
+                    <input type="text" id="tel" name="tel">
+                </div>
 
-            <div class="form_row">
-                <label for="staff_comeday">入店日付</label>
-                <input type="datetime-local" id="workStartDate" name="workStartDate">
+                <div class="form_row">
+                    <label for="address">住所</label>
+                    <input type="text" id="address" name="address">
+                </div>
+
+                <div class="form_row">
+                    <label for="workStartDate">入店日付</label>
+                    <input type="date" id="workStartDate" name="workStartDate">
+                </div>
             </div>
-        </div>
-        <div class="popup_footer">
-            <button class="cancel-popup normal-button">キャンセル</button>
+            <div class="popup_footer">
+                <button class="cancel-popup normal-button">キャンセル</button>
                 <input type="hidden" name="registerType" value="add">
                 <button class="normal-button">登録</button>
+            </div>
         </div>
-    </div>
     </form>
 
     <!--社員情報のpopup  -->
@@ -190,42 +208,52 @@
         <table>
             <tr>
                 <th class="table-left-side">名前</th>
-                <td id="check_name" name="check_name"></td>
+                <td id="check_name"></td>
             </tr>
             <tr>
                 <th>人事ID</th>
-                <td id="check_id" name="check_id"></td>
+                <td id="check_id"></td>
             </tr>
             <tr>
                 <th>パスワード</th>
-                <td id="check_password" name="check_password"></td>
+                <td id="check_password"></td>
             </tr>
             <tr>
                 <th>電話番号</th>
-                <td id="check_tel" name="check_tel"></td>
+                <td id="check_tel"></td>
             </tr>
             <tr>
                 <th>住所</th>
-                <td class="longer-table-text" id="check_address" name="check_address"></td>
+                <td class="longer-table-text" id="check_address"></td>
             </tr>
             <tr>
                 <th>入店日付</th>
-                <td id="check_workStartDate" name="check_workStartDate"></td>
+                <td id="check_workStartDate"></td>
             </tr>
         </table>
 
-        <div class="popup_footer">
+        <div class="popup_footer_flex_column">
             <!--ポップアップ開いた時点でstaffIDの値を設定する。-->
-            <form action="staff-confirm.jsp" method="post">
-                <button onclick="change_open()" class="normal-button">個人情報修正</button>
-                <input type="hidden" name="staffID" value="staffID">
-            </form>
+            <button id="open-change-button" class="normal-button">個人情報修正</button>
 
-            <form action="staff-confirm.jsp" method="post">
-                <input type="hidden" name="registerType" value="delete">
-                <input type="hidden" name="staffID" value="staffID">
-                <button class="delete-button">アカウント削除</button>
-            </form>
+            <div id="serious-buttons-holder">
+
+                <form action="staff-confirm.jsp" method="post">
+                    <input type="hidden" name="registerType" value="quit">
+                    <input type="hidden" name="quit_name" id="staffName-toQuit">
+                    <input type="hidden" name="staffID" id="staffID-toQuit">
+                    <button class="delete-button">退職確定</button>
+                </form>
+
+                <form action="staff-confirm.jsp" method="post">
+                    <input type="hidden" name="registerType" value="delete">
+                    <input type="hidden" name="delete_name" id="staffName-toDelete">
+                    <input type="hidden" name="staffID" id="staffID-toDelete">
+                    <button class="delete-button">アカウント削除</button>
+                </form>
+
+            </div>
+
         </div>
     </div>
 
@@ -240,32 +268,32 @@
 
                 <div class="form_row">
                     <label for="name_change">名前</label>
-                    <input type="text" name="name" id="name_change" value="name">
+                    <input type="text" name="name_change" id="name_change">
                 </div>
-                
+
                 <div class="form_row">
-                    <label for="id_change">人事ID</label>
-                    <input type="text" name="id" id="staffID" value="staffID" disabled>
+                    <label for="staffID">人事ID</label>
+                    <input type="text" name="staffID" id="staffID" disabled>
                 </div>
-        
+
                 <div class="form_row">
                     <label for="password_change">パスワード</label>
-                    <input type="text" name="password" id="password_change" value="password">
+                    <input type="text" name="password_change" id="password_change">
                 </div>
-        
+
                 <div class="form_row">
                     <label for="phone_change">電話番号</label>
-                    <input type="text" name="tel" id="phone_change" value="tel">
+                    <input type="text" name="phone_change" id="phone_change">
                 </div>
-                
+
                 <div class="form_row">
                     <label for="address_change">住所</label>
-                    <input type="text" name="address" id="address_change" value="address">
+                    <input type="text" name="address_change" id="address_change">
                 </div>
 
                 <div class="form_row">
                     <label for="startDate_change">入店日付</label>
-                    <input type="text" name="startDate" id="startDate_change" value="workStartDate" disabled>
+                    <input type="text" name="startDate_change" id="startDate_change" disabled>
                 </div>
 
             </div>
@@ -273,15 +301,10 @@
             <div class="popup_footer">
                 <button class="normal-button cancel-popup" type="button" onclick="close_all_popups()">キャンセル</button>
 
-                <form action="staff-confirm.jsp" method="post">
-                    <input type="hidden" name="registerType" value="change">
-                    <input type="hidden" name="staffID" value="staffID">
-                    <input type="hidden" name="name_change" value="name">
-                    <input type="hidden" name="password_change" value="password">
-                    <input type="hidden" name="address_change" value="address">
-                    <input type="hidden" name="workStartDate" value="workStartDate">
-                    <button class="submit">修正</button>
-                </form>
+                <input type="hidden" name="registerType" value="change">
+                <input type="hidden" name="staffID" id="staffID-hidden">
+
+                <button class="submit">修正</button>
             </div>
 
         </form>
@@ -302,21 +325,17 @@
 
         //staffのデータをJSに渡す
         let staffList = [];
-        <%
-        for(int i = 0; i < staffList.size(); i++) {
-            %>
-            let staffMember = {
-                'staffID':<%=staffList.get(i).get("staffID")%>,
-                'name':<%=staffList.get(i).get("name")%>,
-                'password':<%=staffList.get(i).get("password")%>,
-                'tel':<%=staffList.get(i).get("tel")%>,
-                'address':<%=staffList.get(i).get("address")%>,
-                'workStartDate':<%=staffList.get(i).get("workStartDate")%>
-            };
-            staffList.push(staffMember);
-        <%
-            }
-        %>
+        <% for(int i = 0; i < staffList.size(); i++) { %>
+            staffList.push({
+                'staffID':"<%=staffList.get(i).get("staffID")%>",
+                'name':"<%=staffList.get(i).get("name")%>",
+                'password':"<%=staffList.get(i).get("password")%>",
+                'tel':"<%=staffList.get(i).get("tel")%>",
+                'address':"<%=staffList.get(i).get("address")%>",
+                'workStartDate':"<%=staffList.get(i).get("workStartDate")%>",
+                'quitFlag':"<%=staffList.get(i).get("quitFlag")%>"
+            });
+        <%  } %>
 
         function close_all_popups(){
             document.getElementById("staff_add_popup").classList.remove("active");
@@ -336,15 +355,28 @@
         //個人情報確認
         function check_open(staffID){
             staffList.forEach(staffMember => {
-                if(staffMember.staffID == staffID){
+                if(staffMember.staffID === staffID){
                     document.getElementById("check_name").innerHTML = staffMember.name;
-                    document.getElementById("check_id").innerHTML = staffMember.id;
+                    document.getElementById("staffName-toDelete").value = staffMember.name;
+                    document.getElementById("staffName-toQuit").value = staffMember.name;
+                    document.getElementById("check_id").innerHTML = staffMember.staffID;
+                    document.getElementById("staffID-toDelete").value = staffMember.staffID;
+                    document.getElementById("staffID-toQuit").value = staffMember.staffID;
                     document.getElementById("check_password").innerHTML = staffMember.password;
                     document.getElementById("check_tel").innerHTML = staffMember.tel;
                     document.getElementById("check_address").innerHTML = staffMember.address;
                     document.getElementById("check_workStartDate").innerHTML = staffMember.workStartDate;
+                    console.log(staffMember.quitFlag)
+                    if(staffMember.quitFlag === "1"){
+                        document.getElementById("serious-buttons-holder").style.display = "none";
+                        console.log("removed")
+                    } else {
+                        document.getElementById("serious-buttons-holder").style.display = "flex";
+                        console.log("didn't remove")
+                    }
                 }
             });
+            document.getElementById("open-change-button").addEventListener("click", () => change_open(staffID));
             document.getElementById("staff_check_popup").classList.add("active");
             obfuscationBanner.style.display = "flex";
             document.body.classList.add("stop-scrolling");
@@ -352,7 +384,18 @@
         }
 
         //個人情報修正
-        function change_open(){
+        function change_open(staffID){
+            staffList.forEach(staffMember => {
+                if(staffMember.staffID === staffID){
+                    document.getElementById("name_change").value = staffMember.name;
+                    document.getElementById("staffID").value = staffMember.staffID;
+                    document.getElementById("staffID-hidden").value = staffMember.staffID;
+                    document.getElementById("password_change").value = staffMember.password;
+                    document.getElementById("phone_change").value = staffMember.tel;
+                    document.getElementById("address_change").value = staffMember.address;
+                    document.getElementById("startDate_change").value = staffMember.workStartDate;
+                }
+            });
             document.getElementById("staff_change_popup").classList.add("active");
             obfuscationBanner.style.display = "flex";
             document.body.classList.add("stop-scrolling");
@@ -360,5 +403,6 @@
 
     </script>
 
+<% } %>
 </body>
 </html>

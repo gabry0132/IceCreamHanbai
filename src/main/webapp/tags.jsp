@@ -10,6 +10,9 @@
     String tagTypeID = request.getParameter("tagTypeID");
     String tagToDeleteID = request.getParameter("tagToDelete");
 
+    String previousPage = request.getParameter("previousPage");
+    if(previousPage == null) previousPage = "main.jsp";
+
     //データベースに接続するために使用する変数宣言
     Connection con = null;
     Statement stmt = null;
@@ -169,7 +172,7 @@
 
     <div id="all-tag-types-holder">
 
-        <% if(tags.size() == 0){ %>
+        <% if(tags.isEmpty()){ %>
 
             <h4>タグがありません。</h4>
 
@@ -214,7 +217,7 @@
     </div>
 
     <div id="modoru-holder">
-        <form action="main.jsp" method="post">
+        <form action="<%=previousPage%>" method="post">
             <button id="modoru" class="normal-button">戻る</button>
         </form>
     </div>

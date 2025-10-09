@@ -30,7 +30,7 @@
         stmt = con.createStatement();
 
         sql = new StringBuffer();
-        sql.append("select orderID, productID, initiator, quantity, statDateTime, stoppedFlag from Orders");
+        sql.append("select orderID, productID, initiator, quantity, statDateTime, stoppedFlag from orders ");
         sql.append("where deleteFlag = 0");
 
         rs = stmt.executeQuery(sql.toString());

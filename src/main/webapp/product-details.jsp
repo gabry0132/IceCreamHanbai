@@ -466,6 +466,10 @@
 
             </div>
 
+            <div class="to-tags-holder">
+                <button class="normal-button" type="button" id="toTags">タグ追加</button>
+            </div>
+
             <!-- 登録を個別するための非表示項目 -->
             <input type="hidden" name="registerType" value="detailsUpdate">
             <input type="hidden" name="productID" value="<%=productID%>">
@@ -478,6 +482,11 @@
         </form>
 
     </div>
+
+    <!-- 非表示「タグ追加へ」フォーム -->
+    <form method="post" action="tags.jsp" id="toTags-form">
+        <input type="hidden" name="previousPage" value="product-details.jsp?productID=<%=productID%>">
+    </form>
 
     <script>
         //要素取得
@@ -499,6 +508,9 @@
         //イベントリスナーの設定
         document.getElementById("btn-update-details").addEventListener("click", openUpdateDetailsPopup); 
         document.getElementById("btn-alertUpdate").addEventListener("click", openAlertUpdatePopup);
+        document.getElementById("toTags").addEventListener("click", () => {
+                document.getElementById("toTags-form").submit();
+        });
         document.getElementById("btn-delete").addEventListener("click", () => {
                 document.getElementById("delete-form").submit();
         });

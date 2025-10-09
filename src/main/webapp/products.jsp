@@ -452,18 +452,25 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>購入コスト</td>
-                                <td><input type="text" name="cost" id="cost" required></td>
-                                <td>円</td>
-                            </tr>
-                            <tr>
-                                <td>販売値段</td>
-                                <td><input type="text" name="price" id="price" required></td>
-                                <td>円</td>
+                                <td colspan="2">
+                                    <div class="to-tags-holder">
+                                        <button class="normal-button" type="button" id="toTags">タグ追加</button>
+                                    </div>
+                                </td>
                             </tr>
                         </table>
 
                         <table class="add-table">
+                            <tr>
+                                <td>購入コスト</td>
+                                <td><input type="text" name="cost" id="cost" size="5" required></td>
+                                <td>円</td>
+                            </tr>
+                            <tr>
+                                <td>販売値段</td>
+                                <td><input type="text" name="price" id="price" size="5" required></td>
+                                <td>円</td>
+                            </tr>
                             <tr>
                                 <td class="table-left-side">在庫数</td>
                                 <td><input type="number" name="instockQuantity" id="instockQuantity" min="0" max="999"></td>
@@ -530,6 +537,11 @@
         </form>
             
     </div>
+
+    <!-- 非表示「タグ追加へ」フォーム -->
+    <form method="post" action="tags.jsp" id="toTags-form">
+        <input type="hidden" name="previousPage" value="products.jsp?status=returnFromTags">
+    </form>
         
     <script>
         //ポップアップに使う変数取得
@@ -543,7 +555,6 @@
         let searchMaker = "<%=searchMaker%>";
         let searchFlavor = "<%=searchFlavor%>";
         let searchType = "<%=searchType%>";
-        console.log(searchID);
         if(searchName !== "null") document.getElementById("searchName").value = searchName;
         if(searchID !== "null") document.getElementById("searchID").value = searchID;
         if(searchMaker !== "null") document.getElementById("searchMaker").value = searchMaker;
@@ -583,9 +594,15 @@
 
             //ポップアップを表示する
             openAddPopup();
+        } else if(showAddPopup == "returnFromTags"){
+            //ポップアップを表示する
+            openAddPopup();
         }
 
         //イベントリスナーの設定
+        document.getElementById("toTags").addEventListener("click", () => {
+            document.getElementById("toTags-form").submit();
+        })
         document.getElementById("btn-add").addEventListener("click", openAddPopup);
         document.getElementsByClassName("closure")[0].addEventListener("click", closeAllPopups);
         document.getElementById("btn-add-cancel").addEventListener("click", closeAllPopups);

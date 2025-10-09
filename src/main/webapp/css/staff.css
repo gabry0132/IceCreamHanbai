@@ -119,6 +119,10 @@ div#staff-main-container{
     margin-bottom: 10px;
 }
 
+.quit{
+    background: #cac9c9;
+}
+
 .staff-box .label {
     border-radius: 6px;
     padding: 4px 12px;
@@ -164,6 +168,10 @@ th{
     padding-bottom: 10px;
 }
 
+td{
+    padding-bottom: 10px;
+}
+
 .form_row {
     font-size: 20px;
     display: flex;
@@ -190,6 +198,10 @@ th{
 
 .form_row input:focus {
     border-color: #007BFF;
+}
+
+input#includeQuit-checkbox{
+    transform: scale(1.2);
 }
 
 /* POP-UPのCSS */
@@ -254,11 +266,37 @@ div#obfuscation-banner{
     margin: 15px 0 10px 0;
 }
 
+
 .popup_footer{
-    margin-top: 10px;
+    margin: 10px auto auto auto;
     margin-bottom: 20px;
     display: flex;
+    width: fit-content;
     justify-content: center;
     gap: 20px;
+}
+
+.popup_footer_flex_column{
+    margin: 10px auto auto auto;
+    margin-bottom: 20px;
+    display: flex;
+    width: fit-content;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+}
+
+button#open-change-button{
+    width: fit-content;
+    margin: auto;
+}
+
+div#serious-buttons-holder{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+    form{
+        margin: 20px;
+    }
 }
 

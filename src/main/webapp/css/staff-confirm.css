@@ -8,7 +8,7 @@ div#main_container{
     flex-direction: column;
 }
 
-div#table_container{
+div.table_container{
     display: flex;
     flex-direction: column;
     width: fit-content;
@@ -16,7 +16,7 @@ div#table_container{
     align-items: center;
 }
 
-div#button-group{
+div.button-group{
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -38,12 +38,12 @@ button.normal-button:hover{
     box-shadow: 0 4px 8px 0 #00000033, 0 6px 20px 0 #00000030;
 }
 
-table#staff_check{
+table.staff-table{
     margin: 25px auto 0 auto;
     border-collapse: separate;   
 }
 
-table#staff_check td{
+table.staff-table td{
     padding-left: 20px;
     text-align: left;
 }

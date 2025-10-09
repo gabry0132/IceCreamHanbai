@@ -207,6 +207,16 @@ div#add-right-side{
     margin-left: 10px;
 }
 
+div.to-tags-holder{
+    width: fit-content;
+    display: flex;
+    margin: auto;
+    button{
+        font-size: 1rem;
+        border: 1px solid black;
+    }
+}
+
 div#add-image-section{
     display: flex;
     flex-direction: column;
