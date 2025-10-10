@@ -225,13 +225,13 @@
                     <select name="product" id="product">
                         <!--動的に画像を変更する-->
                         <option hidden disabled selected value>商品を選択</option>
-                        <%
+<%
                             for(int i=0; i<products_list.size(); i++){
-                        %>
-                        <option value="<%= i+1 %>"><%= products_list.get(i).get("productID") %> <%= products_list.get(i).get("name") %></option>
-                        <%
+%>
+                                <option value="<%= i+1 %>"><%= products_list.get(i).get("productID") %> <%= products_list.get(i).get("name") %></option>
+<%
                             }
-                        %>
+%>
                     </select>
                 </div>
     
@@ -242,23 +242,23 @@
                             <td>
                                 <div class="sale-time-setting">
                                     <div class="sale-time-button-holder">
-                                        <input type="radio" onclick="checkRadioCreate()" name="sale-time-create" id="now-time-create" value="今現在" checked>今現在
-                                        <input type="radio" onclick="checkRadioCreate()" name="sale-time-create" id="adjust-time-create" value="指定する">指定する
+                                        <input type="radio" onclick="checkRadioCreate()" name="sale_time_now" id="now-time-create" value="今現在" checked>今現在
+                                        <input type="radio" onclick="checkRadioCreate()" name="sale_time_adjust" id="adjust-time-create" value="指定する">指定する
                                     </div>
-                                    <input type="datetime-local" name="sale-time-textbox" class="sale-time-textbox">
+                                    <input type="datetime-local" name="sale_time" class="sale-time-textbox">
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>販売担当</td>
-                            <td><input type="text" class="sale-staff" id="sale-staff-create" value="入合憂政" disabled></td>
+                            <td><input type="text" class="sale-staff" name="sale_staff" id="sale-staff-create" value="入合憂政" disabled></td>
                         </tr>
                         <tr>
                             <td>販売個数</td>
                             <!--売上データ作成のポップアップだけは、販売個数のmaxを対象の商品の在庫数に設定する。-->
                             <!--画像を変換する時点で、販売個数をチェックする。1以上あれば普通の動きで必ず個数を1に設定する。ゼロだったら登録させないように-->
                             <!--JavaでもらうデータをJSに渡す必要がある。-->
-                            <td><input type="number" class="sale-quantity-input" id="sale-quantity-create" min="1" max="999" value="1"></td>
+                            <td><input type="number" class="sale-quantity-input" name="sale_quantity" id="sale-quantity-create" min="1" max="999" value="1"></td>
                         </tr>
                     </table>
                 </div>

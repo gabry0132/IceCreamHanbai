@@ -1,9 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, java.util.*" %>
 <%
-        // 文字コードの指定
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
+    // 文字コードの指定
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
+
+    String product = request.getParameter("product");
+    String sale_time_now = request.getParameter("sale_time_now");
+    String sale_time_adjust = request.getParameter("sale_time_adjust");
+    String sale_time_textbox = request.getParameter("sale_time_textbox");
+    String sale_staff = request.getParameter("sale_staff");
+    String sale_quantitiy = request.getParameter("sale_quantitiy");
+
+    System.out.println(product);
+
+
 %>
 
 <!DOCTYPE html>
