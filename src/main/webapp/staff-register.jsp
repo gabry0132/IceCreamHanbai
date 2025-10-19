@@ -65,7 +65,7 @@
             sql.append("insert into staff (staffID, password, name, tel, address, workStartDate) ");
             sql.append("values( ");
             sql.append("'" + generatedID + "', ");
-            sql.append("' " + generatedPassword + "', ");
+            sql.append("'" + generatedPassword + "', ");
             sql.append("'" + name + "', ");
             sql.append("'" + tel + "', ");
             sql.append("'" + address + "', ");

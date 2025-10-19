@@ -38,13 +38,15 @@
         //-----売上一覧-----
         try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
         Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT p.name AS productName, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID;")
+        ResultSet rs = stmt.executeQuery("SELECT p.productID, p.name, p.image, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID;")
         ) {
 
             // データ抽出
             while (rs.next()) {
                 HashMap<String, String> map = new HashMap<>();
-                map.put("productName", rs.getString("productName"));
+                map.put("productID", rs.getString("productID"));
+                map.put("productName", rs.getString("name"));
+                map.put("imageFileName", rs.getString("image"));
                 map.put("dateTime", rs.getString("dateTime"));
                 map.put("quantity", rs.getString("quantity"));
                 map.put("staffID", rs.getString("staffID"));
@@ -105,6 +107,14 @@
     <link rel="stylesheet" href="css/sales.css">
 </head>
 <body>
+
+<% if(ERMSG != null){ %>
+
+    <h4>エラーが発生しました。</h4>
+    <p><%=ERMSG%></p>
+
+<% } else { %>
+
     <div id="everything-wrapper">
         
         <div id="top-text-holder">
@@ -184,8 +194,8 @@
                     <div class="sale-box">
                         <div class="sale-image-txt-holder">
                             <!--?product=xxx&previousPage=sales.jspを追加する。-->
-                            <a href="product-details.jsp" class="image-wrapper-anchor">
-                                <img class="sale-image" src="images/ice1.png" width="100" height="100" alt="ice1">
+                            <a href="product-details.jsp?productID=<%=salesList.get(i).get("productID")%>&previousPage=sales.jsp" class="image-wrapper-anchor">
+                                <img class="image" src="<%=request.getContextPath()%>/images/<%=salesList.get(i).get("imageFileName")%>" width="100" height="100" alt="<%=salesList.get(i).get("productName")%>">
                             </a>
                             <p class="sale-text"><%= salesList.get(i).get("productName") %>が <%= salesList.get(i).get("dateTime") %>に <%= salesList.get(i).get("quantity") %>個 販売されました。(<%= salesList.get(i).get("staffName") %>より)</p>
                         </div>
@@ -469,7 +479,8 @@
 
             return input;
         }
+
     </script>
-    
+<% } %>
 </body>
 </html>

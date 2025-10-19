@@ -169,7 +169,7 @@
                 <button class="normal-button">内容を修正する</button>
             </form>
             <form action="sales-register.jsp" method="post">
-                <input type="hidden" name="registerType" value="create">
+                <input type="hidden" name="registerType" value="<%=registerType%>">
                 <input type="hidden" name="productID" value="<%=productID%>">
                 <input type="hidden" name="saleTime" value="<%=saleTime%>">
                 <input type="hidden" name="saleQuantity" value="<%=saleQuantitiy%>">
