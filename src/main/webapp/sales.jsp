@@ -6,16 +6,30 @@
     response.setCharacterEncoding("UTF-8");
 
 //    String staffID = session.getAttribute("staffID");
-//    String staffID = session.getAttribute("staffName");
+//    String staffName = session.getAttribute("staffName");
+//    String isAdmin = session.getAttribute("isAdmin");
     String staffID = "00";      //仮にシステムの登録だとします
     String staffName = "システム";      //仮にシステムの登録だとします
+    boolean isAdmin = true;
 
-    //検索条件
-    int test;
+    //ページング変数
+    int numberOfPages = 1;
+    int pageLimitOffset = 50;   //1ページに何件が表示されるか
+    int selectedPage = 1;
+    if(request.getParameter("selectedPage") != null) selectedPage = Integer.parseInt(request.getParameter("selectedPage"));
+    selectedPage--; //オフセット計算に使うので -1にします
+
+    //検索条件                                      <<<<<<<<<<<<<<<<<<<<<<<unfinished
     String productSearch = request.getParameter("productSearch");
     String staffSearch = request.getParameter("staffSearch");
     String searchStartDate = request.getParameter("searchStartDate");
+    if(searchStartDate != null){
+        if(searchStartDate.equals("")) searchStartDate = null;
+    }
     String searchEndDate = request.getParameter("searchEndDate");
+    if(searchEndDate != null){
+        if(searchEndDate.equals("")) searchEndDate = null;
+    }
 
     //売上データ作成から戻った時にもらうパラメータ
     String productIDFromCreate = request.getParameter("productIDFromCreate"); //対象商品のIDです
@@ -29,6 +43,7 @@
     String PASSWORD = "root";
     String URL = "jdbc:mysql://localhost/icehanbaikanri";
     String DRIVER = "com.mysql.jdbc.Driver";
+    String sql = "";
 
     // エラーメッセージ格納用
     String ERMSG = null;
@@ -42,10 +57,34 @@
         // JDBCドライバのロード
         Class.forName(DRIVER);
 
+        //合計ページ数を取得します。
+        sql = "select count(salesID) as count from sales where deleteFlag = 0 ";
+        if(productSearch != null) sql += " and s.productID = " + productSearch;
+        if(staffSearch != null) sql += " and s.staffID = " + staffSearch;
+        if(searchStartDate != null) sql += " and s.dateTime > " + searchStartDate;
+        if(searchEndDate != null) sql += " and s.dateTime < " + searchEndDate;
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery("select count(salesID) as count from sales where deleteFlag = 0 ")
+        ) {
+
+            if (rs.next()) {
+                numberOfPages = (rs.getInt("count") / pageLimitOffset) + 1;
+            }
+        }
+
+        //売上のクエリ
+        sql = "SELECT p.productID, p.name, p.image, s.salesID, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID where s.deleteFlag = 0 ";
+        if(productSearch != null) sql += " and s.productID = " + productSearch;
+        if(staffSearch != null) sql += " and s.staffID = '" + staffSearch + "' ";
+        if(searchStartDate != null) sql += " and s.dateTime > '" + searchStartDate + "' ";
+        if(searchEndDate != null) sql += " and s.dateTime < '" + searchEndDate + "' ";
+        sql += " order by dateTime desc limit " + pageLimitOffset + " offset " + (selectedPage * pageLimitOffset);
+
         //-----売上一覧-----
         try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
         Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT p.productID, p.name, p.image, s.salesID, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID where s.deleteFlag = 0 order by dateTime desc;")
+        ResultSet rs = stmt.executeQuery(sql)
         ) {
 
             while (rs.next()) {
@@ -118,7 +157,7 @@
         
         <div id="top-text-holder">
             <h1>売上データ一覧</h1>
-            <span>管理者モード</span>
+            <%if(isAdmin){%><span>管理者モード</span><%}%>
         </div>
 
         <div id="top-area-container">
@@ -197,15 +236,17 @@
                             </a>
                             <p class="sale-text"><b><%= salesList.get(i).get("dateTime") %></b>に <a href="product-details.jsp?productID=<%=salesList.get(i).get("productID")%>&previousPage=sales.jsp" class="product-name-anchor"><%= salesList.get(i).get("productName") %></a>が <%= salesList.get(i).get("quantity") %>個 販売されました。(<%= salesList.get(i).get("staffName") %>より)</p>
                         </div>
-                        <div class="sale-button-box">
-                            <button type="button" class="edit-button" onclick="openEditPopup(<%=salesList.get(i).get("salesID")%>)">修正</button>
-                            <form action="sales-confirm.jsp" method="post" class="deleteForm">
-                                <input type="hidden" name="registerType" value="delete">
-                                <input type="hidden" name="saleID" value="<%=salesList.get(i).get("salesID")%>">
-                                <input type="hidden" name="productID" value="<%=salesList.get(i).get("productID")%>">
-                                <button type="submit" class="delete-button">削除</button>
-                            </form>
-                        </div>
+                        <% if(isAdmin){ %>
+                            <div class="sale-button-box">
+                                <button type="button" class="edit-button" onclick="openEditPopup(<%=salesList.get(i).get("salesID")%>)">修正</button>
+                                <form action="sales-confirm.jsp" method="post" class="deleteForm">
+                                    <input type="hidden" name="registerType" value="delete">
+                                    <input type="hidden" name="saleID" value="<%=salesList.get(i).get("salesID")%>">
+                                    <input type="hidden" name="productID" value="<%=salesList.get(i).get("productID")%>">
+                                    <button type="submit" class="delete-button">削除</button>
+                                </form>
+                            </div>
+                        <% } %>
                     </div>
 <%
                 }
@@ -226,10 +267,21 @@
 
         <!--本来は複数のaタグにするか、スパンのテキストに応じてJavaScriptで検索開始-->
         <div id="page-selector-wrapper">
-            <a href="sales.jsp">
-                <p id="page-selector">1　<span>2</span></p>
-            </a>
+
+            <% for (int i = 1; i <= numberOfPages; i++) { %>
+                <span class="page-number-span <% if(i - 1  == selectedPage){ %> current-page <% } %>" onclick="reloadOnPage(<%=i%>)"><%=i%></span>
+            <% } %>
+
         </div>
+
+<%--        ページングのための非表示フォーム--%>
+        <form action="sales.jsp" method="post" id="pageingSearch">
+            <% if(productSearch != null){ %>     <input type="hidden" name="productSearch" value="<%=productSearch%>">      <% } %>
+            <% if(staffSearch != null){ %>       <input type="hidden" name="staffSearch" value="<%=staffSearch%>">          <% } %>
+            <% if(searchStartDate != null){ %>   <input type="hidden" name="searchStartDate" value="<%=searchStartDate%>">  <% } %>
+            <% if(searchEndDate != null){ %>     <input type="hidden" name="searchEndDate" value="<%=searchEndDate%>">      <% } %>
+            <input type="hidden" name="targetPage" id="targetPage">
+        </form>
 
     </div>
 
@@ -250,10 +302,10 @@
             <div id="create-pop-contents">
     
                 <div id="create-top-section">
-                    <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/<%=productsList.get(0).get("image")%>" width="200" height="200" alt="<%=productsList.get(0).get("name")%>">
+                    <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/placeholder.png" width="200" height="200" alt="アイスを選択してください">
                     <select name="productID" id="product">
                         <!--動的に画像を変更する-->
-<%--                        <option hidden disabled selected value>商品を選択</option>--%>
+                        <% if(salesList.isEmpty()){ %><option hidden disabled selected value>商品を選択</option><% } %>
 <%
                             for(int i=0; i<productsList.size(); i++){
 %>
@@ -313,9 +365,9 @@
             <div id="edit-pop-contents">
     
                 <div id="edit-top-section">
-                    <img src="<%=request.getContextPath()%>/images/<%=salesList.get(0).get("imageFileName")%>" class="sale-image" id="edit-image" alt="<%=salesList.get(0).get("productName")%>" width="120" height="120">
+                    <img src="<%=request.getContextPath()%>/images/placeholder.png" class="sale-image" id="edit-image" alt="アイスを選択してください" width="120" height="120">
                     <select name="productID" id="product-edit">
-                        <option hidden disabled selected value>商品を選択</option>
+                        <% if(salesList.isEmpty()){ %><option hidden disabled selected value>商品を選択</option><% } %>
                         <%
                             for(int i=0; i<productsList.size(); i++){
                         %>
@@ -380,7 +432,13 @@
         let blackBackground = document.getElementById("black-background");
         let createPopup = document.getElementById("create-popup");
         let editPopup = document.getElementById("edit-popup");
-        let saleQuantities = Array.from(document.getElementsByClassName("sale-quantity-input"))
+        let saleQuantities = Array.from(document.getElementsByClassName("sale-quantity-input"));
+
+        //検索条件があればここで設定します。
+        <% if(productSearch != null){ %> document.getElementById("productSearch").value = "<%=productSearch%>" <% } %>
+        <% if(staffSearch != null){ %> document.getElementById("staffSearch").value = "<%=staffSearch%>" <% } %>
+        <% if(searchStartDate != null){ %> document.getElementById("searchStartDate").value = "<%=searchStartDate%>" <% } %>
+        <% if(searchEndDate != null){ %> document.getElementById("searchEndDate").value = "<%=searchEndDate%>" <% } %>
 
         //商品データをJSに渡します
         let products = [];
@@ -516,6 +574,11 @@
             if(quantity > max) input = String(max);
 
             return input;
+        }
+
+        function reloadOnPage(targetPage){
+            document.getElementById("targetPage").value = Number(targetPage);
+            document.getElementById("pageingSearch").submit();
         }
 
     </script>

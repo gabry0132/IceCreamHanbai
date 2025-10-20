@@ -124,12 +124,20 @@ button#btn-add{
     margin-right: 7%;
 }
 
-p#page-selector{
-    font-size: 1rem;
+div#page-selector-wrapper{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+}
+span.page-number-span{
+    font-size: 0.9rem;
+    cursor: pointer;
     text-align: center;
-    span{
-        font-size: 0.8rem;
-    }
+    padding: 5px;
+}
+span.current-page{
+    font-size: 1rem;
+    text-decoration: underline;
 }
 
 /* ���ꂩ��͔���f�[�^1���R�[�h���̐ݒ� */
