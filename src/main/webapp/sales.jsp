@@ -10,6 +10,13 @@
     String staffID = "00";      //仮にシステムの登録だとします
     String staffName = "システム";      //仮にシステムの登録だとします
 
+    //検索条件
+    int test;
+    String productSearch = request.getParameter("productSearch");
+    String staffSearch = request.getParameter("staffSearch");
+    String searchStartDate = request.getParameter("searchStartDate");
+    String searchEndDate = request.getParameter("searchEndDate");
+
     //売上データ作成から戻った時にもらうパラメータ
     String productIDFromCreate = request.getParameter("productIDFromCreate"); //対象商品のIDです
     String saleTimeSelector = request.getParameter("sale_time_selector");
@@ -38,21 +45,19 @@
         //-----売上一覧-----
         try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
         Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT p.productID, p.name, p.image, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID;")
+        ResultSet rs = stmt.executeQuery("SELECT p.productID, p.name, p.image, s.salesID, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID where s.deleteFlag = 0 order by dateTime desc;")
         ) {
 
-            // データ抽出
             while (rs.next()) {
                 HashMap<String, String> map = new HashMap<>();
+                map.put("salesID", rs.getString("salesID"));
                 map.put("productID", rs.getString("productID"));
                 map.put("productName", rs.getString("name"));
                 map.put("imageFileName", rs.getString("image"));
-                map.put("dateTime", rs.getString("dateTime"));
+                map.put("dateTime", rs.getString("dateTime").substring(0, rs.getString("dateTime").lastIndexOf(".")));    //なぜか秒は17.0の形で来ます。「.0」を捨てます。
                 map.put("quantity", rs.getString("quantity"));
                 map.put("staffID", rs.getString("staffID"));
                 map.put("staffName", rs.getString("staffName"));
-
-                // リストに追加
                 salesList.add(map);
             }
         }
@@ -60,16 +65,13 @@
         //-----スタッフ一覧-----
         try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
              Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery("select staffID, name from staff;")
+             ResultSet rs = stmt.executeQuery("select staffID, name from staff where deleteFlag = 0;")
         ) {
 
-            // データ抽出
             while (rs.next()) {
                 HashMap<String, String> map = new HashMap<>();
                 map.put("staffID", rs.getString("staffID"));
-                map.put("name", rs.getString("name"));
-
-                // リストに追加
+                map.put("staffName", rs.getString("name"));
                 staffList.add(map);
             }
         }
@@ -80,15 +82,12 @@
              ResultSet rs = stmt.executeQuery("select productID, name, quantity, image from products;")
         ) {
 
-            // データ抽出
             while (rs.next()) {
                 HashMap<String, String> map = new HashMap<>();
                 map.put("productID", rs.getString("productID"));
                 map.put("name", rs.getString("name"));
                 map.put("image", rs.getString("image"));
                 map.put("quantity", rs.getString("quantity"));
-
-                // リストに追加
                 productsList.add(map);
             }
         }
@@ -130,7 +129,7 @@
 
                     <div id="pulldown-menus-container">
                         
-                        <select name="product" id="product-Search">
+                        <select id="productSearch" name="productSearch">
                             <option hidden disabled selected value>商品を選択</option>
 <%
                             for(int i=0; i < productsList.size(); i++){
@@ -141,12 +140,12 @@
 %>
                         </select>
 
-                        <select name="staff" id="staff-Search">
+                        <select id="staffSearch" name="staffSearch">
                             <option hidden disabled selected value>販売の人事</option>
 <%
                             for(int i=0; i<staffList.size(); i++){
 %>
-                            <option value="<%= staffList.get(i).get("staffID") %>"><%= staffList.get(i).get("staffID") %> <%= staffList.get(i).get("name") %></option>
+                            <option value="<%= staffList.get(i).get("staffID") %>"><%= staffList.get(i).get("staffID") %> <%= staffList.get(i).get("staffName") %></option>
 <%
                             }
 %>
@@ -157,11 +156,11 @@
                     <div id="dates-menus-container">
                         
                         <div class="date-row-wrapper">
-                            <input type="date" name="date-start" id="searchStartDate">
+                            <input type="date" name="searchStartDate" id="searchStartDate">
                             <p>から</p>
                         </div>
                         <div class="date-row-wrapper">
-                            <input type="date" name="date-end" id="searchEndDate">
+                            <input type="date" name="searchEndDate" id="searchEndDate">
                             <p>まで</p>
                         </div>
                         
@@ -193,17 +192,17 @@
 %>
                     <div class="sale-box">
                         <div class="sale-image-txt-holder">
-                            <!--?product=xxx&previousPage=sales.jspを追加する。-->
                             <a href="product-details.jsp?productID=<%=salesList.get(i).get("productID")%>&previousPage=sales.jsp" class="image-wrapper-anchor">
                                 <img class="image" src="<%=request.getContextPath()%>/images/<%=salesList.get(i).get("imageFileName")%>" width="100" height="100" alt="<%=salesList.get(i).get("productName")%>">
                             </a>
-                            <p class="sale-text"><%= salesList.get(i).get("productName") %>が <%= salesList.get(i).get("dateTime") %>に <%= salesList.get(i).get("quantity") %>個 販売されました。(<%= salesList.get(i).get("staffName") %>より)</p>
+                            <p class="sale-text"><b><%= salesList.get(i).get("dateTime") %></b>に <a href="product-details.jsp?productID=<%=salesList.get(i).get("productID")%>&previousPage=sales.jsp" class="product-name-anchor"><%= salesList.get(i).get("productName") %></a>が <%= salesList.get(i).get("quantity") %>個 販売されました。(<%= salesList.get(i).get("staffName") %>より)</p>
                         </div>
                         <div class="sale-button-box">
-                            <button type="button" class="edit-button" onclick="openEditPopup()">修正</button>
+                            <button type="button" class="edit-button" onclick="openEditPopup(<%=salesList.get(i).get("salesID")%>)">修正</button>
                             <form action="sales-confirm.jsp" method="post" class="deleteForm">
-                                <input type="hidden" name="status" value="delete">
-                                <input type="hidden" name="saleID" value="">
+                                <input type="hidden" name="registerType" value="delete">
+                                <input type="hidden" name="saleID" value="<%=salesList.get(i).get("salesID")%>">
+                                <input type="hidden" name="productID" value="<%=salesList.get(i).get("productID")%>">
                                 <button type="submit" class="delete-button">削除</button>
                             </form>
                         </div>
@@ -275,7 +274,7 @@
                                         <input type="radio" onclick="checkRadioCreate()" name="sale_time_selector" id="now-time-create" value="今現在" checked>今現在
                                         <input type="radio" onclick="checkRadioCreate()" name="sale_time_selector" id="adjust-time-create" value="指定する">指定する
                                     </div>
-                                    <input type="datetime-local" name="sale_time" id="sale-time-input" class="sale-time-textbox">
+                                    <input type="datetime-local" name="sale_time" id="sale-time-input" class="sale-time-textbox" step="1">
                                 </div>
                             </td>
                         </tr>
@@ -285,9 +284,6 @@
                         </tr>
                         <tr>
                             <td>販売個数</td>
-                            <!--売上データ作成のポップアップだけは、販売個数のmaxを対象の商品の在庫数に設定する。-->
-                            <!--画像を変換する時点で、販売個数をチェックする。1以上あれば普通の動きで必ず個数を1に設定する。ゼロだったら登録させないように-->
-                            <!--JavaでもらうデータをJSに渡す必要がある。-->
                             <td><input type="number" class="sale-quantity-input" name="sale_quantity" id="sale-quantity-create" min="1" max="<%=productsList.get(0).get("quantity")%>" value="1"></td>
                         </tr>
                     </table>
@@ -317,13 +313,13 @@
             <div id="edit-pop-contents">
     
                 <div id="edit-top-section">
-                    <img src="images/ice1.png" class="sale-image" alt="ice1" width="120" height="120">
-                    <select name="product" id="product-edit">
+                    <img src="<%=request.getContextPath()%>/images/<%=salesList.get(0).get("imageFileName")%>" class="sale-image" id="edit-image" alt="<%=salesList.get(0).get("productName")%>" width="120" height="120">
+                    <select name="productID" id="product-edit">
                         <option hidden disabled selected value>商品を選択</option>
                         <%
                             for(int i=0; i<productsList.size(); i++){
                         %>
-                        <option value="<%= i+1 %>"><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
+                        <option value="<%= productsList.get(i).get("productID") %>"><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
                         <%
                             }
                         %>
@@ -338,23 +334,35 @@
                                 <div class="sale-time-setting">
                                     <div class="sale-time-button-holder">
                                         <!-- checked追加しても動作しないのでJS側で設定する -->
-                                        <input type="radio" onclick="checkRadioEdit()" name="sale-time-edit" id="now-time-edit" value="今現在" checked>今現在
-                                        <input type="radio" onclick="checkRadioEdit()" name="sale-time-edit" id="adjust-time-edit" value="指定する">指定する
+                                        <input type="radio" onclick="checkRadioEdit()" name="sale-time-edit" id="now-time-edit" value="今現在">今現在
+                                        <input type="radio" onclick="checkRadioEdit()" name="sale-time-edit" id="adjust-time-edit" value="指定する" checked>指定する
                                     </div>
-                                    <input type="datetime-local" name="sale-time-textbox" class="sale-time-textbox">
+                                    <input type="datetime-local" name="sale_time" id="edit-time-textbox" class="sale-time-textbox" step="1">
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>販売担当</td>
-                            <td><input type="text" class="sale-staff" id="sale-staff-edit" value="入合憂政"></td>
+                            <td>
+                                <select name="sale-staff-edit" id="sale-staff-edit">
+                                    <% for (int i = 0; i < staffList.size(); i++) { %>
+                                        <option value="<%=staffList.get(i).get("staffID")%>"><%=staffList.get(i).get("staffName")%></option>
+                                    <% } %>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
                             <td>販売個数</td>
-                            <td><input type="number" class="sale-quantity-input" id="sale-quantity-edit" min="1" max="999" value="1"></td>
+                            <td><input type="number" name="sale_quantity" class="sale-quantity-input" id="sale-quantity-edit" min="1" max="999"></td>
                         </tr>
                     </table>
+
                 </div>
+
+                <p id="edit-warning-message">売上修正の時点で量数と在庫数のチェックが行われないのでご注意ください。<br>修正後、量数の差が在庫数に反映されます。</p>
+
+                <input type="hidden" name="registerType" value="edit">
+                <input type="hidden" name="saleID" id="edit-saleID">
     
                 <div id="edit-buttons-holder">
                     <button type="button" class="normal-button" onclick="closeAllPopups()">キャンセル</button>
@@ -384,6 +392,19 @@
             });
         <% } %>
 
+        //セールデータをJSに渡します
+        let sales = [];
+        <% for(int i = 0; i < salesList.size(); i++) { %>
+            sales.push({
+                "saleID": "<%=salesList.get(i).get("salesID")%>",
+                "productID": "<%=salesList.get(i).get("productID")%>",
+                "productName": "<%=salesList.get(i).get("productName")%>",
+                "image": "<%=salesList.get(i).get("imageFileName")%>",
+                "dateTime": "<%=salesList.get(i).get("dateTime")%>",
+                "quantity": "<%=salesList.get(i).get("quantity")%>",
+                "staffID": "<%=salesList.get(i).get("staffID")%>"
+            });
+        <% } %>
 
         //対象商品が変わった時の処理を行う。
         document.getElementById("product").addEventListener("input", (event) => {
@@ -440,7 +461,7 @@
         function checkRadioEdit(){
             if(document.getElementById("now-time-edit").checked){
                 inputBoxes[1].style.display = "none";
-                inputBoxes[1].value = "";
+                // inputBoxes[1].value = "";    //修正なので残します。
             }else if(document.getElementById("adjust-time-edit").checked){
                 inputBoxes[1].style.display = "flex";
             }
@@ -451,9 +472,26 @@
             createPopup.style.display = "flex";
         }
         
-        function openEditPopup(){
+        function openEditPopup(saleID){
+            setupEditPopup(saleID);
             blackBackground.style.display = "flex";
             editPopup.style.display = "flex";
+        }
+
+        function setupEditPopup(saleID){
+            sales.forEach(sale => {
+                if(sale.saleID == saleID){
+                    document.getElementById("edit-image").src = "<%=request.getContextPath()%>/images/" + sale.image;
+                    document.getElementById("edit-image").alt = sale.productName;
+                    document.getElementById("product-edit").value = sale.productID;
+                    document.getElementById("adjust-time-edit").checked = "true";
+                    document.getElementById("edit-time-textbox").value = sale.dateTime;
+                    document.getElementById("sale-staff-edit").value = sale.staffID;
+                    document.getElementById("sale-quantity-edit").value = sale.quantity;
+                    document.getElementById("edit-saleID").value = sale.saleID;
+                    checkRadioEdit();
+                }
+            });
         }
 
         function closeAllPopups(){

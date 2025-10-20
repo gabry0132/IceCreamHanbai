@@ -52,3 +52,24 @@ button.normal-button:hover{
     cursor: pointer;
     box-shadow: 0 4px 8px 0 #00000033, 0 6px 20px 0 #00000030;
 }
+
+button.delete-button{
+    background-color: orangered;
+    border-radius: 5px;
+    font-size: 1.6rem;
+    border-width: 1px;
+    padding: 0 15px 0 15px;
+    transition: 1s;
+}
+button.delete-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 red, 10px 6px 20px 0 #00000030;
+}
+
+
+p#delete-text{
+    display: inline-block;
+    margin-left: 20px;
+    width: fit-content;
+    text-align: center;
+}

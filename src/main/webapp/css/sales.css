@@ -162,6 +162,11 @@ a.image-wrapper-anchor{
     line-height: 0;
 }
 
+a.product-name-anchor{
+    text-decoration: underline;
+    color: black;
+}
+
 img.sale-image{
     border: 0.5px solid black;
     border-radius: 7px;
@@ -284,7 +289,7 @@ div#edit-popup{
     z-index: 5;
 }
 div#edit-pop-contents{
-    width: 60%;
+    width: 70%;
     margin: 0 auto 30px auto;
 }
 div#edit-title-section{
@@ -316,4 +321,10 @@ div#edit-buttons-holder{
     button{
         margin: 10px 40px;
     }
+}
+
+p#edit-warning-message {
+    color: grey;
+    text-align: center;
+    font-size: 0.8rem;
 }

@@ -13,13 +13,17 @@
     String registerType = request.getParameter("registerType");
 
     //作成の場合にもらうパラメータ
-    String productID = request.getParameter("productID");
+    String productID = request.getParameter("productID");                   //修正・削除の場合ももらいます
     String saleTimeSelector = request.getParameter("sale_time_selector");
-    String saleTime = request.getParameter("sale_time");
-    String saleQuantitiy = request.getParameter("sale_quantity");
+    String saleTime = request.getParameter("sale_time");                    //修正の場合ももらいます
+    String saleQuantitiy = request.getParameter("sale_quantity");           //修正の場合ももらいます
     String productName = "";
     String productImage = "";
 
+    //修正の場合のパラメータ
+    String saleID = request.getParameter("saleID");                         //削除の場合ももらいます
+    String editStaffID = request.getParameter("sale-staff-edit");
+    String editStaffName = "";
 
     //データベースに接続するために使用する変数宣言
     Connection con = null;
@@ -64,6 +68,7 @@
             saleTime = saleTime.replace("T", " ") + ":" + seconds;
         }
     }
+
     try {
         //オブジェクトの代入
         Class.forName(driver).newInstance();
@@ -84,6 +89,31 @@
 
         } else {
             throw new Exception("対象の商品が見つかりませんでした。");
+        }
+
+        if(registerType.equals("edit")){
+            sql = new StringBuffer();
+            sql.append("select name from staff ");
+            sql.append("where staffID = ");
+            sql.append(staffID);
+            rs = stmt.executeQuery(sql.toString());
+
+            if (rs.next()) {
+                editStaffName = rs.getString("name");
+            } else {
+                throw new Exception("対象の商品が見つかりませんでした。");
+            }
+        }else if(registerType.equals("delete")){
+            sql = new StringBuffer();
+            sql.append("select quantity from sales where salesID = ");
+            sql.append(saleID);
+            rs = stmt.executeQuery(sql.toString());
+
+            if (rs.next()) {
+                saleQuantitiy = rs.getString("quantity");
+            } else {
+                throw new Exception("対象の商品が見つかりませんでした。");
+            }
         }
 
     } catch(ClassNotFoundException e){
@@ -124,62 +154,158 @@
     <link rel="stylesheet" href="css/sales-confirm.css">
 </head>
 <body>
-    
+
+<% if(ermsg != null){ %>
+
+    <h4>エラーが発生しました。</h4>
+    <p><%=ermsg%></p>
+
+<% } else { %>
+
     <div id="everything-wrapper">
 
-        <h2>売上データ追加内容確認</h2>
+        <% if(registerType.equals("create")){ %>
 
-        <div id="main-section-wrapper">
+            <h2>売上データ追加内容確認</h2>
 
-            <div id="left-section-wrapper">
-                <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/<%=productImage%>" width="100" height="100" alt="<%=productName%>">
+            <div id="main-section-wrapper">
+
+                <div id="left-section-wrapper">
+                    <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/<%=productImage%>" width="100" height="100" alt="<%=productName%>">
+                </div>
+
+                <div id="right-section-wrapper">
+                    <table>
+                        <tr>
+                            <td class="table-left-side"><%=productID%></td>
+                            <td><%=productName%></td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">販売日時</td>
+                            <td><%=saleTime%></td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">販売担当</td>
+                            <td><%=staffName%></td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">販売個数</td>
+                            <td><%=saleQuantitiy%></td>
+                        </tr>
+                    </table>
+
+                </div>
+
             </div>
 
-            <div id="right-section-wrapper">
-                <table>
-                    <tr>
-                        <td class="table-left-side"><%=productID%></td>
-                        <td><%=productName%></td>
-                    </tr>
-                    <tr>
-                        <td class="table-left-side">販売日時</td>
-                        <td><%=saleTime%></td>
-                    </tr>
-                    <tr>
-                        <td class="table-left-side">販売担当</td>
-                        <td><%=staffName%></td>
-                    </tr>
-                    <tr>
-                        <td class="table-left-side">販売個数</td>
-                        <td><%=saleQuantitiy%></td>
-                    </tr>
-                </table>
+            <div id="buttons-holder">
+                <!--どこから来たのか非表示のinputでわかるはずなので「内容を修正」ボタンで正しい場所へ戻される。-->
+                <!--設定変更の場合は詳細ページに戻ったら自動的に正しいポップアップを出すようにする。-->
+                <form action="sales.jsp" method="post">
+                    <input type="hidden" name="productIDFromCreate" value="<%=productID%>">
+                    <input type="hidden" name="sale_time_selector" value="<%=saleTimeSelector%>">
+                    <input type="hidden" name="saleQuantity" value="<%=saleQuantitiy%>">
+                    <button class="normal-button">内容を修正する</button>
+                </form>
+                <form action="sales-register.jsp" method="post">
+                    <input type="hidden" name="registerType" value="<%=registerType%>">
+                    <input type="hidden" name="productID" value="<%=productID%>">
+                    <input type="hidden" name="saleTime" value="<%=saleTime%>">
+                    <input type="hidden" name="saleQuantity" value="<%=saleQuantitiy%>">
+
+                    <button class="normal-button">登録</button>
+                </form>
+            </div>
+
+        <% } else if (registerType.equals("edit")){ %>
+
+            <h2>売上データ修正内容確認</h2>
+
+            <div id="main-section-wrapper">
+
+                <div id="left-section-wrapper">
+                    <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/<%=productImage%>" width="100" height="100" alt="<%=productName%>">
+                </div>
+
+                <div id="right-section-wrapper">
+                    <table>
+                        <tr>
+                            <td class="table-left-side"><%=productID%></td>
+                            <td><%=productName%></td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">販売日時</td>
+                            <td><%=saleTime%></td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">販売担当</td>
+                            <td><%=editStaffName%></td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-side">販売個数</td>
+                            <td><%=saleQuantitiy%></td>
+                        </tr>
+                    </table>
+
+                </div>
 
             </div>
 
-        </div>
+            <div id="buttons-holder">
+                <form action="sales.jsp" method="post">
+                    <button class="normal-button">内容を修正する</button>
+                </form>
+                <form action="sales-register.jsp" method="post">
+                    <input type="hidden" name="registerType" value="<%=registerType%>">
+                    <input type="hidden" name="saleID" value="<%=saleID%>">
+                    <input type="hidden" name="productID" value="<%=productID%>">
+                    <input type="hidden" name="editStaffID" value="<%=editStaffID%>">
+                    <input type="hidden" name="saleTime" value="<%=saleTime%>">
+                    <input type="hidden" name="saleQuantity" value="<%=saleQuantitiy%>">
 
-        <div id="buttons-holder">
-            <!--どこから来たのか非表示のinputでわかるはずなので「内容を修正」ボタンで正しい場所へ戻される。-->
-            <!--設定変更の場合は詳細ページに戻ったら自動的に正しいポップアップを出すようにする。-->
-            <form action="sales.jsp" method="post">
-                <input type="hidden" name="productIDFromCreate" value="<%=productID%>">
-                <input type="hidden" name="sale_time_selector" value="<%=saleTimeSelector%>">
-                <input type="hidden" name="saleQuantity" value="<%=saleQuantitiy%>">
-                <button class="normal-button">内容を修正する</button>
-            </form>
-            <form action="sales-register.jsp" method="post">
-                <input type="hidden" name="registerType" value="<%=registerType%>">
-                <input type="hidden" name="productID" value="<%=productID%>">
-                <input type="hidden" name="saleTime" value="<%=saleTime%>">
-                <input type="hidden" name="saleQuantity" value="<%=saleQuantitiy%>">
+                    <button class="normal-button">登録</button>
+                </form>
+            </div>
 
-                <button class="normal-button">登録</button>
-            </form>
-        </div>
+
+        <% } else if (registerType.equals("delete")) { %>
+
+            <h2>売上データ削除確認</h2>
+
+            <div id="main-section-wrapper">
+
+                <div id="left-section-wrapper">
+                    <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/<%=productImage%>" width="100" height="100" alt="<%=productName%>">
+                    <p id="delete-text"><%=productName%> の売上データ (売上ID: <%=saleID%>)を削除します。<br>対象の<b><%=saleQuantitiy%>個</b>を在庫に戻しますか？</p>
+                </div>
+
+            </div>
+
+            <div id="buttons-holder">
+                <form action="sales.jsp" method="post">
+                    <button class="normal-button">中止</button>
+                </form>
+                <form action="sales-register.jsp" method="post">
+                    <input type="hidden" name="registerType" value="<%=registerType%>">
+                    <input type="hidden" name="saleID" value="<%=saleID%>">
+                    <input type="hidden" name="returnQuantity" value="true">
+
+                    <button class="delete-button"><%=saleQuantitiy%>個を戻して削除</button>
+                </form>
+                <form action="sales-register.jsp" method="post">
+                    <input type="hidden" name="registerType" value="<%=registerType%>">
+                    <input type="hidden" name="saleID" value="<%=saleID%>">
+
+                    <button class="delete-button">このまま削除</button>
+                </form>
+            </div>
+
+
+        <% } %>
 
     </div>
 
+<% } %>
+
 </body>
-<script>console.log("<%=saleTime%>")</script>
 </html>
