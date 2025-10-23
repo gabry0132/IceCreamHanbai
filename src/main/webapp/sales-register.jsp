@@ -1,5 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.io.InputStream" %>
+<%@ page import="java.io.BufferedReader" %>
+<%@ page import="java.io.InputStreamReader" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.time.LocalDate" %>
 <%
     // 文字コードの指定
     request.setCharacterEncoding("UTF-8");
@@ -24,6 +31,13 @@
     //削除のパラメータ
     boolean returnQuantity = request.getParameter("returnQuantity") != null;
 
+    //CSVから読み込むためのパラメータ
+    Part filePart = request.getPart("fileInput");
+    String targetDate = request.getParameter("targetDate");
+    String adjustedDate = request.getParameter("readFileAdjustDate");
+    HashMap<String, String> map = new HashMap<>();
+    ArrayList<HashMap<String, String>> salesList = new ArrayList<HashMap<String, String>>();
+
     //データベースに接続するために使用する変数宣言
     Connection con = null;
     Statement stmt = null;
@@ -39,7 +53,7 @@
     //確認メッセージ
     StringBuffer ermsg = null;
     int updatedRows = 0;
-    String logtypeIDforSales = "";       //ログに使います
+    String logtypeIDforSales = "";          //ログに使います
     String productName = "";                //ログに使います
     int recordedQuantity = 0;               //商品テーブルから引数するために使います
 
@@ -277,6 +291,91 @@
                 throw new Exception("売上削除のログ登録処理が失敗しました。");
             }
 
+        } else if(registerType.equals("fromCSV")){
+
+            boolean acceptAll = false;
+
+            //対象の日付を取得します。
+            if(targetDate.equals("today")){
+                targetDate = LocalDate.now().toString();
+            } else if (targetDate.equals("yesterday")) {
+                targetDate = LocalDate.now().minusDays(1).toString();
+            } else if (targetDate.equals("adjust")){
+                if (adjustedDate != null) targetDate = adjustedDate;
+            } else {
+                acceptAll = true;
+            }
+            //昨日
+
+            if(filePart != null && filePart.getSize() > 0){
+                InputStream inputStream = filePart.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                //データを保存します。
+                String line;
+                while((line = reader.readLine()) != null){
+                    map = new HashMap<>();
+                    String date = line.split(",")[0].split(" ")[0];
+                    if(date.equals(targetDate) || acceptAll){
+                        map.put("dateTime", line.split(",")[0]);
+                        map.put("productID", line.split(",")[1]);
+                        map.put("staffID", line.split(",")[2]);
+                        map.put("quantity", line.split(",")[3]);
+                        map.put("deleteFlag", line.split(",")[4]);
+                        salesList.add(map);
+                    }
+                }
+
+                if(salesList.isEmpty()) throw new Exception("CSVファイルからデータの読み込みが失敗しました。");
+
+                //売上ごとのIDを作成しいます。
+                for (int i = 0; i < salesList.size(); i++) {
+                    //売上IDはセキュリティのため10桁の乱数に設定します。
+                    //重複させません。
+                    String generatedID;
+                    do {
+                        generatedID = "";
+                        for (int j = 0; j < 9; j++) {
+                            generatedID += (int) (Math.random() * 10);
+                        }
+                        sql = new StringBuffer();
+                        sql.append("select count(salesID) as count from sales ");
+                        sql.append("where salesID = ");
+                        sql.append(generatedID);
+                        rs = stmt.executeQuery(sql.toString());
+                        rs.next();
+                    } while (rs.getInt("count") > 0);
+                    salesList.get(i).put("saleID", generatedID);
+                }
+
+                //実際の登録を行います。
+                sql = new StringBuffer();
+                sql.append("insert into sales(salesID, productID, staffID, quantity, dateTime, deleteFlag) values ");
+                for (int i = 0; i < salesList.size(); i++) {
+                    if(i != 0) sql.append(",");
+                    sql.append("(");
+                    sql.append(salesList.get(i).get("saleID"));
+                    sql.append(",");
+                    sql.append(salesList.get(i).get("productID"));
+                    sql.append(",'");
+                    sql.append(salesList.get(i).get("staffID"));
+                    sql.append("',");
+                    sql.append(salesList.get(i).get("quantity"));
+                    sql.append(",'");
+                    sql.append(salesList.get(i).get("dateTime"));
+                    sql.append("',");
+                    sql.append(salesList.get(i).get("deleteFlag"));
+                    sql.append(")");
+                }
+
+                updatedRows = stmt.executeUpdate(sql.toString());
+
+                if (updatedRows == 0) {
+                    throw new Exception("ファイルからの売上登録が失敗しました。");
+                }
+
+            }
+
         }
 
     } catch(ClassNotFoundException e){
@@ -330,6 +429,8 @@
             <h1>売上データの登録が正常に完了しました。</h1>
         <% } else if (registerType.equals("edit")){ %>
             <h1>売上データの修正が正常に完了しました。</h1>
+        <% } else if (registerType.equals("fromCSV")){ %>
+            <h1>ファイルからの売上データ登録が正常に完了しました。</h1>
         <% } else if (registerType.equals("delete")){ %>
             <% if(returnQuantity){ %>
                 <h3>量数を在庫に戻し、売上データの削除が正常に完了しました。</h3>

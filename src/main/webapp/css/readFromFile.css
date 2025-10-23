@@ -1,0 +1,62 @@
+div#everything-wrapper{
+    display: flex;
+    flex-direction: column;
+    font-size: 1.2rem;
+}
+
+h2{
+    margin-top: 100px;
+    text-align: center;
+}
+
+form{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+    flex-direction: column;
+}
+
+
+div#adjust-date-holder{
+    display: flex;
+    /*input{*/
+    /*    margin: 0px;*/
+    /*}*/
+}
+
+div#inputs-holder{
+    display: flex;
+    width: fit-content;
+    flex-direction: column;
+    margin: 50px auto auto auto;
+    div.input-holder{
+        margin: 10px;
+    }
+}
+
+
+input#readFileAdjustDate{
+    display: none;
+    margin: auto;
+    padding: 0px;
+}
+
+div#buttons-holder{
+    margin-top: 30px;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+button.normal-button{
+    background-color: white;
+    font-size: 1.2rem;
+    border-radius: 7px;
+    border-width: 2px;
+    padding: 5px 10px;
+    transition: 0.3s;
+}
+button.normal-button:hover{
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 #00000033, 0 6px 30px 0 #00000030;
+}

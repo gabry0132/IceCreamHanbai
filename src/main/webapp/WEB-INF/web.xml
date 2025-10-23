@@ -8,6 +8,7 @@
   <display-name>Archetype Created Web Application</display-name>
 
   <!-- Add JSP multipart config -->
+  <!-- 商品画像アップロード -->
   <servlet>
     <servlet-name>product-confirm.jsp</servlet-name>
     <jsp-file>/product-confirm.jsp</jsp-file>
@@ -21,6 +22,22 @@
   <servlet-mapping>
     <servlet-name>product-confirm.jsp</servlet-name>
     <url-pattern>/product-confirm.jsp</url-pattern>
+  </servlet-mapping>
+
+  <!-- CSVアップロード -->
+  <servlet>
+    <servlet-name>sales-register.jsp</servlet-name>
+    <jsp-file>/sales-register.jsp</jsp-file>
+    <multipart-config>
+      <max-file-size>10485760</max-file-size> <!-- 10 MB -->
+      <max-request-size>20971520</max-request-size> <!-- 20 MB -->
+      <file-size-threshold>0</file-size-threshold>
+    </multipart-config>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>sales-register.jsp</servlet-name>
+    <url-pattern>/sales-register.jsp</url-pattern>
   </servlet-mapping>
 
 </web-app>

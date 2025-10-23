@@ -251,8 +251,7 @@
             <div id="right-buttons-container">
                 <!--作成ポップアップを開いて、自動的にこの商品を選択する。-->
                 <form action="sales.jsp" method="post" class="button-wrapper-form">
-                    <input type="hidden" name="productID" value="<%=productID%>">
-                    <input type="hidden" name="status" value="createSaleOpen">
+                    <input type="hidden" name="createFromProductID" value="<%=productID%>">
                     <input type="hidden" name="previousPage" value="product-details.jsp?productID=<%=productID%>">
                     <button class="normal-button">売上データを<br>作成する</button>
                 </form>
@@ -279,8 +278,8 @@
         <div id="additional-controls-wrapper">
             <!--自動的に検索条件を入れて、それで検索する-->
             <form action="sales.jsp" method="post" class="button-wrapper-form">
-                <input type="hidden" name="productID" value="<%=productID%>">
                 <input type="hidden" name="previousPage" value="product-details.jsp?productID=<%=productID%>">
+<%--                グラフのこと--%>
                 <button class="normal-button">売上データ<br>確認</button>
             </form>
 

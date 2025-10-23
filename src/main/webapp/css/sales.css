@@ -25,6 +25,13 @@ p.close:hover{
     cursor : pointer;
 }
 
+div#top-buttons{
+    width: 50%;
+    justify-content: space-evenly;
+    display: flex;
+    margin-bottom: 30px;
+}
+
 div#search-params-container{
     display: flex;
     width: fit-content;

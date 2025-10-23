@@ -12,6 +12,12 @@
     String staffName = "システム";      //仮にシステムの登録だとします
     boolean isAdmin = true;
 
+    //商品詳細ページから来た場合：
+    String createFromProductID = request.getParameter("createFromProductID");
+    boolean shouldCreateFromID = createFromProductID != null;
+    String previousPage = request.getParameter("previousPage");
+    if(previousPage == null) previousPage = "main.jsp";
+
     //ページング変数
     int numberOfPages = 1;
     int pageLimitOffset = 50;   //1ページに何件が表示されるか
@@ -32,11 +38,11 @@
     }
 
     //売上データ作成から戻った時にもらうパラメータ
-    String productIDFromCreate = request.getParameter("productIDFromCreate"); //対象商品のIDです
+    String productIDCancelledCreate = request.getParameter("productIDCancelledCreate"); //対象商品のIDです
     String saleTimeSelector = request.getParameter("sale_time_selector");
 //    String saleTime = request.getParameter("sale_time");          //戻っても自動設定させません
     String saleQuantity = request.getParameter("saleQuantity");
-    boolean returnFromCreate = (productIDFromCreate != null);
+    boolean returnFromCreate = (productIDCancelledCreate != null);
 
     // データベース接続情報
     String USER = "root";
@@ -160,6 +166,26 @@
             <%if(isAdmin){%><span>管理者モード</span><%}%>
         </div>
 
+        <div id="top-buttons">
+            <form action="readFromFile.jsp" method="post">
+                <button class="normal-button">ファイルから読み込み</button>
+            </form>
+            <form action="graph.jsp" method="post">
+                <select id="productGraph" name="productGraph">
+                    <option hidden disabled selected value>商品を選択</option>
+                    <%
+                        for(int i=0; i < productsList.size(); i++){
+                    %>
+                    <option value="<%= productsList.get(i).get("productID") %>"><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
+                    <%
+                        }
+                    %>
+                </select>
+
+                <button class="normal-button">集計表情</button>
+            </form>
+        </div>
+
         <div id="top-area-container">
 
             <form action="sales.jsp" method="post" id="search-form">
@@ -219,7 +245,7 @@
         </div>
 
         <div class="back-button-holder">
-            <form action="main.jsp" method="post">
+            <form action="<%=previousPage%>" method="post">
                 <button class="normal-button">戻る</button>
             </form>
         </div>
@@ -260,12 +286,11 @@
         </div>
 
         <div class="back-button-holder">
-            <form action="main.jsp" method="post">
+            <form action="<%=previousPage%>" method="post">
                 <button class="normal-button">戻る</button>
             </form>
         </div>
 
-        <!--本来は複数のaタグにするか、スパンのテキストに応じてJavaScriptで検索開始-->
         <div id="page-selector-wrapper">
 
             <% for (int i = 1; i <= numberOfPages; i++) { %>
@@ -304,12 +329,13 @@
                 <div id="create-top-section">
                     <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/placeholder.png" width="200" height="200" alt="アイスを選択してください">
                     <select name="productID" id="product">
+                        <option hidden disabled selected value>商品を選択</option>
                         <!--動的に画像を変更する-->
-                        <% if(salesList.isEmpty()){ %><option hidden disabled selected value>商品を選択</option><% } %>
+<%--                        <% if(salesList.isEmpty()){ %><option hidden disabled selected value>商品を選択</option><% } %>--%>
 <%
                             for(int i=0; i<productsList.size(); i++){
 %>
-                                <option value="<%= productsList.get(i).get("productID") %>" <% if(returnFromCreate){ %><% if(productIDFromCreate.equals(productsList.get(i).get("productID"))){%> selected <% } } %>><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
+                                <option value="<%= productsList.get(i).get("productID") %>" <% if(returnFromCreate){ %><% if(productIDCancelledCreate.equals(productsList.get(i).get("productID"))){%> selected <% } } %>><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
 <%
                             }
 %>
@@ -493,6 +519,14 @@
             document.getElementById("sale-quantity-create").value = <%=saleQuantity%>;
             //最後に画像リフレッシュのためイベントを実行させます。
             document.getElementById("product").dispatchEvent(new Event("input"));
+            openAddPopup();
+        }
+
+        //商品詳細画面から来た時に自動的に追加ポップアップ内の対象商品を選択する
+        if(<%=shouldCreateFromID%>){
+            let productSelect = document.getElementById("product");
+            productSelect.value = "<%=createFromProductID%>";
+            productSelect.dispatchEvent(new Event("input"));
             openAddPopup();
         }
 
