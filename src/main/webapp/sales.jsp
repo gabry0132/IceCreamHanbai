@@ -182,7 +182,7 @@
                     %>
                 </select>
 
-                <button class="normal-button">集計表情</button>
+                <button class="normal-button">集計表示</button>
             </form>
         </div>
 
