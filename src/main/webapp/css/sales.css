@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 div#everything-wrapper{
     display: flex;
     flex-direction: column;
@@ -26,7 +28,7 @@ p.close:hover{
 }
 
 div#top-buttons{
-    width: 50%;
+    width: 38%;
     justify-content: space-evenly;
     display: flex;
     margin-bottom: 30px;
@@ -147,7 +149,7 @@ span.current-page{
     text-decoration: underline;
 }
 
-/* ���ꂩ��͔���f�[�^1���R�[�h���̐ݒ� */
+/* 売上データオブジェクトの設定は */
 
 div.sale-box{
     display: flex;
@@ -192,9 +194,9 @@ form.deleteForm{
     display: flex;
 }
 
-/* popup�̐ݒ� */
+/* popupの設定はここからです */
 div#black-background{
-    display: none;  /* flex��none��؂�ւ��� */
+    display: none;  /* flexとnoneを切り替える */
     position: fixed;
     top: 0;
     left: 0;
@@ -210,7 +212,7 @@ div#create-popup{
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-    display: none;  /* flex��none��؂�ւ��� */
+    display: none;  /* flexとnoneを切り替える */
     z-index: 15;
     width: 50%;
     flex-direction: column;
@@ -271,12 +273,12 @@ div#create-buttons-holder{
 }
 
 input.sale-time-textbox{
-    display: none; /* none��flex������������ */
+    display: none; /* flexとnoneを切り替える */
 }
 
 /* popup(edit)�̐ݒ� */
 div#black-background{
-    display: none;  /* flex��none��؂�ւ��� */
+    display: none;  /* flexとnoneを切り替える */
     position: fixed;
     top: 0;
     left: 0;
@@ -292,7 +294,7 @@ div#edit-popup{
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-    display: none;  /* flex��none��؂�ւ��� */
+    display: none;  /* flexとnoneを切り替える */
     z-index: 15;
     width: 50%;
     flex-direction: column;
@@ -342,4 +344,116 @@ p#edit-warning-message {
     color: grey;
     text-align: center;
     font-size: 0.8rem;
+}
+
+/* popupの設定はここまでです */
+
+
+/* 売上データ集計の設定はここからです */
+
+div.groupingOption-button-holder{
+    display: flex;
+    width: 100%;
+}
+
+button.groupingOption-button{
+    margin: 5px auto auto auto;
+    background-color: white;
+    font-size: 1rem;
+    border-radius: 2px;
+    border-width: 0.5px;
+    padding: 2px 5px;
+    cursor: pointer;
+    transition: 0.1s;
+}
+button.groupingOption-button:hover{
+    box-shadow: 0 2px 2px 0 #00000033;
+}
+button.groupingOption-button:active{
+    transform: translateY(5%);
+}
+
+div#grouping-toggle-button{
+    display: flex;
+    width: fit-content;
+    height: fit-content;
+    margin: auto 0 auto 0;
+    padding: 5px 5px 5px 10px;
+    border: 1px solid darkslategrey;
+    border-radius: 7px;
+    cursor: pointer;
+    z-index: 2;
+    p#grouping-toggle-button-text{
+        margin: 0;
+    }
+    img#grouping-toggle-button-image{
+        margin-left: 10px;
+        transform: rotate(0deg);    /* 0degと180degを切り替える */
+        transition: transform 0.2s ease-in-out;
+    }
+}
+
+div#groupingDiv{
+    display: flex;
+    width: 95%;
+    overflow: hidden;
+    height: 0;  /* 0と100を切り替える */
+    margin: auto auto 50px auto;    /* 0pxと「auto auto 50px auto」を切り替える */
+    transition: height 0.2s ease-in-out;
+    div#groupingSettingsDiv{
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        div.groupingSettingsRow{
+            display: flex;
+            margin: 10px 0px;
+            justify-content: space-between;
+        }
+    }
+    div#groupingResultsDiv{
+        width: 50%;
+        border: 1px solid red;
+    }
+}
+
+div.groupingOptionHolder{
+    width: fit-content;
+    height: auto;
+    margin: 0px 20px auto 20px;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 7px;
+    font-size: 1rem;
+    p.groupingOptionIntro{
+        width: 100%;
+        margin: 0;
+        font-weight: bold;
+    }
+    div.periodGroupingOption-periodHolder{
+        width: 150px;
+        div{
+            margin: 5px 0px 0px 0px;
+        }
+    }
+}
+
+div.paramAndButtonHolder{
+    margin-bottom: 0px;
+}
+
+div#periodTopTen-DetailedSearchParams,
+div#periodWorstTen-DetailedSearchParams{
+    display: flex;
+    flex-direction: column;
+}
+
+p#groupingResultPlaceholder{
+    color: #888888;
+    text-align: center;
+}
+
+/* chartJSの設定 */
+canvas#chart{
+    width: 100%;
+    height: 100%;
 }

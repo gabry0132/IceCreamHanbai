@@ -32,7 +32,10 @@
     boolean returnQuantity = request.getParameter("returnQuantity") != null;
 
     //CSVから読み込むためのパラメータ
-    Part filePart = request.getPart("fileInput");
+    Part filePart = null;
+    if(registerType.equals("fromCSV")){
+        filePart = request.getPart("fileInput");
+    }
     String targetDate = request.getParameter("targetDate");
     String adjustedDate = request.getParameter("readFileAdjustDate");
     HashMap<String, String> map = new HashMap<>();

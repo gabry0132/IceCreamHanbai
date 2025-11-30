@@ -59,13 +59,11 @@
             saleTime += ":";
             if(calendar.get(Calendar.SECOND) < 10) saleTime += "0";
             saleTime += calendar.get(Calendar.SECOND);
-            System.out.println(saleTime);
         }
         else if(saleTimeSelector.equals("指定する")){
-            //2025-10-19T22:55 の形で来ます。
-            String seconds = calendar.get(Calendar.SECOND) + "";
-            if(seconds.length() == 1); seconds = "0" + seconds;
-            saleTime = saleTime.replace("T", " ") + ":" + seconds;
+            //2025-10-19T22:55:11 の形で来ます。
+
+            saleTime = saleTime.replace("T", " ");
         }
     }
 
