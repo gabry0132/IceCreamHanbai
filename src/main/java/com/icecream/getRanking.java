@@ -76,7 +76,7 @@ public class getRanking extends HttpServlet {
             sql.append("select A.productID, A.name, sum(A.quantity) as totalSales from ( ");
             sql.append("select products.productID, products.name, sales.quantity from sales ");
             sql.append("inner join products on sales.productID = products.productID ");
-            sql.append("where 1=1 ");
+            sql.append("where sales.deleteFlag = 0 ");
             if(yearFrom != null) sql.append("and sales.dateTime >= '"+ yearFrom + "-" + monthFrom + "-" + dayFrom + "' ");
             if(yearTo != null) sql.append("and sales.dateTime <= '"+ yearTo + "-" + monthTo + "-" + dayTo + " 23:59:59' "); //最後の1分までチェックします
             sql.append(") as A ");

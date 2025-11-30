@@ -182,61 +182,67 @@
 
                 <div class="groupingSettingsRow">
 
-                    <div class="groupingOptionHolder" id="TopTot-grOpt">
-                        <p class="groupingOptionIntro">全体的 トップ</p>
+                    <p class="groupingSettingsRowIntro">売上ランキング</p>
 
-                        <select name="itemLimit" id="topTotItemLimit">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                            <option value="unlimited">無制限</option>
-                        </select> 商品
-                        <div class="groupingOption-button-holder">
-                            <button class="groupingOption-button" id="topTot-btn">確認</button>
+                    <div class="optionsInRowWrapper">
+
+                        <div class="groupingOptionHolder" id="TopTot-grOpt">
+                            <p class="groupingOptionIntro">全体的 トップ</p>
+
+                            <select name="itemLimit" id="topTotItemLimit">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="50">50</option>
+                                <option value="unlimited">無制限</option>
+                            </select> 商品
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="topTot-btn">確認</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="groupingOptionHolder" id="yearTopTen-grOpt">
-                        <p class="groupingOptionIntro">年 トップ10</p>
+                        <div class="groupingOptionHolder" id="yearTopTen-grOpt">
+                            <p class="groupingOptionIntro">年 トップ10</p>
 
-                        <select class="recentYearsSelect" name="yearTopTen" id="yearTopTen"></select> 年
-                        <div class="groupingOption-button-holder">
-                            <button class="groupingOption-button" id="yearTopTen-btn">確認</button>
+                            <select class="recentYearsSelect" name="yearTopTen" id="yearTopTen"></select> 年
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="yearTopTen-btn">確認</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="groupingOptionHolder" id="periodTopTen-grOpt">
-                        <p class="groupingOptionIntro">期間 トップ10</p>
+                        <div class="groupingOptionHolder" id="periodTopTen-grOpt">
+                            <p class="groupingOptionIntro">期間 トップ10</p>
 
-                        <div class="periodGroupingOption-periodHolder">
+                            <div class="periodGroupingOption-periodHolder">
 
-                            <input type="checkbox" name="periodTopTen-DetailedCheckbox" id="periodTopTen-DetailedCheckbox">詳細指定
+                                <input type="checkbox" name="periodTopTen-DetailedCheckbox" id="periodTopTen-DetailedCheckbox">詳細指定
 
-                            <div id="periodTopTen-NONDetailedSearchParams">
-                                <div>
-                                    <select class="recentYearsSelect" name="periodTopTen-year" id="periodTopTen-year"></select> 年　
+                                <div id="periodTopTen-NONDetailedSearchParams">
+                                    <div>
+                                        <select class="recentYearsSelect" name="periodTopTen-year" id="periodTopTen-year"></select> 年　
+                                    </div>
+                                    <div>
+                                        <select class="allMonthsSelect" name="periodTopTen-month" id="periodTopTen-month"></select> 月
+                                    </div>
                                 </div>
-                                <div>
-                                    <select class="allMonthsSelect" name="periodTopTen-month" id="periodTopTen-month"></select> 月
+
+                                <div id="periodTopTen-DetailedSearchParams">
+                                    <div>
+                                        <input type="date" name="periodTopTen-startDate" id="periodTopTen-startDate"> から
+                                    </div>
+                                    <div>
+                                        <input type="date" name="periodTopTen-endDate" id="periodTopTen-endDate"> まで
+                                    </div>
                                 </div>
+
                             </div>
 
-                            <div id="periodTopTen-DetailedSearchParams">
-                                <div>
-                                    <input type="date" name="periodTopTen-startDate" id="periodTopTen-startDate"> から
-                                </div>
-                                <div>
-                                    <input type="date" name="periodTopTen-endDate" id="periodTopTen-endDate"> まで
-                                </div>
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="periodTopTen-btn">確認</button>
                             </div>
 
-                        </div>
-
-                        <div class="groupingOption-button-holder">
-                            <button class="groupingOption-button" id="periodTopTen-btn">確認</button>
                         </div>
 
                     </div>
@@ -245,62 +251,130 @@
 
                 <div class="groupingSettingsRow">
 
-                    <div class="groupingOptionHolder" id="worstTot-grOpt">
-                        <p class="groupingOptionIntro">全体的 ワースト</p>
+                    <div class="optionsInRowWrapper">
 
-                        <select name="itemLimit" id="worstTotItemLimit">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                            <option value="unlimited">無制限</option>
-                        </select> 商品
-                        <div class="groupingOption-button-holder">
-                            <button class="groupingOption-button" id="worstTot-btn">確認</button>
+                        <div class="groupingOptionHolder" id="worstTot-grOpt">
+                            <p class="groupingOptionIntro">全体的 ワースト</p>
+
+                            <select name="itemLimit" id="worstTotItemLimit">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="50">50</option>
+                                <option value="unlimited">無制限</option>
+                            </select> 商品
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="worstTot-btn">確認</button>
+                            </div>
+                        </div>
+
+                        <div class="groupingOptionHolder" id="yearWorstTen-grOpt">
+                            <p class="groupingOptionIntro">年 ワースト10</p>
+
+                            <select class="recentYearsSelect" name="yearWorstTen" id="yearWorstTen"></select> 年
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="yearWorstTen-btn">確認</button>
+                            </div>
+                        </div>
+
+                        <div class="groupingOptionHolder" id="periodWorstTen-grOpt">
+                            <p class="groupingOptionIntro">期間 ワースト10</p>
+
+                            <div class="periodGroupingOption-periodHolder">
+
+                                <input type="checkbox" name="periodWorstTen-DetailedCheckbox" id="periodWorstTen-DetailedCheckbox">詳細指定
+
+                                <div id="periodWorstTen-NONDetailedSearchParams">
+                                    <div>
+                                        <select class="recentYearsSelect" name="periodWorstTen-year" id="periodWorstTen-year"></select> 年　
+                                    </div>
+                                    <div>
+                                        <select class="allMonthsSelect" name="periodWorstTen-month" id="periodWorstTen-month"></select> 月
+                                    </div>
+                                </div>
+
+                                <div id="periodWorstTen-DetailedSearchParams">
+                                    <div>
+                                        <input type="date" name="periodWorstTen-startDate" id="periodWorstTen-startDate"> から
+                                    </div>
+                                    <div>
+                                        <input type="date" name="periodWorstTen-endDate" id="periodWorstTen-endDate"> まで
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="periodWorstTen-btn">確認</button>
+                            </div>
+
                         </div>
                     </div>
 
-                    <div class="groupingOptionHolder" id="yearWorstTen-grOpt">
-                        <p class="groupingOptionIntro">年 ワースト10</p>
+                </div>
 
-                        <select class="recentYearsSelect" name="yearWorstTen" id="yearWorstTen"></select> 年
-                        <div class="groupingOption-button-holder">
-                            <button class="groupingOption-button" id="yearWorstTen-btn">確認</button>
-                        </div>
-                    </div>
+                <div class="groupingSettingsRow">
 
-                    <div class="groupingOptionHolder" id="periodWorstTen-grOpt">
-                        <p class="groupingOptionIntro">期間 ワースト10</p>
+                    <p class="groupingSettingsRowIntro">販売動向</p>
 
-                        <div class="periodGroupingOption-periodHolder">
+                    <div class="optionsInRowWrapper">
 
-                            <input type="checkbox" name="periodWorstTen-DetailedCheckbox" id="periodWorstTen-DetailedCheckbox">詳細指定
+                        <div class="groupingOptionHolder" id="compare-grOpt">
+                            <p class="groupingOptionIntro">動向確認・比較</p>
 
-                            <div id="periodWorstTen-NONDetailedSearchParams">
-                                <div>
-                                    <select class="recentYearsSelect" name="periodWorstTen-year" id="periodWorstTen-year"></select> 年　
-                                </div>
-                                <div>
-                                    <select class="allMonthsSelect" name="periodWorstTen-month" id="periodWorstTen-month"></select> 月
-                                </div>
+                            <div class="compareOptionSelectionRow">
+                                <select class="productToBeComparedSelect" name="productToBeCompared1" id="productToBeCompared1">
+                                    <option hidden disabled selected value>商品を選択</option>
+                                    <% for(int i=0; i<productsList.size(); i++){ %>
+                                        <option value="<%= productsList.get(i).get("productID") %>"><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
+                                    <% } %>
+                                </select>　　　　
+
+                                <select class="productToBeComparedSelect" name="productToBeCompared2" id="productToBeCompared2">
+                                    <option hidden disabled selected value>商品を選択</option>
+                                    <% for(int i=0; i<productsList.size(); i++){ %>
+                                        <option value="<%= productsList.get(i).get("productID") %>"><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
+                                    <% } %>
+                                </select>（任意）
                             </div>
 
-                            <div id="periodWorstTen-DetailedSearchParams">
-                                <div>
-                                    <input type="date" name="periodWorstTen-startDate" id="periodWorstTen-startDate"> から
-                                </div>
-                                <div>
-                                    <input type="date" name="periodWorstTen-endDate" id="periodWorstTen-endDate"> まで
-                                </div>
+                            <div class="compareOptionSelectionRow">
+                                <select class="productToBeComparedSelect" name="productToBeCompared3" id="productToBeCompared3">
+                                    <option hidden disabled selected value>商品を選択</option>
+                                    <% for(int i=0; i<productsList.size(); i++){ %>
+                                        <option value="<%= productsList.get(i).get("productID") %>"><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
+                                    <% } %>
+                                </select>（任意）
+
+                                <select class="productToBeComparedSelect" name="productToBeCompared4" id="productToBeCompared4">
+                                    <option hidden disabled selected value>商品を選択</option>
+                                    <% for(int i=0; i<productsList.size(); i++){ %>
+                                        <option value="<%= productsList.get(i).get("productID") %>"><%= productsList.get(i).get("productID") %> <%= productsList.get(i).get("name") %></option>
+                                    <% } %>
+                                </select>（任意）
                             </div>
 
+                            <div id="compare-grOpt-radioHolders">
+                                <input type="radio" name="compareTimeFrame" value="6" checked>6ヶ月間
+                                <input type="radio" name="compareTimeFrame" value="12">1年間
+                            </div>
+
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="clear-compare-btn">クリア</button>
+                                <button class="groupingOption-button" id="compare-btn">確認</button>
+                            </div>
                         </div>
 
-                        <div class="groupingOption-button-holder">
-                            <button class="groupingOption-button" id="periodWorstTen-btn">確認</button>
-                        </div>
+                        <!-- <div class="groupingOptionHolder" id="yearTopTen-grOpt">
+                            <p class="groupingOptionIntro">年 トップ10</p>
+
+                            <select class="recentYearsSelect" name="yearTopTen" id="yearTopTen"></select> 年
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="yearTopTen-btn">確認</button>
+                            </div>
+                        </div> -->
 
                     </div>
 
@@ -583,6 +657,8 @@
         </div>
     </form>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0"></script>
+    <script src="salesGrouping.js"></script>
     <script>
         document.getElementById('now-time-create').checked = true;
         document.getElementById('now-time-edit').checked = true;

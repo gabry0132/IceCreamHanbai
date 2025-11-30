@@ -16,7 +16,7 @@ groupingToggleButton.addEventListener("click", () => {
         groupingToggleButtonImage.style.transform = "rotate(0deg)";
         isGroupingDivOpen = false;
     } else {
-        groupingDiv.style.height = "400px";     
+        groupingDiv.style.height = "420px";     
         groupingDiv.style.margin = "auto auto 50px auto";
         groupingToggleButtonImage.style.transform = "rotate(180deg)";
         isGroupingDivOpen = true;
@@ -78,6 +78,49 @@ periodWorstTenDetailedCheckbox.addEventListener("change", () => {
     }
 })
 periodWorstTenDetailedCheckbox.dispatchEvent(new Event("change"));
+
+//販売動向：商品を選択したら他のドロップダウンメニューから選択できないようにする
+const productToBeComparedSelects = Array.from(document.getElementsByClassName("productToBeComparedSelect"));
+productToBeComparedSelects.forEach(select => {
+    select.addEventListener("change", (e) => {
+        let element = e.target;
+        let currentlyChosenValues = [];
+        productToBeComparedSelects.forEach(selectElement => {
+            if(selectElement.value != null || selectElement.value != undefined){
+                currentlyChosenValues.push(selectElement.value);
+            }
+        })
+        productToBeComparedSelects.forEach(selectElement => {
+            if(selectElement.id !== element.id){
+                let options = Array.from(selectElement.children);
+                options.forEach(option => {
+                    if(currentlyChosenValues.includes(option.value)){
+                        option.setAttribute("hidden","true");
+                    } else {
+                        option.removeAttribute("hidden")
+                    }
+                })
+            }
+        })
+    })
+})
+
+//販売動向：クリアボタンの操作
+document.getElementById("clear-compare-btn").addEventListener("click", () => {
+    productToBeComparedSelects.forEach(select => {
+        let options = Array.from(select.children);
+        options.forEach(option => {
+            if(option.value != null || options.value != undefined){
+                option.removeAttribute("hidden")
+            }
+        })
+        select.selectedIndex = 0;
+    })
+})
+
+
+
+
 
 /* ******************* */
 //実際のデータ取得と表示
@@ -207,6 +250,41 @@ document.getElementById("periodWorstTen-btn").addEventListener("click", () =>{
           .then(json => drawRankingGraph(json));
 })
 
+//動向確認・比較 (sales trends)
+document.getElementById("compare-btn").addEventListener("click", () =>{
+    //入力チェック
+    let selectedValues = [];
+    productToBeComparedSelects.forEach(select => {
+        if(select.value !== undefined && select.value !== null && select.value !== ""){
+            selectedValues.push(select.value);
+        }
+    })
+    if(selectedValues.length === 0){
+        document.getElementById("productToBeCompared1").focus({ focusVisible: true });
+        return;
+    }
+    
+    showLoadingMessage();
+
+    let rankingType = "販売動向";
+    let monthsInterval = 6;
+    let compareTimeFrameInputs = Array.from(document.getElementsByName("compareTimeFrame"));
+    compareTimeFrameInputs.forEach(input => {
+        if(input.checked) monthsInterval = input.value;
+        return;
+    })
+
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getSalesTrend?rankingType=" + rankingType +
+     "&monthsInterval=" + monthsInterval;
+    for (let i = 0; i < selectedValues.length; i++) {
+        url += "&product" + (i + 1) + "=" + selectedValues[i];
+    }
+
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawTrendsGraph(json));
+})
+
 
 /* ******************* */
 //canvasでデータを表示する
@@ -256,6 +334,118 @@ function drawRankingGraph(json){
         document.getElementById("groupingResultPlaceholder").innerHTML = "エラーが発生しました。<br>" + error.message
     }
     
+}
+
+function drawTrendsGraph(json){
+    clearCanvas();
+
+    if(json.data.length === 0){
+        document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
+        return;
+    }
+
+    let products = [];
+    json.data.forEach(row => {
+        let newProduct = true;
+        for (let i = 0; i < products.length; i++) {
+            const product = products[i];
+            if(product.productID == row.productID){
+                product.yearMonths.push({yearMonth: row.yearMonth, monthlySales: row.monthlySales});
+                newProduct = false;
+                continue;
+            }
+        }
+        if(newProduct){
+            products.push({
+                productID: row.productID,
+                name: row.name,
+                yearMonths: [{yearMonth: row.yearMonth, monthlySales: row.monthlySales}]
+            });
+        }
+    })
+
+    let monthsInterval = json.monthsInterval;
+    let date = new Date();
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let xValues = getPreviousYearMonth(year + "-" + month, monthsInterval);
+
+    xValues.forEach(yearMonth => {
+        for (let i = 0; i < products.length; i++) {
+            let existing = false;
+            const product = products[i];
+            product.yearMonths.forEach(combo => {
+                if(combo.yearMonth === yearMonth){
+                    existing = true;
+                }
+            })
+            if(!existing){
+                product.yearMonths.push({yearMonth: yearMonth, monthlySales: null})
+            }
+        }
+    })
+
+    //ソートする
+    products.forEach(product => {
+        product.yearMonths.sort((a, b) => {
+            return a.yearMonth.localeCompare(b.yearMonth);
+        });
+    });
+
+    let datasets = [];
+    products.forEach(product => {
+        let data = [];
+        product.yearMonths.forEach(combo => {
+            data.push(combo.monthlySales);
+        })
+        let borderColor = getRandomHSLColor();
+        let fill = false;
+        let label = product.name;
+        datasets.push({
+            label,
+            data,
+            borderColor,
+            fill
+        })
+    });
+
+    try {
+        chart = new Chart("resultChart", {
+            type: "line",
+            data: {
+                labels: xValues,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: json.title
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.log("failed to generate chart", error);
+        document.getElementById("groupingResultPlaceholder").innerHTML = "エラーが発生しました。<br>" + error.message
+    }
+
+}
+
+function getPreviousYearMonth(yearMonth, monthsInterval){
+    let year = Number(yearMonth.split("-")[0]);
+    let month = Number(yearMonth.split("-")[1]);
+
+    let date = new Date();
+    let result = [];
+    for (let i = 0; i < monthsInterval; i++) {
+        date.setMonth(date.getMonth() - 1);
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        result.push(`${y}-${m}`);
+    }
+    return result.reverse();
 }
 
 function getRandomHSLColor(){
