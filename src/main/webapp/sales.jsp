@@ -214,10 +214,10 @@
                         <div class="periodGroupingOption-periodHolder">
 
                             <input type="checkbox" name="periodTopTen-DetailedCheckbox" id="periodTopTen-DetailedCheckbox">詳細指定
-                            
+
                             <div id="periodTopTen-NONDetailedSearchParams">
                                 <div>
-                                    <select class="recentYearsSelect" name="periodTopTen-year" id="periodTopTen-year"></select> 年　 
+                                    <select class="recentYearsSelect" name="periodTopTen-year" id="periodTopTen-year"></select> 年　
                                 </div>
                                 <div>
                                     <select class="allMonthsSelect" name="periodTopTen-month" id="periodTopTen-month"></select> 月
@@ -234,13 +234,13 @@
                             </div>
 
                         </div>
-                        
+
                         <div class="groupingOption-button-holder">
                             <button class="groupingOption-button" id="periodTopTen-btn">確認</button>
                         </div>
 
                     </div>
-                
+
                 </div>
 
                 <div class="groupingSettingsRow">
@@ -277,10 +277,10 @@
                         <div class="periodGroupingOption-periodHolder">
 
                             <input type="checkbox" name="periodWorstTen-DetailedCheckbox" id="periodWorstTen-DetailedCheckbox">詳細指定
-                            
+
                             <div id="periodWorstTen-NONDetailedSearchParams">
                                 <div>
-                                    <select class="recentYearsSelect" name="periodWorstTen-year" id="periodWorstTen-year"></select> 年　 
+                                    <select class="recentYearsSelect" name="periodWorstTen-year" id="periodWorstTen-year"></select> 年　
                                 </div>
                                 <div>
                                     <select class="allMonthsSelect" name="periodWorstTen-month" id="periodWorstTen-month"></select> 月
@@ -297,13 +297,13 @@
                             </div>
 
                         </div>
-                        
+
                         <div class="groupingOption-button-holder">
                             <button class="groupingOption-button" id="periodWorstTen-btn">確認</button>
                         </div>
 
                     </div>
-                
+
                 </div>
 
 
@@ -460,7 +460,7 @@
     
                 <div id="create-top-section">
                     <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/placeholder.png" width="200" height="200" alt="アイスを選択してください">
-                    <select name="productID" id="product" required>
+                    <select name="productID" id="product">
                         <option hidden disabled selected value>商品を選択</option>
                         <!--動的に画像を変更する-->
 <%--                        <% if(salesList.isEmpty()){ %><option hidden disabled selected value>商品を選択</option><% } %>--%>
@@ -582,11 +582,6 @@
             </div>
         </div>
     </form>
-
-    <%--chartJS--%>
-    <script
-        src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0">
-    </script>
 
     <script>
         document.getElementById('now-time-create').checked = true;
@@ -753,7 +748,6 @@
         }
 
     </script>
-    <script src="salesGrouping.js"></script>
 <% } %>
 </body>
 </html>
