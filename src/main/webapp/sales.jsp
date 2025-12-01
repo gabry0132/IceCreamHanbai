@@ -20,7 +20,7 @@
 
     //ページング変数
     int numberOfPages = 1;
-    int pageLimitOffset = 50;   //1ページに何件が表示されるか
+    int pageLimitOffset = 15;   //1ページに何件が表示されるか
     int selectedPage = 1;
     if(request.getParameter("selectedPage") != null) selectedPage = Integer.parseInt(request.getParameter("selectedPage"));
     selectedPage--; //オフセット計算に使うので -1にします
@@ -184,7 +184,7 @@
 
                     <p class="groupingSettingsRowIntro">売上ランキング</p>
 
-                    <div class="optionsInRowWrapper">
+                    <div class="optionsInRowWrapper justifyContentsSpaceBetween">
 
                         <div class="groupingOptionHolder" id="TopTot-grOpt">
                             <p class="groupingOptionIntro">全体的 トップ</p>
@@ -251,7 +251,7 @@
 
                 <div class="groupingSettingsRow">
 
-                    <div class="optionsInRowWrapper">
+                    <div class="optionsInRowWrapper justifyContentsSpaceBetween">
 
                         <div class="groupingOptionHolder" id="worstTot-grOpt">
                             <p class="groupingOptionIntro">全体的 ワースト</p>
@@ -317,6 +317,34 @@
 
                 <div class="groupingSettingsRow">
 
+                    <p class="groupingSettingsRowIntro">割合 売上高チャート</p>
+
+                    <div class="optionsInRowWrapper">
+
+                        <div class="groupingOptionHolder" id="percentageSales-grOpt">
+                            <p class="groupingOptionIntro">売上個数</p>
+
+                            <select class="recentYearsSelect" name="percentageSalesYear" id="percentageSalesYear"></select> 年
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="percentageSales-btn">確認</button>
+                            </div>
+                        </div>
+
+                        <div class="groupingOptionHolder" id="percentageProfits-grOpt">
+                            <p class="groupingOptionIntro">利益</p>
+
+                            <select class="recentYearsSelect" name="percentageProfitsYear" id="percentageProfitsYear"></select> 年
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="percentageProfits-btn">確認</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="groupingSettingsRow">
+
                     <p class="groupingSettingsRowIntro">販売動向</p>
 
                     <div class="optionsInRowWrapper">
@@ -367,26 +395,17 @@
                             </div>
                         </div>
 
-                        <!-- <div class="groupingOptionHolder" id="yearTopTen-grOpt">
-                            <p class="groupingOptionIntro">年 トップ10</p>
-
-                            <select class="recentYearsSelect" name="yearTopTen" id="yearTopTen"></select> 年
-                            <div class="groupingOption-button-holder">
-                                <button class="groupingOption-button" id="yearTopTen-btn">確認</button>
-                            </div>
-                        </div> -->
-
                     </div>
 
                 </div>
 
+                
 
             </div>
 
             <!-- fetchの結果をここに表示する -->
             <div id="groupingResultsDiv">
                 <p id="groupingResultPlaceholder">集計オプションを選んでください</p>
-                <p id="groupingResultIntro"></p>
                 <canvas id="resultChart"></canvas>
             </div>
 

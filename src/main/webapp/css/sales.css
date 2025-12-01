@@ -400,6 +400,7 @@ div#groupingDiv{
     height: 0;  /* 0と特定の数値を切り替える */
     margin: auto auto 50px auto;    /* 0pxと「auto auto 50px auto」を切り替える */
     transition: height 0.2s ease-in-out;
+    border: none;   /* 1px solid blackとnoneを切り替える */
     div#groupingSettingsDiv{
         width: 50%;
         height: 100%;
@@ -412,14 +413,23 @@ div#groupingDiv{
             div.optionsInRowWrapper{
                 display: flex;
                 margin: 10px 0px;
-                justify-content: space-between;
+                /*justify-content: space-between;*/
             }
         }
     }
     div#groupingResultsDiv{
         width: 50%;
-        border: 1px solid red;
+        /*border: 1px solid red;*/
+        canvas{
+            width: 100%;
+            height: 100%;
+            margin: auto;
+        }
     }
+}
+
+div.justifyContentsSpaceBetween{
+    justify-content: space-between;
 }
 
 div.groupingOptionHolder{
@@ -461,7 +471,12 @@ p#groupingResultPlaceholder{
 p.groupingSettingsRowIntro{
     display: inline-block;
     width: 80%;
+    padding-left: 20px;
     border-bottom: #aaaaaa 2px solid;
+}
+
+div#compare-grOpt{
+    margin-bottom: 20px;
 }
 
 div#compare-grOpt-radioHolders{

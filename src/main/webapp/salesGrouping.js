@@ -13,11 +13,13 @@ groupingToggleButton.addEventListener("click", () => {
     if(isGroupingDivOpen) {
         groupingDiv.style.height = "0px";
         groupingDiv.style.margin = "0px";
+        groupingDiv.style.border = "none";
         groupingToggleButtonImage.style.transform = "rotate(0deg)";
         isGroupingDivOpen = false;
     } else {
-        groupingDiv.style.height = "420px";     
+        groupingDiv.style.height = "420px";
         groupingDiv.style.margin = "auto auto 50px auto";
+        groupingDiv.style.border = "1px solid black";
         groupingToggleButtonImage.style.transform = "rotate(180deg)";
         isGroupingDivOpen = true;
     }
@@ -285,6 +287,30 @@ document.getElementById("compare-btn").addEventListener("click", () =>{
           .then(json => drawTrendsGraph(json));
 })
 
+//割合 売上高：売上個数
+document.getElementById("percentageSales-btn").addEventListener("click", () =>{
+    showLoadingMessage();
+    let targetYear = document.getElementById("percentageSalesYear").value;
+    let rankingType = targetYear + "年 割合 売上高:売上個数";
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getPercentPie?rankingType=" + rankingType +
+     "&targetYear=" + targetYear;
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawPercentPieGraph(json, "sales"));
+})
+
+//割合 売上高：利益
+document.getElementById("percentageProfits-btn").addEventListener("click", () =>{
+    showLoadingMessage();
+    let targetYear = document.getElementById("percentageProfitsYear").value;
+    let rankingType = targetYear + "年 割合 売上高:利益";
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getPercentPie?rankingType=" + rankingType +
+     "&targetYear=" + targetYear;
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawPercentPieGraph(json, "profits"));
+})
+
 
 /* ******************* */
 //canvasでデータを表示する
@@ -432,6 +458,78 @@ function drawTrendsGraph(json){
     }
 
 }
+
+function drawPercentPieGraph(json, calculationMode){
+    clearCanvas();
+
+    if(json.data.length === 0){
+        document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
+        return;
+    }
+
+    let total = 0;
+    json.data.forEach(product => {
+        
+        if(calculationMode === "sales") total += product.quantity;
+        else if(calculationMode === "profits") total += (product.quantity * product.price) - (product.quantity * product.purchaseCost);
+
+    })
+
+    let xValues = [];
+    let yValues = [];
+    let barColors = [];
+    let profitCurrent = 0;
+    json.data.forEach(product => {
+        profitCurrent = (product.quantity * product.price) - (product.quantity * product.purchaseCost);
+        //パーセントを求める
+        if(calculationMode === "sales"){
+            xValues.push(product.name);
+            yValues.push(product.quantity * 100 / total);
+        } else if(calculationMode === "profits"){
+            xValues.push(product.name + " ("+ profitCurrent +"円)");
+            yValues.push(profitCurrent * 100 / total);
+        }
+        barColors.push(getRandomHSLColor())
+    });
+
+    try {
+        chart = new Chart("resultChart", {
+            type: "pie",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: yValues
+                }]
+            },
+            options: {
+                plugins:{
+                    title: {
+                        display: true,
+                        text: json.title
+                    },
+                     legend: {
+                        position: "right",  // move to the right
+                        align: "center",    // vertical center (optional)
+                        labels: {
+                            padding: 20,    // spacing between items
+                            boxWidth: 20,   // size of color squares
+                            usePointStyle: false
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.log("failed to generate chart", error);
+        document.getElementById("groupingResultPlaceholder").innerHTML = "エラーが発生しました。<br>" + error.message
+    }
+}
+
+
+
+
+
 
 function getPreviousYearMonth(yearMonth, monthsInterval){
     let year = Number(yearMonth.split("-")[0]);
