@@ -182,9 +182,71 @@
 
                 <div class="groupingSettingsRow">
 
+                    <p class="groupingSettingsRowIntro">一般集計</p>
+
+                    <div class="optionsInRowWrapper ">
+
+                        <div class="groupingOptionHolder" id="dailyTot-grOpt">
+                            <p class="groupingOptionIntro">今日の</p>
+
+                            <div id="dailyTot-grOpt-radioHolders">
+                                <input type="radio" name="dailyTotCalculationMode" value="sales" checked>個数
+                                <input type="radio" name="dailyTotCalculationMode" value="profits">利益
+                            </div>
+                            
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="dailyTot-btn">確認</button>
+                            </div>
+                        </div>
+                        
+                        <div class="groupingOptionHolder" id="weeklyTot-grOpt">
+                            <p class="groupingOptionIntro">今週の</p>
+
+                            <div id="weeklyTot-grOpt-radioHolders">
+                                <input type="radio" name="weeklyTotCalculationMode" value="sales" checked>個数
+                                <input type="radio" name="weeklyTotCalculationMode" value="profits">利益
+                            </div>
+                            
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="weeklyTot-btn">確認</button>
+                            </div>
+                        </div>
+                        
+                        <div class="groupingOptionHolder" id="monthlyTot-grOpt">
+                            <p class="groupingOptionIntro">今月の</p>
+
+                            <div id="monthlyTot-grOpt-radioHolders">
+                                <input type="radio" name="monthlyTotCalculationMode" value="sales" checked>個数
+                                <input type="radio" name="monthlyTotCalculationMode" value="profits">利益
+                            </div>
+                            
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="monthlyTot-btn">確認</button>
+                            </div>
+                        </div>
+
+                        <div class="groupingOptionHolder" id="yearlyTot-grOpt">
+                            <p class="groupingOptionIntro">今年の</p>
+
+                            <div id="yearlyTot-grOpt-radioHolders">
+                                <input type="radio" name="yearlyTotCalculationMode" value="sales" checked>個数
+                                <input type="radio" name="yearlyTotCalculationMode" value="profits">利益
+                            </div>
+                            
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="yearlyTot-btn">確認</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="groupingSettingsRow">
+
                     <p class="groupingSettingsRowIntro">売上ランキング</p>
 
-                    <div class="optionsInRowWrapper justifyContentsSpaceBetween">
+                    <div class="optionsInRowWrapper  innerDivsMarginBottomAuto">
 
                         <div class="groupingOptionHolder" id="TopTot-grOpt">
                             <p class="groupingOptionIntro">全体的 トップ</p>
@@ -251,7 +313,7 @@
 
                 <div class="groupingSettingsRow">
 
-                    <div class="optionsInRowWrapper justifyContentsSpaceBetween">
+                    <div class="optionsInRowWrapper  innerDivsMarginBottomAuto">
 
                         <div class="groupingOptionHolder" id="worstTot-grOpt">
                             <p class="groupingOptionIntro">全体的 ワースト</p>
@@ -343,14 +405,51 @@
 
                 </div>
 
+
                 <div class="groupingSettingsRow">
 
                     <p class="groupingSettingsRowIntro">販売動向</p>
 
                     <div class="optionsInRowWrapper">
 
+                        <div class="groupingOptionHolder" id="compareGeneral-grOpt">
+
+                            <p class="groupingOptionIntro">全体的確認・売上個数</p>
+
+                            <div id="compareGeneral-grOpt-radioHolders">
+                                <input type="radio" name="compareGeneralTimeFrame" value="6" checked>6ヶ月間
+                                <input type="radio" name="compareGeneralTimeFrame" value="12">1年間
+                            </div>
+
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="compareGeneral-btn">確認</button>
+                            </div>
+                        </div>
+
+                        <div class="groupingOptionHolder" id="compareGeneralSales-grOpt">
+
+                            <p class="groupingOptionIntro">全体的確認・利益</p>
+
+                            <div id="compareGeneralSales-grOpt-radioHolders">
+                                <input type="radio" name="compareGeneralSalesTimeFrame" value="6" checked>6ヶ月間
+                                <input type="radio" name="compareGeneralSalesTimeFrame" value="12">1年間
+                            </div>
+
+                            <div class="groupingOption-button-holder">
+                                <button class="groupingOption-button" id="compareGeneralSales-btn">確認</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="groupingSettingsRow">
+
+                    <div class="optionsInRowWrapper">
+
                         <div class="groupingOptionHolder" id="compare-grOpt">
-                            <p class="groupingOptionIntro">動向確認・比較</p>
+                            <p class="groupingOptionIntro">動向確認・商品比較</p>
 
                             <div class="compareOptionSelectionRow">
                                 <select class="productToBeComparedSelect" name="productToBeCompared1" id="productToBeCompared1">
@@ -399,7 +498,6 @@
 
                 </div>
 
-                
 
             </div>
 

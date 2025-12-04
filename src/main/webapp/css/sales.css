@@ -426,10 +426,16 @@ div.justifyContentsSpaceBetween{
     justify-content: space-between;
 }
 
+div.innerDivsMarginBottomAuto{
+    div{
+        margin-bottom: auto;
+    }
+}
+
 div.groupingOptionHolder{
     width: fit-content;
     height: auto;
-    margin: 0px 20px auto 20px;
+    margin: 0px 20px 0px 20px;
     padding: 10px;
     border: 2px solid black;
     border-radius: 7px;
@@ -480,6 +486,7 @@ div#compare-grOpt-radioHolders{
 }
 
 /* chartJSの設定 */
+
 canvas#resultChart{
     margin: 0px;
     width: 100%;

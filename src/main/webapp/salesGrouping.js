@@ -121,12 +121,169 @@ document.getElementById("clear-compare-btn").addEventListener("click", () => {
 })
 
 
-
-
-
 /* ******************* */
 //実際のデータ取得と表示
 /* ******************* */
+
+//今日の TOP
+document.getElementById("dailyTot-btn").addEventListener("click", () =>{
+    showLoadingMessage();
+    let rankingType = "今日の TOP";
+    let topTotItemLimit = "unlimited";
+    let calculationMode = "sales";
+    let dailyTotCalculationModeInputs = Array.from(document.getElementsByName("dailyTotCalculationMode"));
+    dailyTotCalculationModeInputs.forEach(input => {
+        if(input.checked) calculationMode = input.value;
+        return;
+    })
+
+    let date = new Date();
+    let yearFrom = date.getFullYear();
+    let yearTo = yearFrom;
+    let monthFrom = date.getMonth() + 1;
+    let monthTo = monthFrom;
+    let dayFrom = date.getDate();
+    let dayTo = dayFrom;
+
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getRanking?rankingType=" + rankingType +
+     "&rankingItemLimit=" + topTotItemLimit +"&calculationMode=" + calculationMode +
+     "&yearFrom=" + yearFrom + "&monthFrom=" + monthFrom + "&dayFrom=" + dayFrom +
+     "&yearTo=" + yearTo + "&monthTo=" + monthTo + "&dayTo=" + dayTo;
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawRankingGraph(json, calculationMode, "一般集計"));
+})
+
+//今週の TOP
+document.getElementById("weeklyTot-btn").addEventListener("click", () =>{
+    showLoadingMessage();
+    let rankingType = "今週の TOP";
+    let topTotItemLimit = "unlimited";
+    let calculationMode = "sales";
+    let dailyTotCalculationModeInputs = Array.from(document.getElementsByName("weeklyTotCalculationMode"));
+    dailyTotCalculationModeInputs.forEach(input => {
+        if(input.checked) calculationMode = input.value;
+        return;
+    })
+
+    let date = new Date();
+
+    let yearFrom = date.getFullYear();
+    let yearTo = yearFrom;
+    let monthFrom = date.getMonth() + 1;
+    let monthTo = monthFrom;
+    let dayFrom = date.getDate();
+    let dayTo = dayFrom;
+
+    if(date.getDay() <= 6){
+        dayFrom = 1;
+    } else {
+        for (let i = date.getDay(); i > 0; i--) {
+            dayFrom--;
+        }
+    }
+    let lastDayUtilArray = [
+        //うるう年かどうかチェックする
+        {lastDay:returnLastDayOfFebruary(), months:[2]},
+        {lastDay:30, months:[4,6,9,11]},
+        {lastDay:31, months:[1,3,5,7,8,10,12]}
+    ]
+    let doBreak = false;
+    for (let i = date.getDay(); i < 6; i++) {
+        if(doBreak) break;
+        if(dayTo >= 28){
+            lastDayUtilArray.forEach(util => {
+                if(util.months.includes(monthTo)){
+                    dayTo = util.lastDay;
+                    doBreak = true;
+                    return;
+                }
+            })
+        }
+        dayTo++;
+    }
+
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getRanking?rankingType=" + rankingType +
+     "&rankingItemLimit=" + topTotItemLimit +"&calculationMode=" + calculationMode +
+     "&yearFrom=" + yearFrom + "&monthFrom=" + monthFrom + "&dayFrom=" + dayFrom +
+     "&yearTo=" + yearTo + "&monthTo=" + monthTo + "&dayTo=" + dayTo;
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawRankingGraph(json, calculationMode, "一般集計"));
+})
+
+//今月の TOP
+document.getElementById("monthlyTot-btn").addEventListener("click", () =>{
+    showLoadingMessage();
+    let rankingType = "今月の TOP";
+    let topTotItemLimit = "unlimited";
+    let calculationMode = "sales";
+    let dailyTotCalculationModeInputs = Array.from(document.getElementsByName("monthlyTotCalculationMode"));
+    dailyTotCalculationModeInputs.forEach(input => {
+        if(input.checked) calculationMode = input.value;
+        return;
+    })
+
+    let date = new Date();
+
+    let yearFrom = date.getFullYear();
+    let yearTo = yearFrom;
+    let monthFrom = date.getMonth() + 1;
+    let monthTo = monthFrom;
+    let dayFrom = 1;
+    let dayTo = 31;
+    
+    let lastDayUtilArray = [
+        //うるう年かどうかチェックする
+        {lastDay:returnLastDayOfFebruary(), months:[2]},
+        {lastDay:30, months:[4,6,9,11]},
+        {lastDay:31, months:[1,3,5,7,8,10,12]}
+    ];
+    lastDayUtilArray.forEach(util => {
+        if(util.months.includes(monthTo)){
+            dayTo = util.lastDay;
+            return;
+        }
+    })
+
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getRanking?rankingType=" + rankingType +
+     "&rankingItemLimit=" + topTotItemLimit +"&calculationMode=" + calculationMode +
+     "&yearFrom=" + yearFrom + "&monthFrom=" + monthFrom + "&dayFrom=" + dayFrom +
+     "&yearTo=" + yearTo + "&monthTo=" + monthTo + "&dayTo=" + dayTo;
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawRankingGraph(json, calculationMode, "一般集計"));
+})
+
+//今年の TOP
+document.getElementById("yearlyTot-btn").addEventListener("click", () =>{
+    showLoadingMessage();
+    let rankingType = "今年の TOP";
+    let topTotItemLimit = "unlimited";
+    let calculationMode = "sales";
+    let dailyTotCalculationModeInputs = Array.from(document.getElementsByName("yearlyTotCalculationMode"));
+    dailyTotCalculationModeInputs.forEach(input => {
+        if(input.checked) calculationMode = input.value;
+        return;
+    })
+
+    let date = new Date();
+
+    let yearFrom = date.getFullYear();
+    let yearTo = yearFrom;
+    let monthFrom = 1;
+    let monthTo = 12;
+    let dayFrom = 1;
+    let dayTo = 31;
+
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getRanking?rankingType=" + rankingType +
+     "&rankingItemLimit=" + topTotItemLimit +"&calculationMode=" + calculationMode +
+     "&yearFrom=" + yearFrom + "&monthFrom=" + monthFrom + "&dayFrom=" + dayFrom +
+     "&yearTo=" + yearTo + "&monthTo=" + monthTo + "&dayTo=" + dayTo;
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawRankingGraph(json, calculationMode, "一般集計"));
+})
 
 //全体的 TOP
 document.getElementById("topTot-btn").addEventListener("click", () =>{
@@ -137,7 +294,7 @@ document.getElementById("topTot-btn").addEventListener("click", () =>{
      "&rankingItemLimit=" + topTotItemLimit;
     fetch(url)
           .then(res => res.json())
-          .then(json => drawRankingGraph(json));
+          .then(json => drawRankingGraph(json, "sales", "売上ランキング"));
 })
 
 //全体的 WORST
@@ -149,7 +306,7 @@ document.getElementById("worstTot-btn").addEventListener("click", () =>{
      "&rankingItemLimit=" + worstTotItemLimit + "&worstFlag=true";
     fetch(url)
           .then(res => res.json())
-          .then(json => drawRankingGraph(json));
+          .then(json => drawRankingGraph(json, "sales", "売上ランキング"));
 })
 
 //年 TOP10
@@ -161,7 +318,7 @@ document.getElementById("yearTopTen-btn").addEventListener("click", () =>{
      "&yearFrom=" + yearTopTen;
     fetch(url)
           .then(res => res.json())
-          .then(json => drawRankingGraph(json));
+          .then(json => drawRankingGraph(json, "sales", "売上ランキング"));
 })
 
 //年 WORST10
@@ -173,7 +330,7 @@ document.getElementById("yearWorstTen-btn").addEventListener("click", () =>{
      "&yearFrom=" + yearWorstTen + "&worstFlag=true";
     fetch(url)
           .then(res => res.json())
-          .then(json => drawRankingGraph(json));
+          .then(json => drawRankingGraph(json, "sales", "売上ランキング"));
 })
 
 //期間 TOP10
@@ -211,7 +368,7 @@ document.getElementById("periodTopTen-btn").addEventListener("click", () =>{
 
     fetch(url)
           .then(res => res.json())
-          .then(json => drawRankingGraph(json));
+          .then(json => drawRankingGraph(json, "sales", "売上ランキング"));
 })
 
 //期間 WORST10
@@ -249,7 +406,73 @@ document.getElementById("periodWorstTen-btn").addEventListener("click", () =>{
 
     fetch(url)
           .then(res => res.json())
-          .then(json => drawRankingGraph(json));
+          .then(json => drawRankingGraph(json, "sales", "売上ランキング"));
+})
+
+//割合 売上高：売上個数
+document.getElementById("percentageSales-btn").addEventListener("click", () =>{
+    showLoadingMessage();
+    let targetYear = document.getElementById("percentageSalesYear").value;
+    let rankingType = targetYear + "年 割合 売上高:売上個数";
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getPercentPie?rankingType=" + rankingType +
+     "&targetYear=" + targetYear;
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawPercentPieGraph(json, "sales"));
+})
+
+//割合 売上高：利益
+document.getElementById("percentageProfits-btn").addEventListener("click", () =>{
+    showLoadingMessage();
+    let targetYear = document.getElementById("percentageProfitsYear").value;
+    let rankingType = targetYear + "年 割合 売上高:利益";
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getPercentPie?rankingType=" + rankingType +
+     "&targetYear=" + targetYear;
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawPercentPieGraph(json, "profits"));
+})
+
+//全体的確認・売上個数 (all products, General)
+document.getElementById("compareGeneral-btn").addEventListener("click", () =>{
+    
+    showLoadingMessage();
+
+    let rankingType = "全体動向";
+    let monthsInterval = 6;
+    let compareGeneralTimeFrameInputs = Array.from(document.getElementsByName("compareGeneralTimeFrame"));
+    compareGeneralTimeFrameInputs.forEach(input => {
+        if(input.checked) monthsInterval = input.value;
+        return;
+    })
+
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getSalesTrend?rankingType=" + rankingType +
+     "&monthsInterval=" + monthsInterval;
+
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawSalesBarGraph(json, "sales"));
+})
+
+//全体的確認・利益 (all products, Profits)
+document.getElementById("compareGeneralSales-btn").addEventListener("click", () =>{
+    
+    showLoadingMessage();
+
+    let rankingType = "全体動向";
+    let monthsInterval = 6;
+    let compareGeneralSalesTimeFrameInputs = Array.from(document.getElementsByName("compareGeneralSalesTimeFrame"));
+    compareGeneralSalesTimeFrameInputs.forEach(input => {
+        if(input.checked) monthsInterval = input.value;
+        return;
+    })
+
+    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getSalesTrend?rankingType=" + rankingType +
+     "&monthsInterval=" + monthsInterval;
+
+    fetch(url)
+          .then(res => res.json())
+          .then(json => drawSalesBarGraph(json, "profits"));
 })
 
 //動向確認・比較 (sales trends)
@@ -287,38 +510,15 @@ document.getElementById("compare-btn").addEventListener("click", () =>{
           .then(json => drawTrendsGraph(json));
 })
 
-//割合 売上高：売上個数
-document.getElementById("percentageSales-btn").addEventListener("click", () =>{
-    showLoadingMessage();
-    let targetYear = document.getElementById("percentageSalesYear").value;
-    let rankingType = targetYear + "年 割合 売上高:売上個数";
-    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getPercentPie?rankingType=" + rankingType +
-     "&targetYear=" + targetYear;
-    fetch(url)
-          .then(res => res.json())
-          .then(json => drawPercentPieGraph(json, "sales"));
-})
-
-//割合 売上高：利益
-document.getElementById("percentageProfits-btn").addEventListener("click", () =>{
-    showLoadingMessage();
-    let targetYear = document.getElementById("percentageProfitsYear").value;
-    let rankingType = targetYear + "年 割合 売上高:利益";
-    let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getPercentPie?rankingType=" + rankingType +
-     "&targetYear=" + targetYear;
-    fetch(url)
-          .then(res => res.json())
-          .then(json => drawPercentPieGraph(json, "profits"));
-})
-
-
 /* ******************* */
 //canvasでデータを表示する
 /* ******************* */
 let chart = null;
 
-function drawRankingGraph(json){
+function drawRankingGraph(json, calculationMode, datasetLabel){
     clearCanvas();
+
+    console.log({json})
 
     if(json.data.length === 0){
         document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
@@ -330,8 +530,13 @@ function drawRankingGraph(json){
         let yValues = [];
         let barColors = [];
         json.data.forEach(product => {
-            xValues.push(product.name);
-            yValues.push(product.totalSales);
+            if(calculationMode === "sales") {
+                xValues.push(product.name);
+                yValues.push(product.totalSales);
+            } else if(calculationMode === "profits") {
+                xValues.push(product.name + "（" + product.totalProfit + "円）");
+                yValues.push(product.totalProfit);
+            }
             barColors.push(getRandomHSLColor())
         });
 
@@ -340,7 +545,7 @@ function drawRankingGraph(json){
             data: {
                 labels: xValues,
                 datasets: [{
-                    label: "売上ランキング",
+                    label: datasetLabel,
                     backgroundColor: barColors,
                     data: yValues
                 }]
@@ -360,6 +565,147 @@ function drawRankingGraph(json){
         document.getElementById("groupingResultPlaceholder").innerHTML = "エラーが発生しました。<br>" + error.message
     }
     
+}
+
+function drawPercentPieGraph(json, calculationMode){
+    clearCanvas();
+
+    if(json.data.length === 0){
+        document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
+        return;
+    }
+
+    let total = 0;
+    json.data.forEach(product => {
+        
+        if(calculationMode === "sales") total += product.quantity;
+        else if(calculationMode === "profits") total += (product.quantity * product.price) - (product.quantity * product.purchaseCost);
+
+    })
+
+    let xValues = [];
+    let yValues = [];
+    let barColors = [];
+    let profitCurrent = 0;
+    json.data.forEach(product => {
+        profitCurrent = (product.quantity * product.price) - (product.quantity * product.purchaseCost);
+        //パーセントを求める
+        if(calculationMode === "sales"){
+            xValues.push(product.name + "（" + product.quantity + "個）");
+            yValues.push(product.quantity * 100 / total);
+        } else if(calculationMode === "profits"){
+            xValues.push(product.name + " ("+ profitCurrent +"円)");
+            yValues.push(profitCurrent * 100 / total);
+        }
+        barColors.push(getRandomHSLColor());
+    });
+
+    try {
+        chart = new Chart("resultChart", {
+            type: "pie",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: yValues
+                }]
+            },
+            options: {
+                plugins:{
+                    title: {
+                        display: true,
+                        text: json.title
+                    },
+                     legend: {
+                        position: "right",  // move to the right
+                        align: "center",    // vertical center (optional)
+                        labels: {
+                            padding: 20,    // spacing between items
+                            boxWidth: 20,   // size of color squares
+                            usePointStyle: false
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.log("failed to generate chart", error);
+        document.getElementById("groupingResultPlaceholder").innerHTML = "エラーが発生しました。<br>" + error.message;
+    }
+}
+
+function drawSalesBarGraph(json, calculationMode){
+    clearCanvas();
+
+    console.log({json});
+
+    if(json.data.length === 0){
+        document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
+        return;
+    }
+
+    let xValues = [];
+    let yValues = [];
+    let barColors = [];
+
+    json.data.forEach(product => {
+        let productProfit = (product.price * product.monthlySales) - (product.purchaseCost * product.monthlySales);
+        if(calculationMode === "sales"){    
+            if (xValues.includes(product.yearMonth)){
+                yValues[xValues.lastIndexOf(product.yearMonth)] += product.monthlySales;
+            } else {
+                xValues.push(product.yearMonth);
+                yValues.push(product.monthlySales);
+            }
+        } else if(calculationMode === "profits"){    
+            if (xValues.includes(product.yearMonth)){
+                yValues[xValues.lastIndexOf(product.yearMonth)] += productProfit;
+            } else {
+                xValues.push(product.yearMonth);
+                yValues.push(productProfit);
+            }
+        }
+        barColors.push(getRandomHSLColor());
+    });
+
+    if(xValues.length != yValues.length){
+        console.log("failed to generate bar chart");
+        document.getElementById("groupingResultPlaceholder").innerHTML = "エラーが発生しました。";
+        return;
+    }
+
+    //利益の場合は利益をラベルに付けます（前のループ内に分岐条件なのでできません）
+    if(calculationMode === "profits"){
+        for (let i = 0; i < xValues.length; i++) {
+            xValues[i] += "（" + yValues[i] + "円）";
+        }
+    }
+
+    try {
+        chart = new Chart("resultChart", {
+        type: "bar",
+        data: {
+            labels: xValues,
+            datasets: [{
+                label: json.monthsInterval + "ヶ月間",
+                backgroundColor: barColors,
+                data: yValues
+            }]
+        },
+        options: {
+                plugins:{
+                    title: {
+                        display: true,
+                        text: json.title
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.log("failed to generate chart", error);
+        document.getElementById("groupingResultPlaceholder").innerHTML = "エラーが発生しました。<br>" + error.message;
+
+    }
 }
 
 function drawTrendsGraph(json){
@@ -394,7 +740,7 @@ function drawTrendsGraph(json){
     let date = new Date();
     let year = date.getFullYear();
     let month = date.getMonth() + 1;
-    let xValues = getPreviousYearMonth(year + "-" + month, monthsInterval);
+    let xValues = getPreviousYearMonths(monthsInterval);
 
     xValues.forEach(yearMonth => {
         for (let i = 0; i < products.length; i++) {
@@ -459,77 +805,23 @@ function drawTrendsGraph(json){
 
 }
 
-function drawPercentPieGraph(json, calculationMode){
-    clearCanvas();
-
-    if(json.data.length === 0){
-        document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
-        return;
-    }
-
-    let total = 0;
-    json.data.forEach(product => {
-        
-        if(calculationMode === "sales") total += product.quantity;
-        else if(calculationMode === "profits") total += (product.quantity * product.price) - (product.quantity * product.purchaseCost);
-
-    })
-
-    let xValues = [];
-    let yValues = [];
-    let barColors = [];
-    let profitCurrent = 0;
-    json.data.forEach(product => {
-        profitCurrent = (product.quantity * product.price) - (product.quantity * product.purchaseCost);
-        //パーセントを求める
-        if(calculationMode === "sales"){
-            xValues.push(product.name);
-            yValues.push(product.quantity * 100 / total);
-        } else if(calculationMode === "profits"){
-            xValues.push(product.name + " ("+ profitCurrent +"円)");
-            yValues.push(profitCurrent * 100 / total);
-        }
-        barColors.push(getRandomHSLColor())
-    });
-
-    try {
-        chart = new Chart("resultChart", {
-            type: "pie",
-            data: {
-                labels: xValues,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: yValues
-                }]
-            },
-            options: {
-                plugins:{
-                    title: {
-                        display: true,
-                        text: json.title
-                    },
-                     legend: {
-                        position: "right",  // move to the right
-                        align: "center",    // vertical center (optional)
-                        labels: {
-                            padding: 20,    // spacing between items
-                            boxWidth: 20,   // size of color squares
-                            usePointStyle: false
-                        }
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.log("failed to generate chart", error);
-        document.getElementById("groupingResultPlaceholder").innerHTML = "エラーが発生しました。<br>" + error.message
-    }
+function addDays(date, daysToAdd){
+    msInDay = 86400000;
+    let ms = new Date().getTime() + (daysToAdd * 86400000);
+    return new Date(ms);
 }
 
-function getPreviousYearMonth(yearMonth, monthsInterval){
-    let year = Number(yearMonth.split("-")[0]);
-    let month = Number(yearMonth.split("-")[1]);
+function returnLastDayOfFebruary(){
+    //今現在の年を使う
+    let date = new Date();
+    //3月1日に設定して、－1日を計算する
+    date.setMonth(2);
+    date.setDate(1);
+    date = addDays(date, -1);
+    return date.getDate();
+}
 
+function getPreviousYearMonths(monthsInterval){
     let date = new Date();
     let result = [];
     for (let i = 0; i < monthsInterval; i++) {
@@ -556,5 +848,3 @@ function clearCanvas(){
 function showLoadingMessage(){
     document.getElementById("groupingResultPlaceholder").innerHTML = "読み込み中...";
 }
-
-//TODO: general sales graphs with vertical bars yearmonth/totalsales - for 12 months

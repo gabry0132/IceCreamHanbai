@@ -24,6 +24,13 @@ public class getSalesTrend extends HttpServlet {
         String product3 = req.getParameter("product3");
         String product4 = req.getParameter("product4");
         String[] products = {product1, product2, product3, product4};
+        boolean ignoreProducts = true;
+        for (int i = 0; i < products.length; i++) {
+            if(products[i] != null){
+                ignoreProducts = false;
+                break;
+            }
+        }
 
         //データベースに接続するために使用する変数宣言
         Connection con = null;
@@ -45,6 +52,7 @@ public class getSalesTrend extends HttpServlet {
 
             sql = new StringBuffer();
             sql.append("select products.productID, products.name, ");
+            sql.append("products.purchaseCost, products.price, ");
             sql.append("DATE_FORMAT(sales.dateTime, '%Y-%m') as yearMonth, ");
             sql.append("sum(sales.quantity) as monthlySales ");
             sql.append("from sales ");
@@ -52,16 +60,18 @@ public class getSalesTrend extends HttpServlet {
             sql.append("where sales.deleteFlag = 0 ");
             sql.append("and sales.dateTime >= DATE_SUB(curdate(), interval " + monthsInterval + " month ) ");
             sql.append("group by productID, yearMonth ");
-            sql.append("having products.productID in ( ");
-            boolean passedFirst = false;
-            for (int i = 0; i < products.length; i++) {
-                if(products[i] != null){
-                    if(passedFirst) sql.append(", ");
-                    sql.append((products[i]));
-                    passedFirst = true;
+            if(!ignoreProducts){
+                sql.append("having products.productID in ( ");
+                boolean passedFirst = false;
+                for (int i = 0; i < products.length; i++) {
+                    if(products[i] != null){
+                        if(passedFirst) sql.append(", ");
+                        sql.append((products[i]));
+                        passedFirst = true;
+                    }
                 }
+                sql.append(") ");
             }
-            sql.append(") ");
             sql.append("order by yearMonth, productID ");
 
             rs = stmt.executeQuery(sql.toString());
@@ -78,6 +88,8 @@ public class getSalesTrend extends HttpServlet {
                         .append(",\"name\":\"").append(rs.getString("name"))
                         .append("\",\"yearMonth\":\"").append(rs.getString("yearMonth"))
                         .append("\",\"monthlySales\":").append(rs.getString("monthlySales"))
+                        .append(",\"purchaseCost\":").append(rs.getString("purchaseCost"))
+                        .append(",\"price\":").append(rs.getString("price"))
                         .append("}");
                 first = false;
             }

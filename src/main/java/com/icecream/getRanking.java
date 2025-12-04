@@ -19,6 +19,12 @@ public class getRanking extends HttpServlet {
         res.setContentType("application/json; charset=UTF-8");
 
         String rankingType = req.getParameter("rankingType");
+        String orderByClause = "totalSales";
+        if(req.getParameter("calculationMode") != null){
+            if(req.getParameter("calculationMode").equals("profits")){
+                orderByClause = "totalProfit";
+            }
+        }
 
         String yearFrom = req.getParameter("yearFrom");
         String yearTo = req.getParameter("yearTo");
@@ -73,15 +79,16 @@ public class getRanking extends HttpServlet {
             stmt = con.createStatement();
 
             sql = new StringBuffer();
-            sql.append("select A.productID, A.name, sum(A.quantity) as totalSales from ( ");
-            sql.append("select products.productID, products.name, sales.quantity from sales ");
-            sql.append("inner join products on sales.productID = products.productID ");
+            sql.append("select A.productID, A.name, sum(A.quantity) as totalSales, sum(A.profit) as totalProfit from ( ");
+            sql.append("select products.productID, products.name, sales.quantity, ");
+            sql.append("(products.price * sales.quantity - products.purchaseCost * sales.quantity) as profit ");
+            sql.append("from sales inner join products on sales.productID = products.productID ");
             sql.append("where sales.deleteFlag = 0 ");
             if(yearFrom != null) sql.append("and sales.dateTime >= '"+ yearFrom + "-" + monthFrom + "-" + dayFrom + "' ");
             if(yearTo != null) sql.append("and sales.dateTime <= '"+ yearTo + "-" + monthTo + "-" + dayTo + " 23:59:59' "); //最後の1分までチェックします
             sql.append(") as A ");
             sql.append("group by A.productID ");
-            sql.append("order by totalSales ");
+            sql.append("order by " + orderByClause + " ");
             if(!worstFlag) sql.append("desc ");
             if(!rankingItemLimit.equals("unlimited")) sql.append("limit " + rankingItemLimit);
 
@@ -96,6 +103,7 @@ public class getRanking extends HttpServlet {
                     json.append("{\"productID\":").append(rs.getInt("productID"))
                         .append(",\"name\":\"").append(rs.getString("name"))
                         .append("\",\"totalSales\":").append(rs.getString("totalSales"))
+                        .append(",\"totalProfit\":").append(rs.getString("totalProfit"))
                         .append("}");
                 first = false;
             }
@@ -105,7 +113,7 @@ public class getRanking extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            res.getWriter().write("{\"error\":\"Server error\"}");
+            res.getWriter().write("{\"error\":\"Server error\",\"message\":\"+" + e.toString() +"\"}");
         } finally {
             try {
                 if (rs != null) rs.close();
