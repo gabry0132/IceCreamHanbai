@@ -88,6 +88,18 @@ public class getSalesTrend extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             res.getWriter().write("{\"error\":\"Server error\"}");
+        } finally {
+            try {
+                if (rs != null) rs.close();
+            } catch (SQLException e) { e.printStackTrace(); }
+
+            try {
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) { e.printStackTrace(); }
+
+            try {
+                if (con != null) con.close();
+            } catch (SQLException e) { e.printStackTrace(); }
         }
     }
 

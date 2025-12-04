@@ -526,11 +526,6 @@ function drawPercentPieGraph(json, calculationMode){
     }
 }
 
-
-
-
-
-
 function getPreviousYearMonth(yearMonth, monthsInterval){
     let year = Number(yearMonth.split("-")[0]);
     let month = Number(yearMonth.split("-")[1]);
@@ -561,3 +556,5 @@ function clearCanvas(){
 function showLoadingMessage(){
     document.getElementById("groupingResultPlaceholder").innerHTML = "読み込み中...";
 }
+
+//TODO: general sales graphs with vertical bars yearmonth/totalsales - for 12 months
