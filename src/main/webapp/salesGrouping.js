@@ -3,18 +3,22 @@
 //集計オプション：表示/非表示の切り替え設定
 let isGroupingDivOpen = false;
 const groupingToggleButton = document.getElementById("grouping-toggle-button");
+const fullScreenCanvasButtonHolder = document.getElementById("fullScreenCanvasButtonHolder");
 const groupingToggleButtonImage = document.getElementById("grouping-toggle-button-image");
 
 const groupingSettingsDiv = document.getElementById("groupingSettingsDiv");
 const groupingResultsDiv = document.getElementById("groupingResultsDiv");
 const groupingResultIntro = document.getElementById("groupingResultsIntro");
 
+//集計div全体の表示/非表示設定
 groupingToggleButton.addEventListener("click", () => {
     if(isGroupingDivOpen) {
         groupingDiv.style.height = "0px";
         groupingDiv.style.margin = "0px";
         groupingDiv.style.border = "none";
         groupingToggleButtonImage.style.transform = "rotate(0deg)";
+        clearCanvas();
+        document.getElementById("groupingResultPlaceholder").innerHTML = "集計オプションを選んでください";
         isGroupingDivOpen = false;
     } else {
         groupingDiv.style.height = "420px";
@@ -24,6 +28,17 @@ groupingToggleButton.addEventListener("click", () => {
         isGroupingDivOpen = true;
     }
 })
+
+//canvasのfullscreenボタンを押した時の切り替え
+fullScreenCanvasButtonHolder.addEventListener("click", () => {
+    if(useFullscreenCanvas) return;
+    openFullscreenCanvasPopup();
+    runLatestChartQuery();
+})
+
+//canvasのfullscreenポップアップを解除する
+document.getElementById("black-background").addEventListener("click", closeFullscreenCanvasPopup);
+document.getElementById("closeFullScreenCanvas").addEventListener("click", closeFullscreenCanvasPopup);
 
 //期間検索（詳細指定ではない）年の初期設定
 let allYearsSelects = Array.from(document.getElementsByClassName("recentYearsSelect"));
@@ -41,7 +56,6 @@ allYearsSelects.forEach(select => {
     select.innerHTML += str;
 })
 
-    
 //期間検索（詳細指定ではない）月の初期設定
 let allMonthsSelects = Array.from(document.getElementsByClassName("allMonthsSelect"));
 const currentMonth = date.getMonth() + 1;
@@ -514,6 +528,13 @@ document.getElementById("compare-btn").addEventListener("click", () =>{
 //canvasでデータを表示する
 /* ******************* */
 let chart = null;
+let useFullscreenCanvas = false;
+let targetCanvasID = "";
+setTargetCanvasID();
+let latestChartQuery = {
+    funct: null,
+    params: []
+}
 
 function drawRankingGraph(json, calculationMode, datasetLabel){
     clearCanvas();
@@ -524,6 +545,9 @@ function drawRankingGraph(json, calculationMode, datasetLabel){
         document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
         return;
     }
+
+    showFullscreenCanvasButton();
+    updateLatestChartQuery(drawRankingGraph,[json, calculationMode, datasetLabel]);
 
     try {
         let xValues = [];
@@ -540,7 +564,7 @@ function drawRankingGraph(json, calculationMode, datasetLabel){
             barColors.push(getRandomHSLColor())
         });
 
-        chart = new Chart("resultChart", {
+        chart = new Chart(targetCanvasID, {
             type: "bar",
             data: {
                 labels: xValues,
@@ -575,6 +599,12 @@ function drawPercentPieGraph(json, calculationMode){
         return;
     }
 
+    showFullscreenCanvasButton();
+    updateLatestChartQuery(drawPercentPieGraph,[json, calculationMode]);
+
+    //pieチャートだけをmargin:autoにする
+    setPieChartsMarginAuto();
+
     let total = 0;
     json.data.forEach(product => {
         
@@ -601,7 +631,7 @@ function drawPercentPieGraph(json, calculationMode){
     });
 
     try {
-        chart = new Chart("resultChart", {
+        chart = new Chart(targetCanvasID, {
             type: "pie",
             data: {
                 labels: xValues,
@@ -644,6 +674,9 @@ function drawSalesBarGraph(json, calculationMode){
         return;
     }
 
+    showFullscreenCanvasButton();
+    updateLatestChartQuery(drawSalesBarGraph,[json, calculationMode]);
+
     let xValues = [];
     let yValues = [];
     let barColors = [];
@@ -682,7 +715,7 @@ function drawSalesBarGraph(json, calculationMode){
     }
 
     try {
-        chart = new Chart("resultChart", {
+        chart = new Chart(targetCanvasID, {
         type: "bar",
         data: {
             labels: xValues,
@@ -715,6 +748,9 @@ function drawTrendsGraph(json){
         document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
         return;
     }
+
+    showFullscreenCanvasButton();
+    updateLatestChartQuery(drawTrendsGraph,[json]);
 
     let products = [];
     json.data.forEach(row => {
@@ -782,7 +818,7 @@ function drawTrendsGraph(json){
     });
 
     try {
-        chart = new Chart("resultChart", {
+        chart = new Chart(targetCanvasID, {
             type: "line",
             data: {
                 labels: xValues,
@@ -840,11 +876,72 @@ function getRandomHSLColor(){
     return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
+function updateLatestChartQuery(funct, params){
+    latestChartQuery = {
+        funct,
+        params
+    }
+}
+
+function runLatestChartQuery(){
+    if(!latestChartQuery.funct) return;
+    latestChartQuery.funct.apply(null, latestChartQuery.params);
+}
+
+function openFullscreenCanvasPopup(){
+    //万が一他のポップアップが開かれていればreturn
+    if(document.getElementById("black-background").style.display == "flex") return;
+    document.getElementById("black-background").style.display = "flex";
+    document.getElementById("fullscreenChartDiv").style.display = "flex";
+    //後ろのページのスクロールを一時停止する。
+    document.getElementsByTagName("body")[0].classList.add("stop-scrolling");
+    //ポップアップが完全に見えるように、トップまでスクロールする
+    window.scrollTo(0, 0);
+    useFullscreenCanvas = true;
+    setTargetCanvasID();
+}
+
+function closeFullscreenCanvasPopup(){
+    document.getElementById("black-background").style.display = "none";
+    document.getElementById("fullscreenChartDiv").style.display = "none";
+    //後ろのページのスクロール設定を元に戻す
+    document.getElementsByTagName("body")[0].classList.remove("stop-scrolling");
+    useFullscreenCanvas = false;
+    setTargetCanvasID();
+    runLatestChartQuery();
+}
+
+function setTargetCanvasID(){
+    if(useFullscreenCanvas) targetCanvasID = "fullScreenCanvas";
+    else targetCanvasID = "smallCanvas";
+}
+
+function setPieChartsMarginAuto(){
+    document.getElementById("smallCanvas").style.margin = "auto";
+    document.getElementById("fullScreenCanvas").style.margin = "auto";
+}
+
+function setPieChartsMarginZero(){
+    document.getElementById("smallCanvas").style.margin = "0px";
+    document.getElementById("fullScreenCanvas").style.margin = "0px";
+}
+
 function clearCanvas(){
     document.getElementById("groupingResultPlaceholder").innerHTML = "";
+    hideFullscreenCanvasButton();
+    setPieChartsMarginZero();
     if(chart) chart.destroy();
 }
 
 function showLoadingMessage(){
     document.getElementById("groupingResultPlaceholder").innerHTML = "読み込み中...";
 }
+
+function showFullscreenCanvasButton(){
+    document.getElementById("fullScreenCanvasButtonHolder").style.display = "flex";
+}
+
+function hideFullscreenCanvasButton(){
+    document.getElementById("fullScreenCanvasButtonHolder").style.display = "none";
+}
+

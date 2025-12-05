@@ -191,6 +191,7 @@
 
                             <div id="dailyTot-grOpt-radioHolders">
                                 <input type="radio" name="dailyTotCalculationMode" value="sales" checked>個数
+                                <br>
                                 <input type="radio" name="dailyTotCalculationMode" value="profits">利益
                             </div>
                             
@@ -204,6 +205,7 @@
 
                             <div id="weeklyTot-grOpt-radioHolders">
                                 <input type="radio" name="weeklyTotCalculationMode" value="sales" checked>個数
+                                <br>
                                 <input type="radio" name="weeklyTotCalculationMode" value="profits">利益
                             </div>
                             
@@ -217,6 +219,7 @@
 
                             <div id="monthlyTot-grOpt-radioHolders">
                                 <input type="radio" name="monthlyTotCalculationMode" value="sales" checked>個数
+                                <br>
                                 <input type="radio" name="monthlyTotCalculationMode" value="profits">利益
                             </div>
                             
@@ -230,6 +233,7 @@
 
                             <div id="yearlyTot-grOpt-radioHolders">
                                 <input type="radio" name="yearlyTotCalculationMode" value="sales" checked>個数
+                                <br>
                                 <input type="radio" name="yearlyTotCalculationMode" value="profits">利益
                             </div>
                             
@@ -504,7 +508,15 @@
             <!-- fetchの結果をここに表示する -->
             <div id="groupingResultsDiv">
                 <p id="groupingResultPlaceholder">集計オプションを選んでください</p>
-                <canvas id="resultChart"></canvas>
+                <div id="fullScreenCanvasButtonHolder">
+                    <img title="全画面へ" src="<%=request.getContextPath()%>/images/fullScreen-icon.png" width="32" height="32" alt="全画面に切り替え">
+                </div>
+                <canvas id="smallCanvas"></canvas>
+            </div>
+
+            <div id="fullscreenChartDiv">
+                <canvas id="fullScreenCanvas"></canvas>
+                <div id="closeFullScreenCanvas">✖</div>
             </div>
 
         </div>
@@ -911,6 +923,7 @@
             });
         }
 
+        //chartJSのフルスクリーンを含めない
         function closeAllPopups(){
             blackBackground.style.display = "none";
             createPopup.style.display = "none";
