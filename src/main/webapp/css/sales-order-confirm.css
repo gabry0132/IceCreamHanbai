@@ -1,9 +1,21 @@
+/* sales専用 */
 div#everything-wrapper{
     font-size: 1.4rem;
     width: 100%;
     align-items: center;
     height: fit-content;
     margin: 10% auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* order専用 */
+div#order-everything-wrapper{
+    font-size: 1.4rem;
+    width: 100%;
+    align-items: center;
+    height: fit-content;
+    margin: 5% auto;
     display: flex;
     flex-direction: column;
 }
@@ -25,9 +37,17 @@ img.image{
     border-radius: 7px;
 }
 
-td.table-left-side{
+td.table-left-side{     /* sales専用 */
     width: 120px;
+}
+td.order-table-left-side{   /* order専用 */
+    width: 240px;
+}
 
+td#orderStartQuantityPriceMessage{  /* order専用 */
+    font-size: 1rem;
+    padding-bottom: 20px;
+    text-align: right;
 }
 
 div#buttons-holder{

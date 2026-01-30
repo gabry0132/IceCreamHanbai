@@ -257,8 +257,8 @@
                 </form>
 
                 <!--発注開始のポップアップを開いて、自動的にこの商品を選択する。-->
-                <form action="orders.html" method="post" class="button-wrapper-form">
-                    <input type="hidden" name="productID" value="<%=productID%>">
+                <form action="orders.jsp" method="post" class="button-wrapper-form">
+                    <input type="hidden" name="startFromProductID" value="<%=productID%>">
                     <input type="hidden" name="previousPage" value="product-details.jsp?productID=<%=productID%>">
                     <button class="normal-button<%if(showAlert){%> pulse<%}%>">発注を<br>開始する</button>
                 </form>

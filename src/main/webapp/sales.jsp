@@ -708,7 +708,7 @@
 
                 <div id="create-buttons-holder">
                     <button type="button" class="normal-button" onclick="closeAllPopups()">キャンセル</button>
-                    <button type="submit" class="normal-button">作成</button>
+                    <button type="submit" id="createSaleSubmitBtn" class="normal-button" disabled>作成</button>
                 </div>
             </div>
         </div>
@@ -839,6 +839,8 @@
                     let saleQuantity = document.getElementById("sale-quantity-create");
                     saleQuantity.setAttribute("max", product.quantity);
                     saleQuantity.value = checkQuantity(Number(saleQuantity.value), Number(saleQuantity.min), Number(saleQuantity.max));
+                    //送信ボタンを有効化する
+                    document.getElementById("createSaleSubmitBtn").disabled = false;
                 }
             })
         });
@@ -929,6 +931,7 @@
             blackBackground.style.display = "none";
             createPopup.style.display = "none";
             editPopup.style.display = "none";
+            document.getElementById("createSaleSubmitBtn").disabled = true;
             document.getElementById("create-form").reset();
             document.getElementById("edit-form").reset();
             checkRadioCreate();
@@ -938,7 +941,6 @@
         function checkQuantity(input, min, max){
             // console.log(event.currentTarget);
             // let input = event.currentTarget;
-            console.log("received " + input + ", " + min + ", " + max)
             if(isNaN(input) || input == "") input = 1;
             //parseInt()しないとJSは型変換してくれないので比べられない
             let quantity = parseInt(input);

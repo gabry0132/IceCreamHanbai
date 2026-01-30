@@ -149,9 +149,12 @@ div.order-box{
 }
 
 /* orderStatus 発注ステータスによる変更する背景色 */
-.confirming{ background-color: #a87146 }
-.sending{ background-color: #1677a8 }
-.arrived{ background-color: #15a855 }
+.confirming{ background-color: #d2ccc7
+}
+.sending{ background-color: #b4d9ef
+}
+.arrived{ background-color: #77fbd3
+}
 
 div.order-image-txt-holder, div.order-status-box{
     display: flex;
@@ -165,10 +168,18 @@ div.order-image-txt-holder, div.order-status-box{
         margin: auto 10px;
     }
 }
+div.order-status-box{
+    margin-right: 20px;
+}
 
 a.image-wrapper-anchor{
     display: block;
     line-height: 0;
+    img{
+        margin-right: 10px;
+        border: 0.5px solid black;
+        border-radius: 7px;
+    }
 }
 
 a.product-name-anchor{

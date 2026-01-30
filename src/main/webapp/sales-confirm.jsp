@@ -149,7 +149,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品登録確認</title>
-    <link rel="stylesheet" href="css/sales-confirm.css">
+    <link rel="stylesheet" href="css/sales-order-confirm.css">
 </head>
 <body>
 
@@ -200,7 +200,7 @@
                 <!--どこから来たのか非表示のinputでわかるはずなので「内容を修正」ボタンで正しい場所へ戻される。-->
                 <!--設定変更の場合は詳細ページに戻ったら自動的に正しいポップアップを出すようにする。-->
                 <form action="sales.jsp" method="post">
-                    <input type="hidden" name="productIDFromCreate" value="<%=productID%>">
+                    <input type="hidden" name="productIDCancelledCreate" value="<%=productID%>">
                     <input type="hidden" name="sale_time_selector" value="<%=saleTimeSelector%>">
                     <input type="hidden" name="saleQuantity" value="<%=saleQuantitiy%>">
                     <button class="normal-button">内容を修正する</button>

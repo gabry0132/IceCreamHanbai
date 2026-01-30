@@ -73,7 +73,7 @@
         if(rs.next()){
             logtypeIDforSales = rs.getString("logtypeID");
         } else {
-            throw new Exception("商品ログタイプIDの取得が失敗しました。");
+            throw new Exception("売上ログタイプIDの取得が失敗しました。");
         }
 
         if(registerType.equals("create")) {
@@ -414,7 +414,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/sales-register.css">
+    <link rel="stylesheet" href="css/sales-order-register.css">
     <title>売上データ登録完了</title>
 </head>
 <body>

@@ -17,8 +17,8 @@
     boolean isAdmin = true;
 
     //商品詳細ページから来た場合：
-    String createFromProductID = request.getParameter("createFromProductID");
-    boolean shouldCreateFromID = createFromProductID != null;
+    String startFromProductID = request.getParameter("startFromProductID");
+    boolean shouldStartFromID = startFromProductID != null;
     String previousPage = request.getParameter("previousPage");
     if(previousPage == null) previousPage = "main.jsp";
     
@@ -43,6 +43,7 @@
 
     //発注開始確認画面から戻った時のパラメータ
     String productIDCancelledStart = request.getParameter("productIDCancelledStart"); //対象商品のIDです
+    String quantityBoxesFromStart = request.getParameter("quantityBoxesFromStart");   //入力した箱数
     boolean returnFromStart = (productIDCancelledStart != null);
 
     //データベースに接続するために使用する変数宣言
@@ -301,9 +302,9 @@
             <div class="order-box <%=ordersList.get(i).get("orderStatus")%>">
                 <div class="order-image-txt-holder">
                     <a href="product-details.jsp?productID=<%=ordersList.get(i).get("productID")%>&previousPage=orders.jsp" class="image-wrapper-anchor">
-                        <img class="image" src="<%=request.getContextPath()%>/images/<%=ordersList.get(i).get("imageFileName")%>" width="100" height="100" alt="<%=ordersList.get(i).get("productName")%>">
+                        <img class="image" src="<%=request.getContextPath()%>/images/<%=ordersList.get(i).get("productImage")%>" width="100" height="100" alt="<%=ordersList.get(i).get("productName")%>">
                     </a>
-                    <p class="order-text"><b><%= ordersList.get(i).get("startDateTime") %></b>に <a href="product-details.jsp?productID=<%=ordersList.get(i).get("productID")%>&previousPage=orders.jsp" class="product-name-anchor"><%= ordersList.get(i).get("productName") %></a>が <%= ordersList.get(i).get("quantityBoxes") %>箱 （<%=ordersList.get(i).get("quantityUnits")%>個） 販売されました。(<%= ordersList.get(i).get("staffName") %>より)</p>
+                    <p class="order-text"><b><%= ordersList.get(i).get("startDateTime") %></b>に <a href="product-details.jsp?productID=<%=ordersList.get(i).get("productID")%>&previousPage=orders.jsp" class="product-name-anchor"><%= ordersList.get(i).get("productName") %></a>が <%= ordersList.get(i).get("quantityBoxes") %>箱 （<%=ordersList.get(i).get("quantityUnits")%>個） 発注されました。(<%= ordersList.get(i).get("staffName") %>より)</p>
                 </div>
                 <% if(isAdmin){ %>
                 <div class="order-status-box">
@@ -413,7 +414,7 @@
 
                 <div id="start-buttons-holder">
                     <button type="button" class="normal-button" onclick="closeAllPopups()">キャンセル</button>
-                    <button type="submit" class="normal-button">発注開始</button>
+                    <button type="submit" id="startOrderSubmitBtn" class="normal-button" disabled>発注開始</button>
                 </div>
             </div>
         </div>
@@ -486,6 +487,7 @@
         let blackBackground = document.getElementById("black-background");
         //開始ポップアップ変数
         let startPopup = document.getElementById("start-popup");
+        let startOrderSubmitBtn = document.getElementById("startOrderSubmitBtn");
         let startImage = document.getElementById("start-image");
         let orderQuantityBoxesInput = document.getElementById("orderQuantityBoxes");
         let orderStartQuantityPriceMessage = document.getElementById("orderStartQuantityPriceMessage");
@@ -499,8 +501,7 @@
 
         //イベントリスナーの設定
         blackBackground.addEventListener("click", closeAllPopups);
-        orderQuantityBoxesInput.addEventListener("change", (e) => {
-
+        orderQuantityBoxesInput.addEventListener("input", (e) => {
             composeOrderStartQuantityPriceMessage(lastRecordedUnitPerBox, lastRecordedPurchaseCost);
         })
 
@@ -510,10 +511,27 @@
         <% if(searchStartDate != null){ %> document.getElementById("searchStartDate").value = "<%=searchStartDate%>" <% } %>
         <% if(searchEndDate != null){ %> document.getElementById("searchEndDate").value = "<%=searchEndDate%>" <% } %>
 
-        document.getElementById("product").addEventListener("change", (e) => {
+        document.getElementById("product").addEventListener("input", (e) => {
             let productID = e.target.value;
             setUpStartDiv(productID);
-        })
+        });
+
+        if(<%=returnFromStart%>){
+            //商品の切り替えはJava内で行っています。対象オプションに selected を追加しています。
+            orderQuantityBoxesInput.value = <%=quantityBoxesFromStart%>;
+            let productSelect = document.getElementById("product")
+            productSelect.dispatchEvent(new Event("input"));
+            setUpStartDiv();
+            openStartPopup();
+        }
+
+        if(<%=shouldStartFromID%>){
+            let productSelect = document.getElementById("product");
+            productSelect.value = "<%=startFromProductID%>";
+            productSelect.dispatchEvent(new Event("input"));
+            setUpStartDiv();
+            openStartPopup();
+        }
 
         function setUpStartDiv(productID){
             let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getProductDetails?productID=" + productID;
@@ -529,6 +547,7 @@
 
                         startImage.src = "<%=request.getContextPath()%>/images/" + product.image;
                         orderQuantityBoxesInput.disabled = false;
+                        startOrderSubmitBtn.disabled = false;
                         composeOrderStartQuantityPriceMessage(Number(product.unitPerBox), Number(product.purchaseCost));
                         orderStartCheckingTimespan.innerHTML = product.confirmDays + "日";
                         orderStartDeliveryTimespan.innerHTML = product.shippingDays + "日";
@@ -544,7 +563,7 @@
                 orderQuantityBoxesInput.value = max;
                 orderQuantityBoxes = max;
             }
-            let message = "単位 " + unitPerBox + " 個 × 単価 " + purchaseCost + " -> 合計 " + formatCommaEveryThreeDigits(unitPerBox * orderQuantityBoxes) + "個（" + formatCommaEveryThreeDigits(purchaseCost * unitPerBox * orderQuantityBoxes) + "円）";
+            let message = "単位 " + unitPerBox + " 個 × 単価 " + purchaseCost + "円 ＝ 合計 " + formatCommaEveryThreeDigits(unitPerBox * orderQuantityBoxes) + "個（" + formatCommaEveryThreeDigits(purchaseCost * unitPerBox * orderQuantityBoxes) + "円）";
             orderStartQuantityPriceMessage.innerHTML = message;
         }
 
@@ -596,6 +615,7 @@
             startImage.src = "<%=request.getContextPath()%>/images/placeholder.png";
             orderQuantityBoxesInput.value = 1;
             orderQuantityBoxesInput.disabled = true;
+            startOrderSubmitBtn.disabled = true;
             orderStartQuantityPriceMessage.innerHTML = "";
             orderStartCheckingTimespan.innerHTML = "";
             orderStartDeliveryTimespan.innerHTML = "";
