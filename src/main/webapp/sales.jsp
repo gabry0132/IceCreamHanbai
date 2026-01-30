@@ -22,7 +22,7 @@
     int numberOfPages = 1;
     int pageLimitOffset = 15;   //1ページに何件が表示されるか
     int selectedPage = 1;
-    if(request.getParameter("selectedPage") != null) selectedPage = Integer.parseInt(request.getParameter("selectedPage"));
+    if(request.getParameter("targetPage") != null) selectedPage = Integer.parseInt(request.getParameter("targetPage"));
     selectedPage--; //オフセット計算に使うので -1にします
 
     //検索条件                                      <<<<<<<<<<<<<<<<<<<<<<<unfinished
@@ -75,7 +75,8 @@
         ) {
 
             if (rs.next()) {
-                numberOfPages = (rs.getInt("count") / pageLimitOffset) + 1;
+                numberOfPages = rs.getInt("count") / pageLimitOffset;
+                if(rs.getInt("count") % pageLimitOffset != 0) numberOfPages++;
             }
         }
 
@@ -383,7 +384,7 @@
 
                 <div class="groupingSettingsRow">
 
-                    <p class="groupingSettingsRowIntro">割合 売上高チャート</p>
+                    <p class="groupingSettingsRowIntro">売上高構成比較チャート</p>
 
                     <div class="optionsInRowWrapper">
 
@@ -418,7 +419,7 @@
 
                         <div class="groupingOptionHolder" id="compareGeneral-grOpt">
 
-                            <p class="groupingOptionIntro">全体的確認・売上個数</p>
+                            <p class="groupingOptionIntro">全体確認・売上個数</p>
 
                             <div id="compareGeneral-grOpt-radioHolders">
                                 <input type="radio" name="compareGeneralTimeFrame" value="6" checked>6ヶ月間
@@ -432,7 +433,7 @@
 
                         <div class="groupingOptionHolder" id="compareGeneralSales-grOpt">
 
-                            <p class="groupingOptionIntro">全体的確認・利益</p>
+                            <p class="groupingOptionIntro">全体確認・利益</p>
 
                             <div id="compareGeneralSales-grOpt-radioHolders">
                                 <input type="radio" name="compareGeneralSalesTimeFrame" value="6" checked>6ヶ月間

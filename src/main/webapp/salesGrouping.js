@@ -395,7 +395,7 @@ document.getElementById("periodWorstTen-btn").addEventListener("click", () =>{
     let dayFrom = "";
     let dayTo = "";
 
-    let rankingType = "期間年 TOP";
+    let rankingType = "期間年 WORST";
     let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getRanking?rankingType=" + rankingType;
 
     let detailedCheckbox = document.getElementById("periodWorstTen-DetailedCheckbox");
@@ -423,11 +423,11 @@ document.getElementById("periodWorstTen-btn").addEventListener("click", () =>{
           .then(json => drawRankingGraph(json, "sales", "売上ランキング"));
 })
 
-//割合 売上高：売上個数
+//売上高構成比較チャート：売上個数
 document.getElementById("percentageSales-btn").addEventListener("click", () =>{
     showLoadingMessage();
     let targetYear = document.getElementById("percentageSalesYear").value;
-    let rankingType = targetYear + "年 割合 売上高:売上個数";
+    let rankingType = targetYear + "年 売上高構成比較チャート:売上個数";
     let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getPercentPie?rankingType=" + rankingType +
      "&targetYear=" + targetYear;
     fetch(url)
@@ -435,11 +435,11 @@ document.getElementById("percentageSales-btn").addEventListener("click", () =>{
           .then(json => drawPercentPieGraph(json, "sales"));
 })
 
-//割合 売上高：利益
+//売上高構成比較チャート：利益
 document.getElementById("percentageProfits-btn").addEventListener("click", () =>{
     showLoadingMessage();
     let targetYear = document.getElementById("percentageProfitsYear").value;
-    let rankingType = targetYear + "年 割合 売上高:利益";
+    let rankingType = targetYear + "年 売上高構成比較チャート:利益";
     let url = "http://localhost:8080/IceCreamHanbai_war_exploded/getPercentPie?rankingType=" + rankingType +
      "&targetYear=" + targetYear;
     fetch(url)
@@ -447,7 +447,7 @@ document.getElementById("percentageProfits-btn").addEventListener("click", () =>
           .then(json => drawPercentPieGraph(json, "profits"));
 })
 
-//全体的確認・売上個数 (all products, General)
+//全体確認・売上個数 (all products, General)
 document.getElementById("compareGeneral-btn").addEventListener("click", () =>{
     
     showLoadingMessage();
@@ -468,7 +468,7 @@ document.getElementById("compareGeneral-btn").addEventListener("click", () =>{
           .then(json => drawSalesBarGraph(json, "sales"));
 })
 
-//全体的確認・利益 (all products, Profits)
+//全体確認・利益 (all products, Profits)
 document.getElementById("compareGeneralSales-btn").addEventListener("click", () =>{
     
     showLoadingMessage();
@@ -538,8 +538,6 @@ let latestChartQuery = {
 
 function drawRankingGraph(json, calculationMode, datasetLabel){
     clearCanvas();
-
-    console.log({json})
 
     if(json.data.length === 0){
         document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
@@ -666,8 +664,6 @@ function drawPercentPieGraph(json, calculationMode){
 
 function drawSalesBarGraph(json, calculationMode){
     clearCanvas();
-
-    console.log({json});
 
     if(json.data.length === 0){
         document.getElementById("groupingResultPlaceholder").innerHTML = "データがありません。";
