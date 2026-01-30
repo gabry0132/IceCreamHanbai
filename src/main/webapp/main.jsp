@@ -114,7 +114,7 @@
       <button class="normal-button">売上管理</button>
     </form>
     <% if(isAdmin){ %>
-      <form action="order.jsp" method="post">
+      <form action="orders.jsp" method="post">
         <button class="normal-button">発注管理</button>
       </form>
       <form action="system-menu.html" method="post">

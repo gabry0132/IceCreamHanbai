@@ -279,6 +279,7 @@
             <!--自動的に検索条件を入れて、それで検索する-->
             <form action="sales.jsp" method="post" class="button-wrapper-form">
                 <input type="hidden" name="previousPage" value="product-details.jsp?productID=<%=productID%>">
+                <input type="hidden" name="productSearch" value="<%=productID%>">
 <%--                グラフのこと--%>
                 <button class="normal-button">売上データ<br>確認</button>
             </form>

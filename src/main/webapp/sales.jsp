@@ -25,7 +25,7 @@
     if(request.getParameter("targetPage") != null) selectedPage = Integer.parseInt(request.getParameter("targetPage"));
     selectedPage--; //オフセット計算に使うので -1にします
 
-    //検索条件                                      <<<<<<<<<<<<<<<<<<<<<<<unfinished
+    //検索条件                                      <<<<<<<<<<<<<<<<<<<<<<<unfinished (?)
     String productSearch = request.getParameter("productSearch");
     String staffSearch = request.getParameter("staffSearch");
     String searchStartDate = request.getParameter("searchStartDate");
@@ -52,7 +52,7 @@
     String sql = "";
 
     // エラーメッセージ格納用
-    String ERMSG = null;
+    String ermsg = null;
 
     // 結果格納用リスト
     ArrayList<HashMap<String, String>> salesList = new ArrayList<>();
@@ -139,7 +139,7 @@
         }
 
     } catch (Exception e) {
-        ERMSG = e.getMessage();
+        ermsg = e.getMessage();
     }
 %>
 
@@ -153,17 +153,17 @@
 </head>
 <body>
 
-<% if(ERMSG != null){ %>
+<% if(ermsg != null){ %>
 
     <h4>エラーが発生しました。</h4>
-    <p><%=ERMSG%></p>
+    <p><%=ermsg%></p>
 
 <% } else { %>
 
     <div id="everything-wrapper">
         
         <div id="top-text-holder">
-            <h1>売上データ一覧</h1>
+            <h1>売上一覧</h1>
             <%if(isAdmin){%><span>管理者モード</span><%}%>
         </div>
 
@@ -587,6 +587,7 @@
         </div>
 
         <div id="sales-holder">
+
 <%
             if(!salesList.isEmpty()){
                 for(int i=0; i < salesList.size(); i++){
@@ -870,7 +871,6 @@
 
         saleQuantities.forEach(saleQuantity => {
             saleQuantity.addEventListener("input", () => {
-                console.log("in here")
                 saleQuantity.value = checkQuantity(Number(saleQuantity.value), Number(saleQuantity.min), Number(saleQuantity.max));
             });
         });
