@@ -40,6 +40,8 @@
     if(searchEndDate != null){
         if(searchEndDate.equals("")) searchEndDate = null;
     }
+    boolean searchArrivedOnly = request.getParameter("searchArrivedOnly") != null;
+    boolean searchStoppedOnly = request.getParameter("searchStoppedOnly") != null;
 
     //発注開始確認画面から戻った時のパラメータ
     String productIDCancelledStart = request.getParameter("productIDCancelledStart"); //対象商品のIDです
@@ -76,10 +78,12 @@
         //合計ページ数を先に取得します
         sql = new StringBuffer();
         sql.append("select count(orderID) as count from orders where deleteFlag = 0 ");
-        if(productSearch != null) sql.append(" and s.productID = " + productSearch);
-        if(staffSearch != null) sql.append(" and s.staffID = " + staffSearch);
-        if(searchStartDate != null) sql.append(" and s.startDateTime > " + searchStartDate);
-        if(searchEndDate != null) sql.append(" and s.startDateTime < " + searchEndDate);
+        if(searchArrivedOnly) sql.append(" and completed = 1 ");
+        if(searchStoppedOnly) sql.append(" and stoppedFlag = 1 ");
+        if(productSearch != null) sql.append(" and productID = " + productSearch);
+        if(staffSearch != null) sql.append(" and initiator = " + staffSearch);
+        if(searchStartDate != null) sql.append(" and startDateTime > " + searchStartDate);
+        if(searchEndDate != null) sql.append(" and startDateTime < " + searchEndDate);
         rs = stmt.executeQuery(sql.toString());
 
         if (rs.next()) {
@@ -94,6 +98,8 @@
         sql.append("inner join products as p on o.productID = p.productID ");
         sql.append("inner join staff as s on o.initiator = s.staffID ");
         sql.append("where o.deleteFlag = 0 and p.deleteFlag = 0 and s.deleteFlag = 0 "); //削除されたスタックの発注は表示しないとします。
+        if(searchArrivedOnly) sql.append(" and completed = 1 ");
+        if(searchStoppedOnly) sql.append(" and stoppedFlag = 1 ");
         if(productSearch != null) sql.append(" and o.productID = " + productSearch);
         if(staffSearch != null) sql.append(" and o.initiator = " + staffSearch);
         if(searchStartDate != null) sql.append(" and o.startDateTime > " + searchStartDate);
@@ -126,7 +132,7 @@
             timestampStr = rs.getString("startDateTime").split(" ")[0];
             Calendar orderStartedDate = Calendar.getInstance();
             orderStartedDate.set(Calendar.YEAR, Integer.parseInt(timestampStr.split("-")[0]));
-            orderStartedDate.set(Calendar.MONTH, Integer.parseInt(timestampStr.split("-")[1]));
+            orderStartedDate.set(Calendar.MONTH, Integer.parseInt(timestampStr.split("-")[1]) - 1);
             orderStartedDate.set(Calendar.DATE, Integer.parseInt(timestampStr.split("-")[2]));
 
             Calendar orderConfirmedDate = (Calendar) orderStartedDate.clone();
@@ -134,15 +140,20 @@
             Calendar orderArrivalDate = (Calendar) orderConfirmedDate.clone();
             orderArrivalDate.add(Calendar.DATE, rs.getInt("productShippingDays"));
 
-            if(todayCalendar.before(orderConfirmedDate)){
-                orderStatus = "confirming";
-                orderStatusJap = "発注確認中";
-            } else if (todayCalendar.after(orderConfirmedDate) && todayCalendar.before(orderArrivalDate)) {
-                orderStatus = "sending";
-                orderStatusJap = "配達中";
-            } else {
+            if(rs.getString("completed").equals("1")) {
                 orderStatus = "arrived";
                 orderStatusJap = "入荷済み";
+            } else if(rs.getString("stoppedFlag").equals("1")){
+                orderStatus = "stopped";
+                orderStatusJap = "停止済み";
+            } else {
+                if(todayCalendar.before(orderConfirmedDate)) {
+                    orderStatus = "confirming";
+                    orderStatusJap = "発注確認中";
+                } else {
+                    orderStatus = "sending";
+                    orderStatusJap = "配達中";
+                }
             }
 
             order.put("orderStatus", orderStatus);
@@ -209,7 +220,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>発注データ一覧</title>
-    <link rel="stylesheet" type="text/css" href="css/order.css">
+    <link rel="stylesheet" type="text/css" href="css/orders.css">
 </head>
 <body>
 
@@ -274,9 +285,23 @@
 
                     </div>
 
+                    <div id="search-checkboxes-container">
+
+                        <div>
+                            <input type="checkbox" id="searchArrivedOnly" name="searchArrivedOnly">
+                            <p>入荷済のみ</p>
+                        </div>
+
+                        <div>
+                            <input type="checkbox" id="searchStoppedOnly" name="searchStoppedOnly">
+                            <p>停止のみ</p>
+                        </div>
+
+                    </div>
+
                     <div id="search-buttons-holder">
                         <button class="submit">この条件で検索</button>
-                        <button class="normal-button" id="reset-search" type="reset">条件をクリア</button>
+                        <button class="normal-button" id="reset-search" type="button">条件をクリア</button>
                     </div>
 
                 </div>
@@ -293,6 +318,26 @@
             </form>
         </div>
 
+        <% if(!searchArrivedOnly && !searchStoppedOnly){ %>
+
+            <div id="selectDisplayFilters-holder">
+
+                <input type="checkbox" class="displayFilterCheckbox" id="showConfirmingCheckbox" checked>
+                <p class="displayFilterExplanationP">確認中を表示する</p>
+
+                <input type="checkbox" class="displayFilterCheckbox" id="showSendingCheckbox" checked>
+                <p class="displayFilterExplanationP">配達中を表示する</p>
+
+                <input type="checkbox" class="displayFilterCheckbox" id="showArrivedCheckbox" checked>
+                <p class="displayFilterExplanationP">入荷済を表示する</p>
+
+                <input type="checkbox" class="displayFilterCheckbox" id="showStoppedCheckbox" checked>
+                <p class="displayFilterExplanationP">停止済を表示する</p>
+
+            </div>
+
+        <% } %>
+
         <div id="orders-holder">
 
             <%
@@ -304,17 +349,17 @@
                     <a href="product-details.jsp?productID=<%=ordersList.get(i).get("productID")%>&previousPage=orders.jsp" class="image-wrapper-anchor">
                         <img class="image" src="<%=request.getContextPath()%>/images/<%=ordersList.get(i).get("productImage")%>" width="100" height="100" alt="<%=ordersList.get(i).get("productName")%>">
                     </a>
-                    <p class="order-text"><b><%= ordersList.get(i).get("startDateTime") %></b>に <a href="product-details.jsp?productID=<%=ordersList.get(i).get("productID")%>&previousPage=orders.jsp" class="product-name-anchor"><%= ordersList.get(i).get("productName") %></a>が <%= ordersList.get(i).get("quantityBoxes") %>箱 （<%=ordersList.get(i).get("quantityUnits")%>個） 発注されました。(<%= ordersList.get(i).get("staffName") %>より)</p>
+                    <p class="order-text"><%if(ordersList.get(i).get("orderStatus").equals("stopped")){%><s><%}%><b><%= ordersList.get(i).get("startDateTime") %></b>に <a href="product-details.jsp?productID=<%=ordersList.get(i).get("productID")%>&previousPage=orders.jsp" class="product-name-anchor"><%= ordersList.get(i).get("productName") %></a>が <%= ordersList.get(i).get("quantityBoxes") %>箱 （<%=ordersList.get(i).get("quantityUnits")%>個） 発注されました。(<%= ordersList.get(i).get("staffName") %>より)<%if(ordersList.get(i).get("orderStatus").equals("stopped")){%></s><%}%></p>
                 </div>
                 <% if(isAdmin){ %>
                 <div class="order-status-box">
                     <p class="orderStatusText"><%=ordersList.get(i).get("orderStatusJap")%></p>
                     <% if(ordersList.get(i).get("orderStatus").equals("confirming") && isAdmin){ %>
-                        <%-- ポップアップが使うパラメータを全部渡します --%>
-                        <%-- function openCancelOrderPopup(orderID, productID, productName, productImage, startDateTime, staffName, quantityBoxes, quantityUnits) --%>
-<%--                        <button type="button" class="edit-button" --%>
-<%--                                onclick="openCancelOrderPopup(<%=ordersList.get(i).get("orderID")%>,<%=ordersList.get(i).get("productID")%>,<%=ordersList.get(i).get("productName")%>,<%=ordersList.get(i).get("productImage")%>,<%=ordersList.get(i).get("startDateTime")%>,<%=ordersList.get(i).get("staffName")%>,<%=ordersList.get(i).get("quantityBoxes")%>,<%=ordersList.get(i).get("quantityUnits")%>)--%>
-<%--                                        ">発注停止</button>--%>
+                        <form action="order-confirm.jsp" method="post" id="stopOrder-form">
+                            <input type="hidden" name="stopOrderID" value="<%=ordersList.get(i).get("orderID")%>">
+                            <input type="hidden" name="registerType" value="stop">
+                            <button type="submit" class="edit-button" id="stopOrderBtn">停止する</button>
+                        </form>
                     <% } %>
                 </div>
                 <% } %>
@@ -345,11 +390,13 @@
         </div>
 
         <%--        ページングのための非表示フォーム--%>
-        <form action="sales.jsp" method="post" id="pageingSearch">
+        <form action="orders.jsp" method="post" id="pageingSearch">
             <% if(productSearch != null){ %>     <input type="hidden" name="productSearch" value="<%=productSearch%>">      <% } %>
             <% if(staffSearch != null){ %>       <input type="hidden" name="staffSearch" value="<%=staffSearch%>">          <% } %>
             <% if(searchStartDate != null){ %>   <input type="hidden" name="searchStartDate" value="<%=searchStartDate%>">  <% } %>
             <% if(searchEndDate != null){ %>     <input type="hidden" name="searchEndDate" value="<%=searchEndDate%>">      <% } %>
+            <% if(searchArrivedOnly){ %>         <input type="hidden" name="searchArrivedOnly" value="true">                <% } %>
+            <% if(searchStoppedOnly){ %>         <input type="hidden" name="searchStoppedOnly" value="true">                <% } %>
             <input type="hidden" name="targetPage" id="targetPage">
         </form>
 
@@ -421,70 +468,77 @@
 
     </form>
 
-    <!-- 発注停止ポップアップ -->
-    <form action="order-confirm.jsp" method="post" id="stop-form">
+<%--    <!-- 発注停止ポップアップ -->--%>
+<%--    <form action="order-confirm.jsp" method="post" id="stop-form">--%>
 
-        <div id="stop-popup">
+<%--        <div id="stop-popup">--%>
 
-            <div id="stop-title-section">
-                <h2>発注を開始する</h2>
-                <p class="close" onclick="closeAllPopups()">✖</p>
-            </div>
+<%--            <div id="stop-title-section">--%>
+<%--                <h2>発注を開始する</h2>--%>
+<%--                <p class="close" onclick="closeAllPopups()">✖</p>--%>
+<%--            </div>--%>
 
-            <div id="stop-pop-contents">
+<%--            <div id="stop-pop-contents">--%>
 
-                <div id="stop-top-section">
-                    <img class="image" id="stop-image" src="<%=request.getContextPath()%>/images/placeholder.png" width="200" height="200" alt="アイスを選択してください">
-                    <div id="stop-top-text-holder">
-                        <p id="stopProductID">00001</p>
-                        <p id="stopProductName">ガリガリ君</p>
-                    </div>
-                </div>
+<%--                <div id="stop-top-section">--%>
+<%--                    <img class="image" id="stop-image" src="<%=request.getContextPath()%>/images/placeholder.png" width="200" height="200" alt="アイスを選択してください">--%>
+<%--                    <div id="stop-top-text-holder">--%>
+<%--                        <p id="stopProductID">00001</p>--%>
+<%--                        <p id="stopProductName">ガリガリ君</p>--%>
+<%--                    </div>--%>
+<%--                </div>--%>
 
-                <div id="stop-middle-section">
-                    <table>
-                        <tr>
-                            <td class="table-left-side">発注箱数</td>
-                            <!-- keep empty and write in js -->
-                            <td id="orderStopQuantityBoxes">3箱</td>
+<%--                <div id="stop-middle-section">--%>
+<%--                    <table>--%>
+<%--                        <tr>--%>
+<%--                            <td class="table-left-side">発注箱数</td>--%>
+<%--                            <!-- keep empty and write in js -->--%>
+<%--                            <td id="orderStopQuantityBoxes">3箱</td>--%>
 
-                        </tr>
-                        <tr>
-                            <!-- keep empty and write in js -->
-                            <!-- example of when getting 3 boxes -->
-                            <td colspan="2" id="orderStopQuantityPriceMessage">単位 12個 - 単価 60円 -> 合計 36個（1,800円）</td>
-                        </tr>
-                        <tr>
-                            <td>発注確認期間</td>
-                            <!-- fetch from js, 日 to be added via js -->
-                            <td id="orderStopCheckingTimespan">1日</td>
-                        </tr>
-                        <tr>
-                            <td>出荷後配達期間</td>
-                            <!-- fetch from js, 日 to be added via js -->
-                            <td id="orderStopDeliveryTimespan">2日</td>
-                        </tr>
-                        <tr>
-                            <td>入荷予定日</td>
-                            <!-- calculate based on today + the 2 rows above -->
-                            <td id="orderStopExpectedDeliveryDate">2026年 3月 12日</td>
-                        </tr>
-                    </table>
-                </div>
+<%--                        </tr>--%>
+<%--                        <tr>--%>
+<%--                            <!-- keep empty and write in js -->--%>
+<%--                            <!-- example of when getting 3 boxes -->--%>
+<%--                            <td colspan="2" id="orderStopQuantityPriceMessage">単位 12個 - 単価 60円 -> 合計 36個（1,800円）</td>--%>
+<%--                        </tr>--%>
+<%--                        <tr>--%>
+<%--                            <td>発注確認期間</td>--%>
+<%--                            <!-- fetch from js, 日 to be added via js -->--%>
+<%--                            <td id="orderStopCheckingTimespan">1日</td>--%>
+<%--                        </tr>--%>
+<%--                        <tr>--%>
+<%--                            <td>出荷後配達期間</td>--%>
+<%--                            <!-- fetch from js, 日 to be added via js -->--%>
+<%--                            <td id="orderStopDeliveryTimespan">2日</td>--%>
+<%--                        </tr>--%>
+<%--                        <tr>--%>
+<%--                            <td>入荷予定日</td>--%>
+<%--                            <!-- calculate based on today + the 2 rows above -->--%>
+<%--                            <td id="orderStopExpectedDeliveryDate">2026年 3月 12日</td>--%>
+<%--                        </tr>--%>
+<%--                    </table>--%>
+<%--                </div>--%>
 
-                <input type="hidden" name="registerType" value="stop">
+<%--                <input type="hidden" name="registerType" value="stop">--%>
 
-                <div id="stop-buttons-holder">
-                    <button type="button" class="normal-button" onclick="closeAllPopups()">キャンセル</button>
-                    <button type="submit" class="normal-button">発注開始</button>
-                </div>
-            </div>
-        </div>
+<%--                <div id="stop-buttons-holder">--%>
+<%--                    <button type="button" class="normal-button" onclick="closeAllPopups()">キャンセル</button>--%>
+<%--                    <button type="submit" class="normal-button">発注開始</button>--%>
+<%--                </div>--%>
+<%--            </div>--%>
+<%--        </div>--%>
 
-    </form>
+<%--    </form>--%>
 
     <script>
         let blackBackground = document.getElementById("black-background");
+
+        //表示モードのフィルター
+        let showConfirmingCheckbox = document.getElementById("showConfirmingCheckbox");
+        let showSendingCheckbox = document.getElementById("showSendingCheckbox");
+        let showArrivedCheckbox = document.getElementById("showArrivedCheckbox");
+        let showStoppedCheckbox = document.getElementById("showStoppedCheckbox");
+
         //開始ポップアップ変数
         let startPopup = document.getElementById("start-popup");
         let startOrderSubmitBtn = document.getElementById("startOrderSubmitBtn");
@@ -496,20 +550,32 @@
         let orderStartExpectedDeliveryDate = document.getElementById("orderStartExpectedDeliveryDate");
         let lastRecordedUnitPerBox = 0;
         let lastRecordedPurchaseCost = 0;
+
         //停止ポップアップ変数
         let stopPopup = document.getElementById("stop-popup");
 
         //イベントリスナーの設定
         blackBackground.addEventListener("click", closeAllPopups);
+        document.getElementById("reset-search").addEventListener("click", () => {
+            document.getElementById("search-form").reset();
+            document.getElementById("searchArrivedOnly").checked = false;
+            document.getElementById("searchStoppedOnly").checked = false;
+        })
         orderQuantityBoxesInput.addEventListener("input", (e) => {
             composeOrderStartQuantityPriceMessage(lastRecordedUnitPerBox, lastRecordedPurchaseCost);
         })
+        if(showConfirmingCheckbox) showConfirmingCheckbox.addEventListener("input", recalculateDisplayFilters);
+        if(showSendingCheckbox) showSendingCheckbox.addEventListener("input", recalculateDisplayFilters);
+        if(showArrivedCheckbox) showArrivedCheckbox.addEventListener("input", recalculateDisplayFilters);
+        if(showStoppedCheckbox) showStoppedCheckbox.addEventListener("input", recalculateDisplayFilters);
 
         //検索条件があればここで設定します。
         <% if(productSearch != null){ %> document.getElementById("productSearch").value = "<%=productSearch%>" <% } %>
         <% if(staffSearch != null){ %> document.getElementById("staffSearch").value = "<%=staffSearch%>" <% } %>
         <% if(searchStartDate != null){ %> document.getElementById("searchStartDate").value = "<%=searchStartDate%>" <% } %>
         <% if(searchEndDate != null){ %> document.getElementById("searchEndDate").value = "<%=searchEndDate%>" <% } %>
+        <% if(searchArrivedOnly){ %> document.getElementById("searchArrivedOnly").checked = true <%}%>
+        <% if(searchStoppedOnly){ %> document.getElementById("searchStoppedOnly").checked = true <%}%>
 
         document.getElementById("product").addEventListener("input", (e) => {
             let productID = e.target.value;
@@ -531,6 +597,25 @@
             productSelect.dispatchEvent(new Event("input"));
             setUpStartDiv();
             openStartPopup();
+        }
+
+        function recalculateDisplayFilters() {
+            let showConfirming = Boolean(document.getElementById("showConfirmingCheckbox").checked);
+            let showSending = Boolean(document.getElementById("showSendingCheckbox").checked);
+            let showArrived = Boolean(document.getElementById("showArrivedCheckbox").checked);
+            let showStopped = Boolean(document.getElementById("showStoppedCheckbox").checked);
+
+            let orderBoxes = Array.from(document.getElementsByClassName("order-box"));
+            orderBoxes.forEach((orderBox) => {
+                let toBeShown = false;
+                if(orderBox.classList.contains("arrived") && showArrived)               toBeShown = true;
+                else if(orderBox.classList.contains("confirming") && showConfirming)    toBeShown = true;
+                else if(orderBox.classList.contains("sending") && showSending)          toBeShown = true;
+                else if(orderBox.classList.contains("stopped") && showStopped)          toBeShown = true;
+
+                if(toBeShown) orderBox.style.display = "flex";
+                else orderBox.style.display = "none";
+            })
         }
 
         function setUpStartDiv(productID){

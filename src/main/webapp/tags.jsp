@@ -193,6 +193,7 @@
 
                                 <form action="tags.jsp" method="post" name="<%=tags.get(j).get("tagID")%>">
                                     <input type="hidden" name="tagToDelete" value="<%=tags.get(j).get("tagID")%>">
+                                    <input type="hidden" name="previousPage" value="<%=previousPage%>">
                                     <button class="tag" type="button" onclick= "startDelete('<%=tags.get(j).get("tagID")%>','<%=tagtypes.get(i).get("type")%>')"><span class="tag-text"><%=tags.get(j).get("value")%></span><span class="tag-close">✕</span></button>
                                 </form>
 
@@ -238,6 +239,7 @@
             </div>
 
             <input type="hidden" name="tagTypeID" id="tagTypeIDHolder" value="">
+            <input type="hidden" name="previousPage" value="<%=previousPage%>">
 
             <div id="add-bottom">
                 <button type="button" onclick="closePopup()">キャンセル</button>

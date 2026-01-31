@@ -44,7 +44,7 @@ td.order-table-left-side{   /* order専用 */
     width: 240px;
 }
 
-td#orderStartQuantityPriceMessage{  /* order専用 */
+td#orderStartQuantityPriceMessage, td#orderStopQuantityPriceMessage{  /* order専用 */
     font-size: 1rem;
     padding-bottom: 20px;
     text-align: right;
@@ -54,7 +54,7 @@ div#buttons-holder{
     display: flex;
     width: fit-content;
     margin: auto;
-    button{
+    button {
         font-size: 1.4rem;
         margin: 30px 20px;
     }
@@ -86,10 +86,13 @@ button.delete-button:hover{
     box-shadow: 0 4px 8px 0 red, 10px 6px 20px 0 #00000030;
 }
 
-
 p#delete-text{
     display: inline-block;
     margin-left: 20px;
     width: fit-content;
+    text-align: center;
+}
+
+h5{
     text-align: center;
 }

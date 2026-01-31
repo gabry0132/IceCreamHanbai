@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.io.EOFException" %>
 <%
   // 文字コードの指定
   request.setCharacterEncoding("UTF-8");
@@ -19,7 +20,8 @@
   String quantityBoxes = request.getParameter("quantityBoxes");
 
   //停止の時のパラメータ
-  String orderID = request.getParameter("orderID");
+  String stopOrderID = request.getParameter("stopOrderID");
+  String stopAutoOrderProductID = request.getParameter("stopAutoOrderProductID");
 
   //データベースに接続するために使用する変数宣言
   Connection con = null;
@@ -44,7 +46,7 @@
     con = DriverManager.getConnection(url, user, password);
     stmt = con.createStatement();
 
-    //ログのために商品に関わるログタイプIDを取得。
+    //ログのために発注に関わるログタイプIDを取得。
     sql = new StringBuffer();
     sql.append("select logtypeID from logtypes where type='発注'");
     rs = stmt.executeQuery(sql.toString());
@@ -71,7 +73,7 @@
       sql.append("insert into logs (logtypeID, text, productID) value (");
       sql.append(logtypeIDforOrders);
       sql.append(",'");
-      sql.append(productName + " × " + quantityBoxes + "個の発注が " + staffName + " により 開始されました");
+      sql.append(productName + " × " + quantityBoxes + "箱の発注が " + staffName + " により 開始されました");
       sql.append("',");
       sql.append(productID);
       sql.append(")");
@@ -84,10 +86,36 @@
 
     } else if (registerType.equals("stop")) {
 
-//      sql.append("update Order set deleteFlag = 1 where productID = ");
-//      sql.append(StrproductID);
+      //発注を停止してもmain.jspに戻った時に自動発注されないように、
+      //いわゆる「自動発注」を停止しようとしているユーザーに関しては
+      //ここで更新するのは停止フラグも自動発注停止希望フラグの２つです。
+      sql = new StringBuffer();
+      sql.append("update orders set stoppedFlag = 1 where orderID = " + stopOrderID);
 
-      rs = stmt.executeQuery(sql.toString());
+      updatedRows = stmt.executeUpdate(sql.toString());
+      if(updatedRows == 0) throw new Exception("発注の停止が失敗しました。");
+
+      sql = new StringBuffer();
+      sql.append("update products set stopAutoOrder = 1 where productID = " + stopAutoOrderProductID);
+
+      updatedRows = stmt.executeUpdate(sql.toString());
+      if(updatedRows == 0) throw new Exception("対象商品の自動発注機能無効化処理が失敗しました。");
+
+      //ログの登録を行います。
+      sql = new StringBuffer();
+      sql.append("insert into logs (logtypeID, text, productID) value (");
+      sql.append(logtypeIDforOrders);
+      sql.append(",'");
+      sql.append("発注ID: " + stopOrderID + " (" + productName + " × " + quantityBoxes + "箱) が " + staffName + " により 停止されました");
+      sql.append("',");
+      sql.append(productID);
+      sql.append(")");
+
+      updatedRows = stmt.executeUpdate(sql.toString());
+      if (updatedRows == 0) {
+        throw new Exception("発注開始のログ登録処理が失敗しました。");
+      }
+
     }
   } catch(ClassNotFoundException e){
     ermsg = new StringBuffer();

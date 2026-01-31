@@ -31,6 +31,24 @@ div#search-params-container{
     width: fit-content;
 }
 
+div#search-checkboxes-container{
+    display: flex;
+    flex-direction: column;
+    margin: 0px 20px;
+    div{
+        margin: 5px 0px 10px 0px;
+        display: flex;
+        input{
+            cursor: pointer;
+        }
+        p {
+            width: fit-content;
+            font-size: 1rem;
+            margin: 0px;
+        }
+    }
+}
+
 div#search-buttons-holder{
     display: flex;
     flex-direction: column;
@@ -44,6 +62,21 @@ div.back-button-holder{
     display: flex;
     width: fit-content;
     margin: 0px 2.3% 20px auto;
+}
+
+div#selectDisplayFilters-holder{
+    display: flex;
+    width: fit-content;
+    margin: -50px 0px 0px 30px;
+    input{
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+    p{
+        font-size: 1rem;
+        width: fit-content;
+        margin-right: 20px;
+    }
 }
 
 
@@ -139,7 +172,7 @@ span.current-page{
 /* 発注データオブジェクトの設定はここから */
 
 div.order-box{
-    display: flex;
+    display: flex;  /* 非表示フィルターになったらnoneと切り替える */
     width: 95%;
     margin: auto auto 20px auto;
     border: 2px solid black;
@@ -155,6 +188,8 @@ div.order-box{
 }
 .arrived{ background-color: #77fbd3
 }
+.stopped{ background-color: white
+}
 
 div.order-image-txt-holder, div.order-status-box{
     display: flex;
@@ -164,12 +199,22 @@ div.order-image-txt-holder, div.order-status-box{
         width: fit-content;
         margin: auto;
     }
-    button{
-        margin: auto 10px;
+    form{
+        display: flex;
+        width: fit-content;
+        height: fit-content;
+        button{
+            margin: auto 10px;
+        }
     }
 }
 div.order-status-box{
     margin-right: 20px;
+    flex-direction: column;
+    justify-content: space-evenly;
+    p{
+        margin: 0px auto;
+    }
 }
 
 a.image-wrapper-anchor{

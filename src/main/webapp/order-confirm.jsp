@@ -13,12 +13,12 @@
 
   String registerType = request.getParameter("registerType");
 
-  //開始のパラメータ
+  //開始のパラメータ。停止も表示に使う
   String productID = request.getParameter("productID");
   String quantityBoxes = request.getParameter("orderQuantityBoxes");
 
   //停止のパラメータ
-  String orderID = request.getParameter("orderID");
+  String stopOrderID = request.getParameter("stopOrderID");
 
   //画面に使う変数
   String name = null;
@@ -29,6 +29,8 @@
   String image = null;
   String priceMessage = null;
   String expectedArrivalDate = null;
+  String initiatorName = null; //停止のみ使う
+  String orderDateStr = null; //停止のみ使う
 
   //データベースに接続するために使用する変数宣言
   Connection con = null;
@@ -53,24 +55,69 @@
     con = DriverManager.getConnection(url, user, password);
     stmt = con.createStatement();
 
-    sql = new StringBuffer();
-    sql.append("select name, purchaseCost, unitPerBox, confirmDays, shippingDays, image from products where productID = " + productID);
+    if(registerType.equals("start")) {
 
-    rs = stmt.executeQuery(sql.toString());
-    if(rs.next()){
-      name = rs.getString("name");
-      purchaseCost = rs.getInt("purchaseCost");
-      unitPerBox = rs.getInt("unitPerBox");
-      confirmDays = rs.getInt("confirmDays");
-      shippingDays = rs.getInt("shippingDays");
-      image = rs.getString("image");
+      sql = new StringBuffer();
+      sql.append("select name, purchaseCost, unitPerBox, confirmDays, shippingDays, image from products where productID = " + productID);
 
-      priceMessage = "単位 " + unitPerBox + "個 × 単価 " + purchaseCost + "円 ＝ 合計 " + (Integer.parseInt(quantityBoxes) * unitPerBox) + "個（" + ((Integer.parseInt(quantityBoxes) * unitPerBox) * purchaseCost) + "円）";
-      calendar.add(Calendar.DATE, (confirmDays + shippingDays));
-      expectedArrivalDate = calendar.get(Calendar.YEAR) + "年 " + calendar.get(Calendar.MONTH) + "月 " + calendar.get(Calendar.DATE) + "日";
+      rs = stmt.executeQuery(sql.toString());
+      if (rs.next()) {
+        name = rs.getString("name");
+        purchaseCost = rs.getInt("purchaseCost");
+        unitPerBox = rs.getInt("unitPerBox");
+        confirmDays = rs.getInt("confirmDays");
+        shippingDays = rs.getInt("shippingDays");
+        image = rs.getString("image");
 
-    } else {
-      throw new Exception("対象の商品が見つかりませんでした");
+        priceMessage = "単位 " + unitPerBox + "個 × 単価 " + purchaseCost + "円 ＝ 合計 " + (Integer.parseInt(quantityBoxes) * unitPerBox) + "個（" + ((Integer.parseInt(quantityBoxes) * unitPerBox) * purchaseCost) + "円）";
+        calendar.add(Calendar.DATE, (confirmDays + shippingDays));
+        expectedArrivalDate = calendar.get(Calendar.YEAR) + "年 " + (calendar.get(Calendar.MONTH) + 1) + "月 " + calendar.get(Calendar.DATE) + "日";
+
+      } else {
+        throw new Exception("対象の商品が見つかりませんでした");
+      }
+
+    } else if(registerType.equals("stop")){
+
+      sql = new StringBuffer();
+      sql.append("select o.productID, o.initiator, o.quantity, o.startDateTime, o.completed, o.stoppedFlag, o.deleteFlag, ");
+      sql.append("p.name as productName, p.purchaseCost, p.unitPerBox, p.confirmDays, p.shippingDays, p.image, ");
+      sql.append("s.name as staffName ");
+      sql.append("from orders o inner join products p on o.productID = p.productID ");
+      sql.append("inner join staff s on o.initiator = s.staffID ");
+      sql.append("where o.orderID = " + stopOrderID);
+
+      rs = stmt.executeQuery(sql.toString());
+      if(rs.next()){
+        if(rs.getString("completed").equals("1")) throw new Exception("対象の発注が入荷済みです");
+        if(rs.getString("stoppedFlag").equals("1")) throw new Exception("対象の発注が既に停止されています");
+        if(rs.getString("deleteFlag").equals("1")) throw new Exception("対象の発注が削除されています");
+
+        productID = rs.getString("productID");
+        name = rs.getString("productName");
+        image = rs.getString("image");
+        quantityBoxes = rs.getString("quantity");
+        purchaseCost = rs.getInt("purchaseCost");
+        unitPerBox = rs.getInt("unitPerBox");
+        confirmDays = rs.getInt("confirmDays");
+        shippingDays = rs.getInt("shippingDays");
+
+        priceMessage = "単位 " + unitPerBox + "個 × 単価 " + purchaseCost + "円 ＝ 合計 " + (Integer.parseInt(quantityBoxes) * unitPerBox) + "個（" + ((Integer.parseInt(quantityBoxes) * unitPerBox) * purchaseCost) + "円）";
+
+        String timestampStr = rs.getString("startDateTime").split(" ")[0];
+        calendar.set(Calendar.YEAR, Integer.parseInt(timestampStr.split("-")[0]));
+        calendar.set(Calendar.MONTH, Integer.parseInt(timestampStr.split("-")[1]) - 1);
+        calendar.set(Calendar.DATE, Integer.parseInt(timestampStr.split("-")[2]));
+
+        orderDateStr = rs.getString("startDateTime");
+
+        calendar.add(Calendar.DATE, (confirmDays + shippingDays));
+
+        expectedArrivalDate = calendar.get(Calendar.YEAR) + "年 " + (calendar.get(Calendar.MONTH) + 1) + "月 " + calendar.get(Calendar.DATE) + "日";
+
+        initiatorName = rs.getString("staffName");
+      }
+
     }
 
   } catch(ClassNotFoundException e){
@@ -147,7 +194,7 @@
                 <td><%=quantityBoxes%></td>
               </tr>
               <tr>
-                <td colspan="2" id="orderStartQuantityPriceMessage"><%=priceMessage%></td>   <!-- <<<<<<<<<<<<<<<<<<<<<<<<< -->
+                <td colspan="2" id="orderStartQuantityPriceMessage"><%=priceMessage%></td>
               </tr>
               <tr>
                 <td class="table-left-side">発注確認期間</td>
@@ -181,42 +228,68 @@
             <input type="hidden" name="productName" value="<%=name%>">
             <input type="hidden" name="quantityBoxes" value="<%=quantityBoxes%>">
 
-            <button class="normal-button">開始</button>
+            <button class="normal-button">開始する</button>
           </form>
         </div>
 
       <% } else if (registerType.equals("stop")) { %>
 
-<%--        <h2>売上データ削除確認</h2>--%>
+        <h2>発注停止を確定する</h2>
 
-<%--        <div id="main-section-wrapper">--%>
+        <div id="main-section-wrapper">
 
-<%--          <div id="left-section-wrapper">--%>
-<%--            <img class="image" id="add-image" src="<%=request.getContextPath()%>/images/<%=productImage%>" width="100" height="100" alt="<%=productName%>">--%>
-<%--            <p id="delete-text"><%=productName%> の売上データ (売上ID: <%=saleID%>)を削除します。<br>対象の<b><%=saleQuantitiy%>個</b>を在庫に戻しますか？</p>--%>
-<%--          </div>--%>
+          <div id="left-section-wrapper">
+            <img class="image" id="stop-image" src="<%=request.getContextPath()%>/images/<%=image%>" width="100" height="100" alt="<%=name%>">
+          </div>
 
-<%--        </div>--%>
+          <div id="right-section-wrapper">
+            <table>
+              <tr>
+                <td class="order-table-left-side"><%=productID%></td>
+                <td><%=name%></td>
+              </tr>
+              <tr>
+                <td class="table-left-side">発注箱数</td>
+                <td><%=quantityBoxes%>箱</td>
+              </tr>
+              <tr>
+                <td colspan="2" id="orderStopQuantityPriceMessage"><%=priceMessage%></td>   <!-- <<<<<<<<<<<<<<<<<<<<<<<<< -->
+              </tr>
+              <tr>
+                <td class="table-left-side">発注開始日時</td>
+                <td><%=orderDateStr%></td>
+              </tr>
+              <tr>
+                <td class="table-left-side">入荷予定日</td>
+                <td><%=expectedArrivalDate%></td>
+              </tr>
+              <tr>
+                <td class="table-left-side">開始担当者</td>
+                <td><%=initiatorName%></td>
+              </tr>
 
-<%--        <div id="buttons-holder">--%>
-<%--          <form action="sales.jsp" method="post">--%>
-<%--            <button class="normal-button">中止</button>--%>
-<%--          </form>--%>
-<%--          <form action="sales-register.jsp" method="post">--%>
-<%--            <input type="hidden" name="registerType" value="<%=registerType%>">--%>
-<%--            <input type="hidden" name="saleID" value="<%=saleID%>">--%>
-<%--            <input type="hidden" name="returnQuantity" value="true">--%>
+            </table>
 
-<%--            <button class="delete-button"><%=saleQuantitiy%>個を戻して削除</button>--%>
-<%--          </form>--%>
-<%--          <form action="sales-register.jsp" method="post">--%>
-<%--            <input type="hidden" name="registerType" value="<%=registerType%>">--%>
-<%--            <input type="hidden" name="saleID" value="<%=saleID%>">--%>
+          </div>
 
-<%--            <button class="delete-button">このまま削除</button>--%>
-<%--          </form>--%>
-<%--        </div>--%>
+        </div>
 
+        <h5>発注を停止したらこの商品の自動発注機能も停止します。<br>目的の在庫数に戻ったらもう一度商品詳細画面から有効に切り替えてください。</h5>
+
+        <div id="buttons-holder">
+
+          <form action="orders.jsp" method="post">
+            <button class="normal-button">キャンセル</button>
+          </form>
+
+          <form action="order-register.jsp" method="post">
+            <input type="hidden" name="registerType" value="<%=registerType%>">
+            <input type="hidden" name="stopOrderID" value="<%=stopOrderID%>">
+            <input type="hidden" name="stopAutoOrderProductID" value="<%=productID%>">
+
+            <button class="normal-button">停止する</button>
+          </form>
+        </div>
 
       <% } %>
 

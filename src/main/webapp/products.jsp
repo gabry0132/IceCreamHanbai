@@ -549,6 +549,11 @@
         let obfuscationBanner = document.getElementById("obfuscation-banner");
         let body = document.getElementsByTagName("body")[0];
 
+        //検索条件のクリアボタンの機能
+        document.getElementById("reset-search-params").addEventListener("click", () => {
+            document.getElementById("search-form").reset();
+        })
+
         //検索条件があれば動的に設定します
         let searchName = "<%=searchName%>";
         let searchID = "<%=searchID%>";
@@ -624,7 +629,6 @@
             //後ろのページのスクロール設定を元に戻す
             body.classList.remove("stop-scrolling");
         }
-
 
         //商品名の長さチェック
         let nameHolders = document.getElementsByClassName("product-name-holder");
