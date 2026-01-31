@@ -69,6 +69,7 @@
     HashMap<String,String> tag = null;
     ArrayList<HashMap<String,String>> productsList = new ArrayList<>();
     ArrayList<HashMap<String,String>> tags = new ArrayList<>();
+    ArrayList<String> productsWaitingForArrivalList = new ArrayList<>();
 
     try {
 
@@ -207,7 +208,23 @@
                 }
             }
 
+        }
 
+        //商品ごとに発注されているのであれば画面で出したいのでここで判断します。
+        sql = new StringBuffer();
+        sql.append("select o.productID from orders o where o.completed = 0 and o.stoppedFlag = 0 and o.deleteFlag = 0 ");
+        sql.append("and o.orderID = ( ");
+        sql.append(" select max(o2.orderID) from orders o2 where o2.productID = o.productID ");
+        sql.append(") and o.productID in ( ");
+        for (int i = 0; i < productsList.size(); i++) {
+            if(i > 0) sql.append(",");
+            sql.append(productsList.get(i).get("productID"));
+        }
+        sql.append(" ) ");
+
+        rs = stmt.executeQuery(sql.toString());
+        while(rs.next()){
+            productsWaitingForArrivalList.add(rs.getString("productID"));
         }
 
     } catch(ClassNotFoundException e){
@@ -333,13 +350,22 @@
                 <% for (int i = 0; i < productsList.size(); i++) { %>
 
                     <%
-                        boolean showAlert = false;
+                        String productStatus = "";
+//                        boolean showAlert = false;
+                        //先ずは緊急事態かどうかを判断
                         if(Integer.parseInt(productsList.get(i).get("quantity")) <= Integer.parseInt(productsList.get(i).get("alertNumber"))){
-                            showAlert = true;
+                            productStatus = "showAlert";
+                        }
+                        //発注待ち状態だったら緊急事態を上書きます
+                        for (int j = 0; j < productsWaitingForArrivalList.size(); j++) {
+                            if(productsList.get(i).get("productID").equals(productsWaitingForArrivalList.get(j))){
+                                productStatus = "waitingForOrderArrival";
+                                break;
+                            }
                         }
                     %>
 
-                    <div class="product-container<% if(showAlert){ %> showAlert<% } %>" title="<%= productsList.get(i).get("name") %>" onclick="window.open('product-details.jsp?productID=<%=productsList.get(i).get("productID")%>', '_self')">
+                    <div class="product-container <%=productStatus%>" title="<%= productsList.get(i).get("name") %>" onclick="window.open('product-details.jsp?productID=<%=productsList.get(i).get("productID")%>', '_self')">
                         <table class="product-table">
                             <tr>
                                 <td class="product-image-holder" rowspan="4">
@@ -353,7 +379,7 @@
                                 <td class="product-name-holder"><%= productsList.get(i).get("name")%></td>
                             </tr>
                             <tr>
-                                <td class="instock-intro-holder">在庫数<%if(showAlert){ %><span class="alert-span"> ⚠</span><% } %></td>
+                                <td class="instock-intro-holder">在庫数<%if(productStatus.equals("showAlert")){ %><span class="alert-span"> ⚠</span><% }else if(productStatus.equals("waitingForOrderArrival")){ %><span class="awaitingArrival-span"><i> 入荷待ち</i></span><%}%></td>
                             </tr>
                             <tr>
                                 <td class="instock-quantity-holder"><%= productsList.get(i).get("quantity") %>個</td>

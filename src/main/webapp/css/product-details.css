@@ -109,6 +109,10 @@ div#bottom-buttons-container{
 span.alert-span{
     color: orangered;
 }
+span.awaitingArrival-span{
+    font-size: 1rem;
+    color: #3959eb;
+}
 
 /* pulseボタンの設定がここから */
 

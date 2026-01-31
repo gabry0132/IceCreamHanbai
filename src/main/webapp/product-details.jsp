@@ -44,8 +44,10 @@
     String type = "";
     String typeName = "";
 
+    String productStatus = ""; //showAlert、waitingForOrderArrival、または空文字
+
     int zeroesToPad = 0;
-    boolean showAlert = false;
+//    boolean showAlert = false;
     boolean stopAutoOrder = false;
 
     //確認メッセージ
@@ -118,8 +120,22 @@
         }
 
         //アラートを表示すべきかどうかここで判断
-        if(Integer.parseInt(instockQuantity) <= Integer.parseInt(alertNumber)) showAlert = true;
+        if(Integer.parseInt(instockQuantity) <= Integer.parseInt(alertNumber)) productStatus = "showAlert";
         zeroesToPad = 5 - productID.length();
+
+        //入荷待ちかどうか判断します
+        sql = new StringBuffer();
+        sql.append("select o.productID from orders o where o.completed = 0 and o.stoppedFlag = 0 and o.deleteFlag = 0 ");
+        sql.append("and o.orderID = ( ");
+        sql.append(" select max(o2.orderID) from orders o2 where o2.productID = o.productID ");
+        sql.append(") and o.productID = " + productID);
+
+        rs = stmt.executeQuery(sql.toString());
+        //レコードあれば入荷待ちだという流れです
+        if(rs.next()){
+            //緊急事態を上書きします
+            productStatus = "waitingForOrderArrival";
+        }
 
         //全体的にタグとタグタイプを取得します。
         sql = new StringBuffer();
@@ -219,7 +235,7 @@
                     </tr>
                     <tr>
                         <td>在庫数</td>
-                        <td><%=instockQuantity%>個<%if(showAlert){%><span class="alert-span">  ⚠</span><%}%></td>
+                        <td><%=instockQuantity%>個<%if(productStatus.equals("showAlert")){%><span class="alert-span">  ⚠</span><%}else if(productStatus.equals("waitingForOrderArrival")){%><span class="awaitingArrival-span">　　入荷待ちです。</span><%}%></td>
                     </tr>
                     <tr <% if(stopAutoOrder){%> class="autoOrderStoppedRow"<%}%>>
                         <td>アラート限界</td>
@@ -260,7 +276,7 @@
                 <form action="orders.jsp" method="post" class="button-wrapper-form">
                     <input type="hidden" name="startFromProductID" value="<%=productID%>">
                     <input type="hidden" name="previousPage" value="product-details.jsp?productID=<%=productID%>">
-                    <button class="normal-button<%if(showAlert){%> pulse<%}%>">発注を<br>開始する</button>
+                    <button class="normal-button<%if(productStatus.equals("showAlert")){%> pulse<%}%>">発注を<br>開始する</button>
                 </form>
 
                 <% if(stopAutoOrder){ %>
