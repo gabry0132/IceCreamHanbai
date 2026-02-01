@@ -57,6 +57,7 @@
     StringBuffer ermsg = null;
     int updatedRows = 0;
     String logtypeIDforSales = "";          //ログに使います
+    String logtypeIDforNotices = "";         //csv読み込みログに使います
     String productName = "";                //ログに使います
     int recordedQuantity = 0;               //商品テーブルから引数するために使います
 
@@ -67,11 +68,12 @@
 
         //ログのために商品に関わるログタイプIDを取得。
         sql = new StringBuffer();
-        sql.append("select logtypeID from logtypes where type='売上'");
+        sql.append("select logtypeID, typeEng from logtypes where type='売上' or type='お知らせ'");
         rs = stmt.executeQuery(sql.toString());
 
         if(rs.next()){
-            logtypeIDforSales = rs.getString("logtypeID");
+            if(rs.getString("typeEng").equals("sales")) logtypeIDforSales = rs.getString("logtypeID");
+            else if(rs.getString("typeEng").equals("notice")) logtypeIDforNotices = rs.getString("logtypeID");
         } else {
             throw new Exception("売上ログタイプIDの取得が失敗しました。");
         }
@@ -375,6 +377,19 @@
 
                 if (updatedRows == 0) {
                     throw new Exception("ファイルからの売上登録が失敗しました。");
+                }
+
+                //ログの登録を行います。
+                sql = new StringBuffer();
+                sql.append("insert into logs (logtypeID, text) value (");
+                sql.append(logtypeIDforNotices);
+                sql.append(",'");
+                sql.append(staffName + " のcsv読み込みにより " + salesList.size() + "件 売上が登録されました。");
+                sql.append("')");
+
+                updatedRows = stmt.executeUpdate(sql.toString());
+                if (updatedRows == 0) {
+                    throw new Exception("csv読み込み後のログ処理が失敗しました。");
                 }
 
             }

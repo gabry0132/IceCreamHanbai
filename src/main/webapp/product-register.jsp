@@ -7,7 +7,9 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
-    String operatingUserName = "テストシステム";
+    String staffID = "00";      //仮にシステムの登録だとします
+    String staffName = "システム";      //仮にシステムの登録だとします
+    boolean isAdmin = true;
 
     String registerType = request.getParameter("registerType");
     String previousPage = request.getParameter("previousPage");
@@ -116,7 +118,7 @@
             sql.append("insert into logs (logtypeID, text, productID) value (");
             sql.append(logtypeIDforProducts);
             sql.append(",'");
-            sql.append(productName + " が " + operatingUserName + " に追加されました");
+            sql.append(productName + " が " + staffName + " に追加されました");
             sql.append("',");
             sql.append(productID);
             sql.append(")");
@@ -221,7 +223,7 @@
                 if(rs.next()){
                     productName = rs.getString("name");
                 } else {
-                    productName = "商品ID" + productID;
+                    productName = "商品ID: " + productID;
                 }
             }
             //ログを登録します。
@@ -229,7 +231,7 @@
             sql.append("insert into logs (logtypeID, text, productID) value (");
             sql.append(logtypeIDforProducts);
             sql.append(",'");
-            sql.append(productName + " の詳細データが " + operatingUserName + " に変更されました");
+            sql.append(productName + " の詳細データが " + staffName + " に変更されました");
             sql.append("',");
             sql.append(productID);
             sql.append(")");
@@ -261,7 +263,6 @@
             //System.out.println(sql.toString());
             updatedRows = stmt.executeUpdate(sql.toString());
 
-            //取得したデータを繰り返し処理を表示する
             if (updatedRows == 0) {
                 ermsg = new StringBuffer();
                 ermsg.append("商品の削除が失敗しました。");
@@ -272,7 +273,7 @@
             sql.append("insert into logs (logtypeID, text, productID) value (");
             sql.append(logtypeIDforProducts);
             sql.append(",'");
-            sql.append(productName + " の自動発注機能が " + operatingUserName + " に");
+            sql.append(productName + " の自動発注機能が " + staffName + " に");
             if(stopAutoOrder == 0) sql.append("無効化されました");
             else sql.append("有効化されました");
             sql.append("',");
@@ -297,7 +298,6 @@
             //System.out.println(sql.toString());
             updatedRows = stmt.executeUpdate(sql.toString());
 
-            //取得したデータを繰り返し処理を表示する
             if (updatedRows == 0) {
                 throw new Exception("商品のアラート・自動発注設定の更新が失敗しました。");
             }
@@ -306,7 +306,7 @@
             sql.append("insert into logs (logtypeID, text, productID) value (");
             sql.append(logtypeIDforProducts);
             sql.append(",'");
-            sql.append(productName + " のアラート・自動発注設定が " + operatingUserName + " に変更されました");
+            sql.append(productName + " のアラート・自動発注設定が " + staffName + " に変更されました");
             sql.append("',");
             sql.append(productID);
             sql.append(")");
@@ -373,8 +373,8 @@
             sql.append("insert into logs (logtypeID, text, productID) value (");
             sql.append(logtypeIDforProducts);
             sql.append(",'");
-            if(quantity > 0) sql.append(productName + " が " + quantity + "個 は残った状態で " + operatingUserName + " に削除されました");
-            else sql.append(productName + " が " + operatingUserName + " に削除されました");
+            if(quantity > 0) sql.append(productName + " が " + quantity + "個 は残った状態で " + staffName + " に削除されました");
+            else sql.append(productName + " が " + staffName + " に削除されました");
             sql.append("',");
             sql.append(productID);
             sql.append(")");

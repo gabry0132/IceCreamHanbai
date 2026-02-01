@@ -106,7 +106,7 @@
             sql.append("'");
             //System.out.println(sql.toString());
             updatedRows = stmt.executeUpdate(sql.toString());
-            //取得したデータを繰り返し処理を表示する
+
             if (updatedRows == 0) {
                 throw new Exception("人事の修正が失敗しました。");
             }
@@ -130,7 +130,7 @@
             sql.append(staffID);
             //System.out.println(sql.toString());
             updatedRows = stmt.executeUpdate(sql.toString());
-            //取得したデータを繰り返し処理を表示する
+
             if (updatedRows == 0) {
                 throw new Exception("人事の削除が失敗しました。");
             }
