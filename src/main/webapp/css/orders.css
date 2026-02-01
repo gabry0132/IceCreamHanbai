@@ -182,14 +182,10 @@ div.order-box{
 }
 
 /* orderStatus 発注ステータスによる変更する背景色 */
-.confirming{ background-color: #d2ccc7
-}
-.sending{ background-color: #b4d9ef
-}
-.arrived{ background-color: #77fbd3
-}
-.stopped{ background-color: white
-}
+.confirming{ background-color: #d2ccc7; }
+.sending{ background-color: #b4d9ef; }
+.arrived{ background-color: #77fbd3; }
+.stopped{ background-color: white; }
 
 div.order-image-txt-holder, div.order-status-box{
     display: flex;

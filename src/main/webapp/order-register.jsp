@@ -16,8 +16,8 @@
 
   //開始の時のパラメータ
   String productID = request.getParameter("productID");
-  String productName = request.getParameter("productName");
-  String quantityBoxes = request.getParameter("quantityBoxes");
+  String productName = request.getParameter("productName");     //停止の場合ももらいます。
+  String quantityBoxes = request.getParameter("quantityBoxes"); //停止の場合ももらいます。
 
   //停止の時のパラメータ
   String stopOrderID = request.getParameter("stopOrderID");
@@ -108,7 +108,7 @@
       sql.append(",'");
       sql.append("発注ID: " + stopOrderID + " (" + productName + " × " + quantityBoxes + "箱) が " + staffName + " により 停止されました");
       sql.append("',");
-      sql.append(productID);
+      sql.append(stopAutoOrderProductID);
       sql.append(")");
 
       updatedRows = stmt.executeUpdate(sql.toString());

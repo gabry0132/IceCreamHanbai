@@ -1,3 +1,14 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
+
+    //セッション管理
+
+    //check if admin, redirect to main if not
+
+
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -21,7 +32,7 @@
             </form>
         </div>
         <div id="back-button-holder">
-            <form action="main.html" method="post" id="return-form">
+            <form action="main.jsp" method="post" id="return-form">
                 <button type="submit" id="back-button">戻る</button>
             </form>
         </div>

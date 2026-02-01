@@ -286,6 +286,8 @@
             <input type="hidden" name="registerType" value="<%=registerType%>">
             <input type="hidden" name="stopOrderID" value="<%=stopOrderID%>">
             <input type="hidden" name="stopAutoOrderProductID" value="<%=productID%>">
+            <input type="hidden" name="productName" value="<%=name%>">
+            <input type="hidden" name="quantityBoxes" value="<%=quantityBoxes%>">
 
             <button class="normal-button">停止する</button>
           </form>

@@ -175,8 +175,6 @@
                 </tr>
             </table>
             <div class="button-group">
-                <!-- botton押すとidをstaff.htmlに送ってpopup=true -->
-                <!-- <button onclick="window.location.href='staff.jsp?id=' + 123456 + '&staff_change_popup=true'" id="btn" -->
                 <form action="staff.jsp" method="post">
                     <button class="normal-button">内容を修正する</button>
                 </form>

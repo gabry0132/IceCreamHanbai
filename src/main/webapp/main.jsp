@@ -187,7 +187,7 @@
       }
     }
 
-                                                //check again when orders is finilized
+    //アラート取得処理
     sql = new StringBuffer();
     sql.append("select products.productID, name, image, (products.quantity - autoOrderLimit) as toOrder from products ");
     sql.append("left join orders on products.productID = orders.productid ");
@@ -263,7 +263,7 @@
       <form action="orders.jsp" method="post">
         <button class="normal-button">発注管理</button>
       </form>
-      <form action="system-menu.html" method="post">
+      <form action="system-menu.jsp" method="post">
         <button class="normal-button">システム管理</button>
       </form>
     <% } %>

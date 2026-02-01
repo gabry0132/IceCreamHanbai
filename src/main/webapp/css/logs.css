@@ -119,6 +119,8 @@ div.back-button-holder{
 
 .log-item .log-date {
   margin-left: 10px;
+  margin-right: 20px;
+  font-weight: bold;
   white-space: nowrap;
 }
 
@@ -146,27 +148,18 @@ div.back-button-holder{
   background-color: #d2e9ff;
 }
 
-/* .pagination {
-  text-align: center;
-  margin-top: 10px;
-}
-
-
-.pagination a {
-  margin: 0 5px;
-  font-size: 14px;
-  text-decoration: none;
-  color: #000;
-} */
-
 div#page-selector-wrapper{
-  margin-bottom: 80px;
+  display: flex;
+  width: fit-content;
+  margin: auto;
 }
-
-p#page-selector{
-  font-size: 1rem;
+span.page-number-span{
+  font-size: 0.9rem;
+  cursor: pointer;
   text-align: center;
-  span{
-    font-size: 0.8rem;
-  }
+  padding: 5px;
+}
+span.current-page{
+  font-size: 1rem;
+  text-decoration: underline;
 }

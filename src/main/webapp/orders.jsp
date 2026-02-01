@@ -32,6 +32,8 @@
     //検索条件
     String productSearch = request.getParameter("productSearch");
     String staffSearch = request.getParameter("staffSearch");
+    String startDateSuffix = " 00:00:00";
+    String endDateSuffix = " 23:59:59";
     String searchStartDate = request.getParameter("searchStartDate");
     if(searchStartDate != null){
         if(searchStartDate.equals("")) searchStartDate = null;
@@ -81,9 +83,9 @@
         if(searchArrivedOnly) sql.append(" and completed = 1 ");
         if(searchStoppedOnly) sql.append(" and stoppedFlag = 1 ");
         if(productSearch != null) sql.append(" and productID = " + productSearch);
-        if(staffSearch != null) sql.append(" and initiator = " + staffSearch);
-        if(searchStartDate != null) sql.append(" and startDateTime > " + searchStartDate);
-        if(searchEndDate != null) sql.append(" and startDateTime < " + searchEndDate);
+        if(staffSearch != null) sql.append(" and initiator = '" + staffSearch + "' ");
+        if(searchStartDate != null) sql.append(" and startDateTime > '" + searchStartDate + startDateSuffix + "' ");
+        if(searchEndDate != null) sql.append(" and startDateTime < '" + searchEndDate + endDateSuffix + "' ");
         rs = stmt.executeQuery(sql.toString());
 
         if (rs.next()) {
@@ -101,9 +103,9 @@
         if(searchArrivedOnly) sql.append(" and completed = 1 ");
         if(searchStoppedOnly) sql.append(" and stoppedFlag = 1 ");
         if(productSearch != null) sql.append(" and o.productID = " + productSearch);
-        if(staffSearch != null) sql.append(" and o.initiator = " + staffSearch);
-        if(searchStartDate != null) sql.append(" and o.startDateTime > " + searchStartDate);
-        if(searchEndDate != null) sql.append(" and o.startDateTime < " + searchEndDate);
+        if(staffSearch != null) sql.append(" and initiator = '" + staffSearch + "' ");
+        if(searchStartDate != null) sql.append(" and startDateTime > '" + searchStartDate + startDateSuffix + "' ");
+        if(searchEndDate != null) sql.append(" and startDateTime < '" + searchEndDate + endDateSuffix + "' ");
         sql.append(" order by startDateTime desc limit " + pageLimitOffset + " offset " + (selectedPage * pageLimitOffset));
 
         rs = stmt.executeQuery(sql.toString());

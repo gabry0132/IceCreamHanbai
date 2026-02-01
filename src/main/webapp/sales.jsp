@@ -28,6 +28,8 @@
     //検索条件                                      <<<<<<<<<<<<<<<<<<<<<<<unfinished (?)
     String productSearch = request.getParameter("productSearch");
     String staffSearch = request.getParameter("staffSearch");
+    String startDateSuffix = " 00:00:00";
+    String endDateSuffix = " 23:59:59";
     String searchStartDate = request.getParameter("searchStartDate");
     if(searchStartDate != null){
         if(searchStartDate.equals("")) searchStartDate = null;
@@ -66,9 +68,9 @@
         //合計ページ数を取得します。
         sql = "select count(salesID) as count from sales where deleteFlag = 0 ";
         if(productSearch != null) sql += " and s.productID = " + productSearch;
-        if(staffSearch != null) sql += " and s.staffID = " + staffSearch;
-        if(searchStartDate != null) sql += " and s.dateTime > " + searchStartDate;
-        if(searchEndDate != null) sql += " and s.dateTime < " + searchEndDate;
+        if(staffSearch != null) sql += " and s.staffID = '" + staffSearch + "' ";
+        if(searchStartDate != null) sql += " and s.dateTime >= '" + searchStartDate + startDateSuffix + "' ";
+        if(searchEndDate != null) sql += " and s.dateTime <= '" + searchEndDate + endDateSuffix + "' ";
         try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery("select count(salesID) as count from sales where deleteFlag = 0 ")
@@ -84,8 +86,8 @@
         sql = "SELECT p.productID, p.name, p.image, s.salesID, s.dateTime, s.quantity, st.staffID, st.name AS staffName FROM Products p JOIN Sales s ON p.productID = s.productID JOIN Staff st ON s.staffID = st.staffID where s.deleteFlag = 0 ";
         if(productSearch != null) sql += " and s.productID = " + productSearch;
         if(staffSearch != null) sql += " and s.staffID = '" + staffSearch + "' ";
-        if(searchStartDate != null) sql += " and s.dateTime > '" + searchStartDate + "' ";
-        if(searchEndDate != null) sql += " and s.dateTime < '" + searchEndDate + "' ";
+        if(searchStartDate != null) sql += " and s.dateTime >= '" + searchStartDate + startDateSuffix + "' ";
+        if(searchEndDate != null) sql += " and s.dateTime <= '" + searchEndDate + endDateSuffix + "' ";
         sql += " order by dateTime desc limit " + pageLimitOffset + " offset " + (selectedPage * pageLimitOffset);
 
         //-----売上一覧-----
