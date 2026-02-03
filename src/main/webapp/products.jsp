@@ -7,15 +7,14 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
-//    String logout = request.getParameter("logout");
-//    if(logout != null){
-//        session.removeAttribute("userID");
-//    }
-//    String userID = (String) session.getAttribute("userID");
-//
-//    if(userID != null){
-//        response.sendRedirect("main.jsp");
-//    }
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
     //検索条件
     String searchName = request.getParameter("searchName");

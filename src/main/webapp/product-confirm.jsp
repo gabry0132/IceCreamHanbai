@@ -15,6 +15,15 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
+
     String registerType = request.getParameter("registerType");
 
     //修正と削除の場合のパラメータ
@@ -140,6 +149,8 @@
         }
         else if(registerType.equals("detailsUpdate")){
 
+            if(!isAdmin) throw new Exception("管理者権限が必要です。");
+
             sql.append("select name, purchaseCost, price, image from products where productID = ");
             sql.append(productID);
 
@@ -233,6 +244,8 @@
         }
         else if(registerType.equals("alertUpdate")){
 
+            if(!isAdmin) throw new Exception("管理者権限が必要です。");
+
             sql.append("select name, alertNumber, autoOrderLimit, autoOrderQuantity, unitPerBox, image from products where productID = ");
             sql.append(productID);
 
@@ -251,6 +264,8 @@
 
         }
         else if(registerType.equals("delete")){
+
+            if(!isAdmin) throw new Exception("管理者権限が必要です。");
 
             sql.append("select name, quantity, image from products ");
             sql.append("where deleteFlag = 0 and productID = ");

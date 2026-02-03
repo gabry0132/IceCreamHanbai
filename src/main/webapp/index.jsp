@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.net.URLEncoder" %>
 <%
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
@@ -25,6 +26,7 @@
 
     if(logout != null){
         session.removeAttribute("staffID");
+        session.removeAttribute("staffName");
         session.removeAttribute("isAdmin");
     }
 
@@ -37,10 +39,11 @@
             stmt = con.createStatement();
 
             sql = new StringBuffer();
-            sql.append("select staffID, password, adminFlag from  staff ");
+            sql.append("select staffID, name, password, adminFlag from  staff ");
             sql.append("where staffID = '");
             sql.append(staffID);
             sql.append("' ");
+            sql.append(" and quitFlag = 0 and deleteFlag = 0 ");
 
             rs = stmt.executeQuery(sql.toString());
 
@@ -48,8 +51,9 @@
 
                 if(staffID.equals(rs.getString("staffID")) && pass.equals(rs.getString("password"))){
                     // ログイン成功
-//                    session.setMaxInactiveInterval(300);
+                    session.setMaxInactiveInterval(600000);
                     session.setAttribute("staffID", staffID);
+                    session.setAttribute("staffName", rs.getString("name"));
                     if(rs.getInt("adminFlag") == 1){
                         session.setAttribute("isAdmin", true);
                     } else {
@@ -57,22 +61,17 @@
                     }
 
                     response.sendRedirect("main.jsp");
-                    return; // ここで処理終了
+                    return;
 
                 } else {
                     // ログイン失敗
-                    request.setAttribute("errorMsg", "社員番号またはパスワードが違います。");
-                    RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-                    rd.forward(request, response);
+                    response.sendRedirect("error.jsp?errorMsg=" + URLEncoder.encode("社員番号またはパスワードが違います。", "UTF-8"));
                     return;
-
                 }
 
             } else {
                 // ログイン失敗
-                request.setAttribute("errorMsg", "社員番号またはパスワードが違います。");
-                RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-                rd.forward(request, response);
+                response.sendRedirect("error.jsp?errorMsg=" + URLEncoder.encode("社員番号またはパスワードが違います。", "UTF-8"));
                 return;
             }
 
@@ -115,7 +114,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>ログイン画面</title>
-    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
 
 </head>
 
@@ -123,7 +122,7 @@
 
 <h1>ログイン画面</h1>
 
-<form action="login.jsp" method="post">
+<form action="index.jsp" method="post">
     <div id="login-container">
         <div id="syainbangou">
             <p class="login-text">社員番号　</p>
@@ -137,8 +136,8 @@
     </div>
 
     <div id="button-container">
-        <button type="reset">クリア</button>
-        <button>ログイン</button>
+        <button class="normal-button" type="reset">クリア</button>
+        <button class="normal-button">ログイン</button>
     </div>
 </form>
 

@@ -2,19 +2,23 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.HashMap"%>
 <%@ page import="java.util.ArrayList"%>
+<%@ page import="java.net.URLEncoder" %>
 <%
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
-//    String logout = request.getParameter("logout");
-//    if(logout != null){
-//        session.removeAttribute("userID");
-//    }
-//    String userID = (String) session.getAttribute("userID");
-//
-//    if(userID != null){
-//        response.sendRedirect("main.jsp");
-//    }
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
+    if(!isAdmin){
+        response.sendRedirect("error.jsp?errorMsg=" + URLEncoder.encode("管理者権限が必要です。", "UTF-8"));
+        return;
+    }
 
     //検索条件
     String receivedName = request.getParameter("searchName");
@@ -57,8 +61,8 @@
         sql.append("where deleteFlag = 0 ");
         if(receivedName != null) sql.append(" and name like '%" + receivedName + "%' ");
         if(receivedID != null) sql.append(" and staffID = '" + receivedID + "' ");
-        if(includeQuit == null) sql.append("  and quitFlag = 0 order by adminFlag ");
-        else sql.append(" order by adminFlag, quitFlag ");
+        if(includeQuit == null) sql.append("  and quitFlag = 0 ");
+        else sql.append(" order by adminFlag desc ");
         rs = stmt.executeQuery(sql.toString());
 
         while(rs.next()){
@@ -241,14 +245,14 @@
                 <form action="staff-confirm.jsp" method="post">
                     <input type="hidden" name="registerType" value="quit">
                     <input type="hidden" name="quit_name" id="staffName-toQuit">
-                    <input type="hidden" name="staffID" id="staffID-toQuit">
+                    <input type="hidden" name="quit_staffID" id="staffID-toQuit">
                     <button class="delete-button">退職確定</button>
                 </form>
 
                 <form action="staff-confirm.jsp" method="post">
                     <input type="hidden" name="registerType" value="delete">
                     <input type="hidden" name="delete_name" id="staffName-toDelete">
-                    <input type="hidden" name="staffID" id="staffID-toDelete">
+                    <input type="hidden" name="delete_staffID" id="staffID-toDelete">
                     <button class="delete-button">アカウント削除</button>
                 </form>
 
@@ -302,7 +306,7 @@
                 <button class="normal-button cancel-popup" type="button" onclick="close_all_popups()">キャンセル</button>
 
                 <input type="hidden" name="registerType" value="change">
-                <input type="hidden" name="staffID" id="staffID-hidden">
+                <input type="hidden" name="change_staffID" id="staffID-hidden">
 
                 <button class="submit">修正</button>
             </div>

@@ -6,10 +6,14 @@
   request.setCharacterEncoding("UTF-8");
   response.setCharacterEncoding("UTF-8");
 
-  //    String staffID = session.getAttribute("staffID");
-//    String staffID = session.getAttribute("staffName");
-  String staffID = "00";      //仮にシステムの登録だとします
-  String staffName = "システム";      //仮にシステムの登録だとします
+  //セッション管理
+  String staffID = (String) session.getAttribute("staffID");
+  if(staffID == null){
+    response.sendRedirect("index.jsp");
+    return;
+  }
+  String staffName = (String) session.getAttribute("staffName");
+  boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
   String registerType = request.getParameter("registerType");
 

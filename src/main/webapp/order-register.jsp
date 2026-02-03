@@ -6,10 +6,14 @@
   request.setCharacterEncoding("UTF-8");
   response.setCharacterEncoding("UTF-8");
 
-  //    String staffID = session.getAttribute("staffID");
-//    String staffID = session.getAttribute("staffName");
-  String staffID = "00";      //仮にシステムの登録だとします
-  String staffName = "システム";      //仮にシステムの登録だとします
+  //セッション管理
+  String staffID = (String) session.getAttribute("staffID");
+  if(staffID == null){
+    response.sendRedirect("index.jsp");
+    return;
+  }
+  String staffName = (String) session.getAttribute("staffName");
+  boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
   String registerType = request.getParameter("registerType");
   String logtypeIDforOrders = null;   //ログに使います
@@ -83,8 +87,9 @@
         throw new Exception("発注開始のログ登録処理が失敗しました。");
       }
 
-
     } else if (registerType.equals("stop")) {
+
+      if(!isAdmin) throw new Exception("管理者権限が必要です。");
 
       //発注を停止してもmain.jspに戻った時に自動発注されないように、
       //いわゆる「自動発注」を停止しようとしているユーザーに関しては

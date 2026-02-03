@@ -12,10 +12,14 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
-    //    String staffID = session.getAttribute("staffID");
-//    String staffID = session.getAttribute("staffName");
-    String staffID = "00";      //仮にシステムの登録だとします
-    String staffName = "システム";      //仮にシステムの登録だとします
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
     String registerType = request.getParameter("registerType");
 
@@ -162,6 +166,8 @@
             }
         } else if(registerType.equals("edit")){
 
+            if(!isAdmin) throw new Exception("管理者権限が必要。");
+
             //修正の場合は数量のチェックを行いません。このまま数量の差を反映させます。負数になる可能性があります。
             int registeredQuantity = 0;
             int registeredSaleQuantity = 0;
@@ -238,6 +244,9 @@
             }
 
         } else if(registerType.equals("delete")){
+
+            if(!isAdmin) throw new Exception("管理者権限が必要。");
+
             int quantityToReturn = 0;
             int currentQuantity = 0;
 

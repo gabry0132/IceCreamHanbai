@@ -8,6 +8,15 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
+
     String productID = request.getParameter("productID");
     String previousPage = request.getParameter("previousPage");
     if(previousPage == null) previousPage = "products.jsp"; //検索条件を無視する？
@@ -194,8 +203,11 @@
 
     <div id="everything-wrapper">
 
-        <!--商品名の長さが予測できないのでタイトルに入れないほうがいい-->
-        <h1>商品詳細データ</h1>
+<%--        <h1>商品詳細データ</h1>--%>
+        <div id="top-text-holder">
+            <h1>商品詳細データ</h1>
+            <%if(isAdmin){%><span>管理者モード</span><%}%>
+        </div>
 
         <div id="main-section-wrapper">
 
@@ -300,11 +312,11 @@
                 <button class="normal-button">売上データ<br>確認</button>
             </form>
 
-            <button class="normal-button" id="btn-alertUpdate">アラート・自動発注<br>設定変更</button>
+            <button class="normal-button" id="btn-alertUpdate" <%if(!isAdmin){%>disabled<%}%>>アラート・自動発注<br>設定変更</button>
     
-            <button class="normal-button" id="btn-update-details">商品情報<br>変更</button>
+            <button class="normal-button" id="btn-update-details" <%if(!isAdmin){%>disabled<%}%>>商品情報<br>変更</button>
 
-            <button class="delete-button" id="btn-delete">商品削除</button>
+            <button class="delete-button" id="btn-delete" <%if(!isAdmin){%>disabled<%}%>>商品削除</button>
             
         </div>
         

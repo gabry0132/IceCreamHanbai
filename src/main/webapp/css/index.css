@@ -29,11 +29,10 @@ p.login-text{
     
 }
 div#button-container{
+    width: 40%;
     display: flex;
-    margin: auto;
-    width: fit-content;
-    padding-left: 20%;
-    
+    margin: 30px auto;
+    justify-content: space-evenly;
 }
 
 button.normal-button{

@@ -2,11 +2,18 @@
 <%@ page import="java.sql.*" %>
 <%
 
-	//session stuff
-
     //文字コードの指定
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
+
+	//セッション管理
+	String staffID = (String) session.getAttribute("staffID");
+	if(staffID == null){
+		response.sendRedirect("index.jsp");
+		return;
+	}
+	String staffName = (String) session.getAttribute("staffName");
+	boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
 %>
 <!DOCTYPE html>

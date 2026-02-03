@@ -1,16 +1,28 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.net.URLEncoder" %>
 <%
-    //Button押す→Confirm以上の社員データを追加していいですか？→Register　人事追加は成功しました
-    //ここではooの処理が成功したの画面、それでバックエンド側データベースの処理
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
+
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
+    if(!isAdmin){
+        response.sendRedirect("error.jsp?errorMsg=" + URLEncoder.encode("管理者権限が必要です。", "UTF-8"));
+        return;
+    }
 
     //削除・修正・追加の確認画面と操作完了提示画面を分けるためのflag
     String registerType = request.getParameter("registerType");
 
-    //修正・削除の場合のパラメータ
-    String staffID = request.getParameter("staffID");
+    //修正・削除・退職の場合のパラメータ
+    String targetStaffID = request.getParameter("targetStaffID");
     //修正から取得のデータ
     String changed_staff_name = request.getParameter("changed_staff_name");
     String changed_staff_password = request.getParameter("changed_staff_password");
@@ -102,7 +114,7 @@
             sql.append("', address ='");
             sql.append(changed_staff_address);
             sql.append("' where staffID= '");
-            sql.append(staffID);
+            sql.append(targetStaffID);
             sql.append("'");
             //System.out.println(sql.toString());
             updatedRows = stmt.executeUpdate(sql.toString());
@@ -127,7 +139,7 @@
 
         } else if (registerType.equals("delete")) {
             sql.append("update staff set deleteFlag = 1 where staffID= ");
-            sql.append(staffID);
+            sql.append(targetStaffID);
             //System.out.println(sql.toString());
             updatedRows = stmt.executeUpdate(sql.toString());
 
@@ -151,7 +163,7 @@
 
         } else if (registerType.equals("quit")) {
             sql.append("update staff set quitFlag = 1 where staffID= ");
-            sql.append(staffID);
+            sql.append(targetStaffID);
             //System.out.println(sql.toString());
             updatedRows = stmt.executeUpdate(sql.toString());
             //取得したデータを繰り返し処理を表示する

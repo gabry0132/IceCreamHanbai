@@ -7,21 +7,14 @@
   request.setCharacterEncoding("UTF-8");
   response.setCharacterEncoding("UTF-8");
 
-//    String logout = request.getParameter("logout");
-//    if(logout != null){
-//        session.removeAttribute("userID");
-//    }
-
-//    String staffID = (String) session.getAttribute("staffID");
-//
-//    if(staffID != null){
-//        response.sendRedirect("index.jsp");
-//    }
-
-//  boolean isAdmin = (boolean) session.getAttribute("isAdmin");
-  String staffID = "00";      //仮にシステムの登録だとします
-  String staffName = "システム";      //仮にシステムの登録だとします
-  boolean isAdmin = true; //fix this
+  //セッション管理
+  String staffID = (String) session.getAttribute("staffID");
+  if(staffID == null){
+    response.sendRedirect("index.jsp");
+    return;
+  }
+  String staffName = (String) session.getAttribute("staffName");
+  boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
   Connection con = null;
   Statement stmt = null;
@@ -259,10 +252,10 @@
     <form action="sales.jsp" method="post">
       <button class="normal-button">売上管理</button>
     </form>
+    <form action="orders.jsp" method="post">
+      <button class="normal-button">発注管理</button>
+    </form>
     <% if(isAdmin){ %>
-      <form action="orders.jsp" method="post">
-        <button class="normal-button">発注管理</button>
-      </form>
       <form action="system-menu.jsp" method="post">
         <button class="normal-button">システム管理</button>
       </form>

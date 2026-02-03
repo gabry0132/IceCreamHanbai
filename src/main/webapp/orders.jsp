@@ -9,12 +9,14 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
-//    String staffID = session.getAttribute("staffID");
-//    String staffName = session.getAttribute("staffName");
-//    String isAdmin = session.getAttribute("isAdmin");
-    String staffID = "00";      //仮にシステムの登録だとします
-    String staffName = "システム";      //仮にシステムの登録だとします
-    boolean isAdmin = true;
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
     //商品詳細ページから来た場合：
     String startFromProductID = request.getParameter("startFromProductID");
@@ -353,10 +355,9 @@
                     </a>
                     <p class="order-text"><%if(ordersList.get(i).get("orderStatus").equals("stopped")){%><s><%}%><b><%= ordersList.get(i).get("startDateTime") %></b>に <a href="product-details.jsp?productID=<%=ordersList.get(i).get("productID")%>&previousPage=orders.jsp" class="product-name-anchor"><%= ordersList.get(i).get("productName") %></a>が <%= ordersList.get(i).get("quantityBoxes") %>箱 （<%=ordersList.get(i).get("quantityUnits")%>個） 発注されました。(<%= ordersList.get(i).get("staffName") %>より)<%if(ordersList.get(i).get("orderStatus").equals("stopped")){%></s><%}%></p>
                 </div>
-                <% if(isAdmin){ %>
                 <div class="order-status-box">
                     <p class="orderStatusText"><%=ordersList.get(i).get("orderStatusJap")%></p>
-                    <% if(ordersList.get(i).get("orderStatus").equals("confirming") && isAdmin){ %>
+                    <% if(isAdmin && ordersList.get(i).get("orderStatus").equals("confirming")){ %>
                         <form action="order-confirm.jsp" method="post" id="stopOrder-form">
                             <input type="hidden" name="stopOrderID" value="<%=ordersList.get(i).get("orderID")%>">
                             <input type="hidden" name="registerType" value="stop">
@@ -364,7 +365,6 @@
                         </form>
                     <% } %>
                 </div>
-                <% } %>
             </div>
             <%
                     }

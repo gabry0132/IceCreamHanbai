@@ -5,9 +5,9 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
-    String errorMsg = (String)request.getAttribute("errorMsg");
-    if (errorMsg == null) {
-        errorMsg = "エラーが発生しました。";
+    String errorMsg = "エラーが発生しました。";
+    if (request.getParameter("errorMsg") != null) {
+        errorMsg = (String)request.getParameter("errorMsg");
     }
 %>
 <!DOCTYPE html>
@@ -26,7 +26,7 @@
     <p>
         <%= errorMsg %>
     </p>
-    <form action="index.jsp" method="post">
+    <form action="main.jsp" method="post">
         <button class="normal-button">
             トップページへ戻る
         </button>

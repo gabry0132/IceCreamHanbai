@@ -7,9 +7,14 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
-    String staffID = "00";      //仮にシステムの登録だとします
-    String staffName = "システム";      //仮にシステムの登録だとします
-    boolean isAdmin = true;
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
     String registerType = request.getParameter("registerType");
     String previousPage = request.getParameter("previousPage");
@@ -142,6 +147,8 @@
             }
 
         } else if (registerType.equals("detailsUpdate")){
+
+            if(!isAdmin) throw new Exception("管理者権限が必要です。");
 
             //動的にしてみたら複雑なので一つ一つ自分のクエリにします。
             if(productName != null) {
@@ -287,6 +294,8 @@
 
         } else if (registerType.equals("alertUpdate")) {
 
+            if(!isAdmin) throw new Exception("管理者権限が必要です。");
+
             sql.append("update products set alertNumber = ");
             sql.append(alertNumber);
             sql.append(", autoOrderLimit = ");
@@ -317,6 +326,8 @@
             }
 
         } else if (registerType.equals("delete")) {
+
+            if(!isAdmin) throw new Exception("管理者権限が必要です。");
 
             int quantity = 0;
 
@@ -369,6 +380,7 @@
                 throw new Exception("商品の削除が失敗しました。");
             }
 
+            //ログに登録します
             sql = new StringBuffer();
             sql.append("insert into logs (logtypeID, text, productID) value (");
             sql.append(logtypeIDforProducts);

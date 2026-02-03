@@ -2,9 +2,23 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="java.net.URLEncoder" %>
 <%
   request.setCharacterEncoding("UTF-8");
   response.setCharacterEncoding("UTF-8");
+
+ //セッション管理
+  String staffID = (String) session.getAttribute("staffID");
+  if(staffID == null){
+    response.sendRedirect("index.jsp");
+    return;
+  }
+  String staffName = (String) session.getAttribute("staffName");
+  boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
+  if(!isAdmin){
+    response.sendRedirect("error.jsp?errorMsg=" + URLEncoder.encode("管理者権限が必要です。", "UTF-8"));
+    return;
+  }
 
   String activityType = request.getParameter("activityType"); //検索条件にもなります
   if(activityType == null) activityType = "すべて";

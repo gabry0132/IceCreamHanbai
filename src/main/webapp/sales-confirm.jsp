@@ -5,10 +5,14 @@
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
 
-    //    String staffID = session.getAttribute("staffID");
-//    String staffID = session.getAttribute("staffName");
-    String staffID = "00";      //仮にシステムの登録だとします
-    String staffName = "システム";      //仮にシステムの登録だとします
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
 
     String registerType = request.getParameter("registerType");
 
@@ -90,6 +94,9 @@
         }
 
         if(registerType.equals("edit")){
+
+            if(!isAdmin) throw new Exception("管理者権限が必要。");
+
             sql = new StringBuffer();
             sql.append("select name from staff ");
             sql.append("where staffID = ");
@@ -102,6 +109,9 @@
                 throw new Exception("対象の商品が見つかりませんでした。");
             }
         }else if(registerType.equals("delete")){
+
+            if(!isAdmin) throw new Exception("管理者権限が必要。");
+
             sql = new StringBuffer();
             sql.append("select quantity from sales where salesID = ");
             sql.append(saleID);

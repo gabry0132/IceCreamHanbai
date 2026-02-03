@@ -1,20 +1,35 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.net.URLEncoder" %>
 <%
-    //Button押す→Confirm以上の社員データを追加していいですか？→Register　人事追加は成功しました
-    //ここでは追加してもいいですかの処理、社員IDと初期パスポートの生成はこちら
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
+
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
+    if(!isAdmin){
+        response.sendRedirect("error.jsp?errorMsg=" + URLEncoder.encode("管理者権限が必要です。", "UTF-8"));
+        return;
+    }
+
     String registerType = request.getParameter("registerType");
 
     //削除の場合のパラメータ
-    String staffID = request.getParameter("staffID");
+    String deleteStaffID = request.getParameter("delete_staffID");
     String deleteStaffName = request.getParameter("delete_name");
     
     //退職のパラメータ
+    String quitStaffID = request.getParameter("quit_staffID");
     String quitStaffName = request.getParameter("quit_name");
 
     //修正の場合のパラメータ
+    String changeStaffID = request.getParameter("change_staffID");
     String changed_staff_name = request.getParameter("name_change");
     String changed_staff_password = request.getParameter("password_change");
     String changed_staff_tel = request.getParameter("phone_change");
@@ -200,7 +215,7 @@
                 </tr>
                 <tr>
                     <td>人事ID</td>
-                    <td><%=staffID%></td>
+                    <td><%=changeStaffID%></td>
                 </tr>
                 <tr>
                     <td>パスワード</td>
@@ -222,7 +237,7 @@
                 <form action="staff-register.jsp" method="post">
 
                     <input type="hidden" name="registerType" value="change">
-                    <input type="hidden" name="staffID" value="<%= staffID %>">
+                    <input type="hidden" name="targetStaffID" value="<%=changeStaffID%>">
                     <input type="hidden" name="changed_staff_name" value="<%=changed_staff_name%>">
                     <input type="hidden" name="changed_staff_password" value="<%=changed_staff_password%>">
                     <input type="hidden" name="changed_staff_tel" value="<%=changed_staff_tel%>">
@@ -241,7 +256,7 @@
                 </tr>
                 <tr>
                     <td>人事ID</td>
-                    <td><%=staffID%></td>
+                    <td><%=deleteStaffID%></td>
                 </tr>
             </table>
             <div class="button-group">
@@ -251,7 +266,7 @@
                 <form action="staff-register.jsp" method="post">
                     <input type="hidden" name="registerType" value="delete">
                     <input type="hidden" name="name" value="<%=deleteStaffName%>">
-                    <input type="hidden" name="staffID" value="<%=staffID%>">
+                    <input type="hidden" name="targetStaffID" value="<%=deleteStaffID%>">
                     <button class="normal-button">削除</button>
                 </form>
             </div>
@@ -266,7 +281,7 @@
                 </tr>
                 <tr>
                     <td>人事ID</td>
-                    <td><%=staffID%></td>
+                    <td><%=quitStaffID%></td>
                 </tr>
             </table>
             <div class="button-group">
@@ -276,7 +291,7 @@
                 <form action="staff-register.jsp" method="post">
                     <input type="hidden" name="registerType" value="quit">
                     <input type="hidden" name="name" value="<%=quitStaffName%>">
-                    <input type="hidden" name="staffID" value="<%=staffID%>">
+                    <input type="hidden" name="targetStaffID" value="<%=quitStaffID%>">
                     <button class="normal-button">退職を確定する</button>
                 </form>
             </div>

@@ -2,9 +2,23 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="java.net.URLEncoder" %>
 <%
     request.setCharacterEncoding("UTF-8");
     response.setCharacterEncoding("UTF-8");
+
+    //セッション管理
+    String staffID = (String) session.getAttribute("staffID");
+    if(staffID == null){
+        response.sendRedirect("index.jsp");
+        return;
+    }
+    String staffName = (String) session.getAttribute("staffName");
+    boolean isAdmin = session.getAttribute("isAdmin") == null ? false : (boolean) session.getAttribute("isAdmin");
+    if(!isAdmin){
+        response.sendRedirect("error.jsp?errorMsg=" + URLEncoder.encode("管理者権限が必要です。", "UTF-8"));
+        return;
+    }
 
     String tag = request.getParameter("tag");
     String tagTypeID = request.getParameter("tagTypeID");
@@ -34,12 +48,26 @@
     //追加と削除のチェックに使う
     int updatedRows = 0;
     boolean alreadyExisting = false;
+    String logtypeIDforNotices = null;
 
     try {
         //オブジェクトの代入
         Class.forName(driver).newInstance();
         con = DriverManager.getConnection(url, user, password);
         stmt = con.createStatement();
+
+        //登録・削除が必要だったらログのためにログタイプを取得します
+        if(tag != null || tagToDeleteID != null){
+            sql = new StringBuffer();
+            sql.append("select logtypeID from logtypes where type='お知らせ'");
+            rs = stmt.executeQuery(sql.toString());
+
+            if(rs.next()){
+                logtypeIDforNotices = rs.getString("logtypeID");
+            } else {
+                throw new Exception("お知らせログタイプIDの取得が失敗しました。");
+            }
+        }
 
         //新しいタグを登録する場合
         if(tag != null){
@@ -64,14 +92,26 @@
                 sql.append(", '");
                 sql.append(tag);
                 sql.append("')");
-    //            System.out.println(sql.toString());
 
                 updatedRows += stmt.executeUpdate(sql.toString());
 
                 if(updatedRows == 0){
-                    ermsg = new StringBuffer();
-                    ermsg.append("追加が失敗しました。");
+                    throw new Exception("追加が失敗しました。");
                 }
+
+                //ログに登録します
+                sql = new StringBuffer();
+                sql.append("insert into logs (logtypeID, text) value (");
+                sql.append(logtypeIDforNotices);
+                sql.append(",'");
+                sql.append("タグ " + tag + " が " + staffName + " により 追加されました。");
+                sql.append("')");
+
+                updatedRows = stmt.executeUpdate(sql.toString());
+                if (updatedRows == 0) {
+                    throw new Exception("タグ追加ログ登録処理が失敗しました。");
+                }
+
             }
         }
 
@@ -84,11 +124,22 @@
             updatedRows += stmt.executeUpdate(sql.toString());
 
             if(updatedRows == 0){
-                ermsg = new StringBuffer();
-                ermsg.append("削除が失敗しました。");
+                throw new Exception("削除が失敗しました。");
+            }
+
+            //ログに登録します
+            sql = new StringBuffer();
+            sql.append("insert into logs (logtypeID, text) value (");
+            sql.append(logtypeIDforNotices);
+            sql.append(",'");
+            sql.append("タグID: " + tagToDeleteID + " が " + staffName + " により 削除されました。");
+            sql.append("')");
+
+            updatedRows = stmt.executeUpdate(sql.toString());
+            if (updatedRows == 0) {
+                throw new Exception("タグ削除ログ登録処理が失敗しました。");
             }
         }
-
 
         sql = new StringBuffer();
         sql.append("select tagID, value, type, tagtypes.tagTypeID from tags inner join tagtypes on tags.tagtypeID = tagtypes.tagtypeID where tags.deleteFlag=0");
@@ -103,6 +154,7 @@
             for (int i = 0; i < tagtypes.size(); i++) {
                 if(tagtypes.get(i).get("type").equals(rs.getString("type"))){
                     newType = false;
+                    break;
                 }
             }
             if(newType){
